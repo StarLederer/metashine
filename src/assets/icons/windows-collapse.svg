@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-2250,0)">
+        <g id="icon-windows-collapse" transform="matrix(0.416667,0,0,0.625,2250,0)">
+            <g clip-path="url(#_clip1)">
+                <g transform="matrix(1.92,0,0,1.6,-4200,0)">
+                    <g id="icon-windows-collapse1" serif:id="icon-windows-collapse">
+                        <path d="M2750,200C2784.49,200 2812.5,222.404 2812.5,250C2812.5,277.596 2784.49,300 2750,300L2250,300C2215.51,300 2187.5,277.596 2187.5,250C2187.5,222.404 2215.51,200 2250,200L2750,200Z"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,85 @@
+#files-section {
+	background: #f8f8f8;
+}
+
+/* window controls */
+#window-controls {
+	display: flex;
+}
+
+#window-controls button {
+	width: 2rem;
+	height: 2rem;
+
+	font-size: 0.75em;
+
+	margin-left: 1em;
+
+	border-radius: 1rem;
+}
+
+#window-controls button:hover {
+	background: rgba(0, 0, 0, 0.1);
+}
+
+button#window-control-close:hover {
+	color: #e81123;
+}
+
+/* files section */
+#files-section main::before {
+	content: "";
+	width: calc(100% - 4em);
+	height: 1px;
+	background: rgba(0, 0, 0, 0.0625);
+	margin: 0 auto;
+	position: absolute;
+	left: 0;
+	right: 0;
+	display: block;
+}
+
+/* file list */
+#file-list {
+	height: calc(100vh - 6rem);
+
+	padding: 2rem;
+	padding-right: 0.625rem;
+	margin-right: 0.625rem;
+
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+.file-card {
+	height: 2rem;
+
+	display: flex;
+	align-items: center;
+
+	cursor: pointer;
+
+	transition: 200ms ease-in-out;
+}
+
+.file-card:last-child {
+	margin-bottom: 0;
+}
+
+.file-card span {
+	font-size: 0.75rem;
+
+	opacity: 0.7;
+
+	transition: 200ms ease-in-out;
+}
+
+.file-card:hover {
+	background: rgba(0, 0, 0, 0.0625);
+	transition: 50ms ease-out;
+}
+
+.file-card:hover span {
+	margin-left: 1rem;
+	transition: 50ms ease-out;
+}

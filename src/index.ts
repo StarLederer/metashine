@@ -8,12 +8,15 @@ if (require("electron-squirrel-startup")) {
 	app.quit();
 }
 
+let mainWindow: BrowserWindow;
+
 const createWindow = (): void => {
 	// Create the browser window.
-	const mainWindow = new BrowserWindow({
-		height: 600,
+	mainWindow = new BrowserWindow({
+		height: 1200,
 		width: 1000,
-		darkTheme: true,
+		frame: false,
+		icon: "./src/assets/app-icon.png",
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
@@ -24,7 +27,7 @@ const createWindow = (): void => {
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools();
+	//mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -53,3 +56,14 @@ app.on("activate", () => {
 ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 	if (file.name.toLowerCase().endsWith(".mp3")) event.sender.send("file-approved", file);
 });
+
+// window controls
+ipcMain.on("window-collapse", (event: IpcMainEvent) => mainWindow.minimize());
+ipcMain.on("window-toggle-size", (event: IpcMainEvent) => {
+	if (!mainWindow.isMaximized()) {
+		mainWindow.maximize();
+	} else {
+		mainWindow.unmaximize();
+	}
+});
+ipcMain.on("window-close", (event: IpcMainEvent) => mainWindow.close());

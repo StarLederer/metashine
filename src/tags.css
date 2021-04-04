@@ -1,0 +1,84 @@
+#tags-section {
+	background: #ffffff;
+}
+
+#tags-save {
+	width: 6rem;
+	height: 2rem;
+
+	background: #000000;
+	color: #ffffff;
+
+	font-weight: 700;
+	font-size: 0.75em;
+
+	border-radius: 1rem;
+}
+
+#tags-section header #tags-save:hover {
+	background: #571be5;
+	color: #ffffff;
+}
+
+/* fileds */
+.tag-edit-field {
+	transition: 500ms;
+}
+
+.tag-edit-field::before {
+	content: "";
+	width: 100%;
+	height: 1px;
+	background: rgba(0, 0, 0, 0.0625);
+	position: absolute;
+	display: block;
+}
+
+.tag-edit-field label,
+.tag-edit-field span {
+	font-size: 0.75em;
+
+	opacity: 0.5;
+
+	display: block;
+	top: 2rem;
+	margin: 0 2rem;
+}
+
+.tag-edit-field input {
+	width: 100%;
+	height: 2rem;
+
+	font-size: 1em;
+	font-weight: 700;
+
+	opacity: 0.87;
+
+	padding: 0 2rem;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+}
+
+.tag-edit-field input::placeholder {
+	color: #000;
+	opacity: 0.5;
+}
+
+#album-art-field {
+	padding-bottom: 4rem;
+}
+
+#album-art-input {
+	width: 20rem;
+	height: 20rem;
+
+	background: rgba(0, 0, 0, 0.125);
+
+	margin: 0 2rem;
+	margin-top: 4rem;
+}
+
+/* tag field hover */
+.tag-edit-field:hover {
+	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.0625);
+}
