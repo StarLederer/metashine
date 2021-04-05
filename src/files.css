@@ -27,16 +27,9 @@ button#window-control-close:hover {
 }
 
 /* files section */
-#files-section main::before {
-	content: "";
+#files-section header::after {
 	width: calc(100% - 4em);
-	height: 1px;
-	background: rgba(0, 0, 0, 0.0625);
 	margin: 0 auto;
-	position: absolute;
-	left: 0;
-	right: 0;
-	display: block;
 }
 
 /* file list */
@@ -52,7 +45,7 @@ button#window-control-close:hover {
 }
 
 .file-card {
-	height: 2rem;
+	height: 1.5rem;
 
 	display: flex;
 	align-items: center;
@@ -68,6 +61,7 @@ button#window-control-close:hover {
 
 .file-card span {
 	font-size: 0.75rem;
+	white-space: nowrap;
 
 	opacity: 0.7;
 
@@ -75,7 +69,7 @@ button#window-control-close:hover {
 }
 
 .file-card:hover {
-	background: rgba(0, 0, 0, 0.0625);
+	background: rgba(0, 0, 0, 0.05);
 	transition: 50ms ease-out;
 }
 
