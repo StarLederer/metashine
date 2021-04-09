@@ -64,8 +64,10 @@ ui.windowControls.close.on("click", (e) => {
 ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
 	console.log("adding file " + file.name + "...");
 	ui.fileList.append(`
-        <div class="file-card">
-            <span>${file.name}</span>
+        <div class="row">
+            <div class="col">${file.name}</div>
+			<div class="col">${file.type}</div>
+			<div class="col">${file.location}</div>
         </div>
     `);
 });

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, IpcMain, ipcMain, IpcRendererEvent } from "electron";
 import { IpcMainEvent } from "electron/main";
+import path from "path";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -54,7 +55,17 @@ app.on("activate", () => {
 
 // Event handler for asynchronous incoming messages
 ipcMain.on("file-received", (event: IpcMainEvent, file) => {
-	if (file.name.toLowerCase().endsWith(".mp3")) event.sender.send("file-approved", file);
+	let outFile = {
+		name: path.basename(file.path, path.extname(file.path)),
+		type: path.extname(file.path.toLowerCase()).substring(1),
+		location: path.dirname(file.path),
+	};
+
+	// console.log(outFile.name);
+	// console.log(outFile.type);
+	// console.log(outFile.location);
+
+	if (file.name.endsWith("mp3")) event.sender.send("file-approved", outFile);
 });
 
 // window controls
