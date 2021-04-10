@@ -22,6 +22,7 @@ const ui = {
 		albumTitle: $("#album-title"),
 		albumArtist: $("#album-artist"),
 		year: $("#year"),
+		albumArt: $("#album-art"),
 	},
 	fileList: $("#file-list"),
 };
@@ -101,4 +102,18 @@ ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta) => {
 	ui.tagFileds.albumTitle.val(meta.common.album);
 	ui.tagFileds.albumArtist.val(meta.common.albumartist);
 	ui.tagFileds.year.val(meta.common.year);
+
+	const base64String = _arrayBufferToBase64(meta.common.picture[0].data);
+	console.log(`data:${meta.common.picture[0].format};base64,${base64String}`);
+	ui.tagFileds.albumArt.attr("src", `data:${meta.common.picture[0].format};base64,${base64String}`);
 });
+
+function _arrayBufferToBase64(buffer: Array<number>): string {
+	let binary = "";
+	const bytes = new Uint8Array(buffer);
+	const len = bytes.byteLength;
+	for (let i = 0; i < len; i++) {
+		binary += String.fromCharCode(bytes[i]);
+	}
+	return window.btoa(binary);
+}

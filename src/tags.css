@@ -68,6 +68,7 @@
 	opacity: 0.1;
 }
 
+/* album art */
 #album-art-field {
 	padding-bottom: 4rem;
 }
@@ -101,6 +102,11 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+#album-art-input img {
+	width: 100%;
+	height: 100%;
 }
 
 /* tag field hover */
