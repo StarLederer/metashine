@@ -63,11 +63,20 @@ ui.windowControls.close.on("click", (e) => {
  */
 ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
 	console.log("adding file " + file.name + "...");
-	ui.fileList.append(`
-        <div class="row">
-            <div class="col">${file.name}</div>
-			<div class="col">${file.type}</div>
-			<div class="col">${file.location}</div>
-        </div>
-    `);
+	ui.fileList
+		.append(
+			`
+			<div class="row file-entry">
+				<div class="col">${file.name}</div>
+				<div class="col">${file.type}</div>
+				<div class="col">${file.location}</div>
+			</div>
+			`
+		)
+		.on("click", onFileEntryClicked);
 });
+
+function onFileEntryClicked(e: JQuery.ClickEvent) {
+	$(".file-entry").removeClass("selected");
+	$(e.target).addClass("selected");
+}

@@ -28,20 +28,19 @@ button#window-control-close:hover {
 
 /* files section */
 #files-section header::after {
-	width: calc(100% - 4em);
+	width: calc(100% - 4rem);
 	margin: 0 auto;
 }
 
 /* file list */
 #files-section .table {
+	width: calc(100% - 3rem + 0.125rem);
 	height: 100%;
-
-	padding: 2rem;
 	padding-top: 3rem;
-	padding-right: 0.625rem;
-	margin-right: 0.625rem;
+	padding-right: 1rem;
+	left: 2rem;
 
-	overflow-x: hidden;
+	overflow-x: visible;
 	overflow-y: scroll;
 
 	border: none;
@@ -51,34 +50,57 @@ button#window-control-close:hover {
 	height: 2rem;
 
 	display: grid;
-	grid-template-columns: 500px 50px auto;
+	grid-template-columns: 400px 50px auto;
+	grid-gap: 1rem;
 
 	transition: 50ms ease-in-out;
 }
 
 #files-section .row div {
 	height: 2rem;
-	padding-right: 2rem;
 
-	opacity: 0.7;
+	color: #0008;
 
 	font-size: 0.75rem;
 	white-space: nowrap;
-	overflow: hidden;
 
 	display: flex;
 	align-items: center;
+	overflow: hidden;
+
+	pointer-events: none;
 }
 
-#files-section .row:hover {
-	background: rgba(0, 0, 0, 0.05);
+/* file entries */
+#files-section .row.file-entry div {
+	cursor: pointer;
 }
 
-/* fade */
+#files-section .row.file-entry div {
+	font-weight: 700;
+}
+
+#files-section .row.file-entry:hover div {
+	color: #571be588;
+}
+
+#files-section .row.file-entry.selected {
+	background: #571be508;
+}
+#files-section .row.file-entry.selected div {
+	color: #571be5;
+}
+
+#files-section .row.file-entry:hover {
+	background: #571be511;
+}
+
+/* bottom fade */
 #files-section::after {
 	content: "";
 
-	width: calc(100%);
+	width: 100%;
+	width: 100%;
 	height: 2rem;
 	position: absolute;
 	bottom: 0;
@@ -90,7 +112,8 @@ button#window-control-close:hover {
 
 /* table head */
 #files-section .table-head {
-	width: calc(100% - 18rem);
+	width: calc(100% - 28rem);
+
 	position: fixed;
 	top: 6rem;
 
@@ -101,17 +124,18 @@ button#window-control-close:hover {
 #files-section .table-head::before {
 	content: "";
 
-	width: calc(100% - 10rem);
+	width: calc(100%);
 	height: 4rem;
 	position: absolute;
 
 	background: linear-gradient(180deg, #f8f8f8ff 0%, #f8f8f8ff 50%, #f8f8f800 100%);
+	/* background: red; */
 
 	pointer-events: none;
 }
 
 #files-section .table-head::after {
-	width: calc(100% - 10rem);
+	width: calc(100%);
 }
 
 #files-section .table-head div {
