@@ -60,6 +60,7 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 		name: path.basename(file.path, path.extname(file.path)),
 		type: path.extname(file.path.toLowerCase()).substring(1),
 		location: path.dirname(file.path),
+		path: file.path,
 		meta: {},
 	};
 
@@ -77,6 +78,16 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 				console.error(error.message);
 			});
 	}
+});
+
+ipcMain.on("load-meta", (event: IpcMainEvent, path) => {
+	mm.parseFile(path)
+		.then((value) => {
+			event.sender.send("render-meta", value);
+		})
+		.catch((error) => {
+			console.error(error.message);
+		});
 });
 
 // window controls

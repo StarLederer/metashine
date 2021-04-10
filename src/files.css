@@ -71,6 +71,10 @@ button#window-control-close:hover {
 	pointer-events: none;
 }
 
+#files-section .row div.hidden {
+	display: none;
+}
+
 /* file entries */
 #files-section .row.file-entry div {
 	cursor: pointer;

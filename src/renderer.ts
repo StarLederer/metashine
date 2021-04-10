@@ -5,7 +5,7 @@ import "./files.css";
 import { ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 
-let ui = {
+const ui = {
 	windowControls: {
 		close: $("#window-control-close"),
 		toggleSize: $("#window-control-toggle-size"),
@@ -15,6 +15,14 @@ let ui = {
 		tags: $("#tags-section"),
 		files: $("#files-section"),
 	},
+	tagFileds: {
+		trackTitle: $("#track-title"),
+		trackArtist: $("#track-artist"),
+		trackNumber: $("#track-number"),
+		albumTitle: $("#album-title"),
+		albumArtist: $("#album-artist"),
+		year: $("#year"),
+	},
 	fileList: $("#file-list"),
 };
 
@@ -23,7 +31,7 @@ document.addEventListener("drop", (event) => {
 	event.stopPropagation();
 
 	for (let i = 0; i < event.dataTransfer.files.length; ++i) {
-		let f = event.dataTransfer.files[i];
+		const f = event.dataTransfer.files[i];
 		ipcRenderer.send("file-received", {
 			path: f.path,
 			name: f.name,
@@ -58,26 +66,39 @@ ui.windowControls.close.on("click", (e) => {
 //
 //
 // File UI
-/**
- * @description Adds file entries to the UI.
- */
+
 ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
 	// console.log("adding file " + file.name + "...");
-	console.log(file.meta);
-	ui.fileList
-		.append(
-			`
-			<div class="row file-entry">
-				<div class="col">${file.name}</div>
-				<div class="col">${file.type}</div>
-				<div class="col">${file.location}</div>
-			</div>
-			`
-		)
-		.on("click", onFileEntryClicked);
+
+	const fileEntry = $(`
+						<div class="row file-entry">
+							<div>${file.name}</div>
+							<div>${file.type}</div>
+							<div>${file.location}</div>
+							<div class="hidden">${file.path}</div>
+						</div>
+						`);
+
+	ui.fileList.append(fileEntry);
+	fileEntry.on("click", onFileEntryClicked);
 });
 
 function onFileEntryClicked(e: JQuery.ClickEvent) {
 	$(".file-entry").removeClass("selected");
 	$(e.target).addClass("selected");
+	ipcRenderer.send("load-meta", $(e.target).children().eq(3).text());
 }
+
+/**
+ * @description Puts provided metadata into the tags section
+ */
+ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta) => {
+	console.log(meta);
+
+	ui.tagFileds.trackTitle.val(meta.common.title);
+	ui.tagFileds.trackArtist.val(meta.common.artist);
+	ui.tagFileds.trackNumber.val(meta.common.track.no);
+	ui.tagFileds.albumTitle.val(meta.common.album);
+	ui.tagFileds.albumArtist.val(meta.common.albumartist);
+	ui.tagFileds.year.val(meta.common.year);
+});
