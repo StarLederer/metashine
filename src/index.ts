@@ -1,6 +1,7 @@
 import { app, BrowserWindow, IpcMain, ipcMain, IpcRendererEvent } from "electron";
 import { IpcMainEvent } from "electron/main";
 import path from "path";
+import * as mm from "music-metadata";
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -55,26 +56,36 @@ app.on("activate", () => {
 
 // Event handler for asynchronous incoming messages
 ipcMain.on("file-received", (event: IpcMainEvent, file) => {
-	let outFile = {
+	const outFile = {
 		name: path.basename(file.path, path.extname(file.path)),
 		type: path.extname(file.path.toLowerCase()).substring(1),
 		location: path.dirname(file.path),
+		meta: {},
 	};
 
 	// console.log(outFile.name);
 	// console.log(outFile.type);
 	// console.log(outFile.location);
 
-	if (file.name.endsWith("mp3")) event.sender.send("file-approved", outFile);
+	if (file.name.endsWith("mp3")) {
+		mm.parseFile(file.path)
+			.then((value) => {
+				outFile.meta = value;
+				event.sender.send("file-approved", outFile);
+			})
+			.catch((error) => {
+				console.error(error.message);
+			});
+	}
 });
 
 // window controls
-ipcMain.on("window-collapse", (event: IpcMainEvent) => mainWindow.minimize());
-ipcMain.on("window-toggle-size", (event: IpcMainEvent) => {
+ipcMain.on("window-collapse", () => mainWindow.minimize());
+ipcMain.on("window-toggle-size", () => {
 	if (!mainWindow.isMaximized()) {
 		mainWindow.maximize();
 	} else {
 		mainWindow.unmaximize();
 	}
 });
-ipcMain.on("window-close", (event: IpcMainEvent) => mainWindow.close());
+ipcMain.on("window-close", () => mainWindow.close());

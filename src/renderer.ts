@@ -62,7 +62,8 @@ ui.windowControls.close.on("click", (e) => {
  * @description Adds file entries to the UI.
  */
 ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
-	console.log("adding file " + file.name + "...");
+	// console.log("adding file " + file.name + "...");
+	console.log(file.meta);
 	ui.fileList
 		.append(
 			`
