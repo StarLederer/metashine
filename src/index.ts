@@ -2,7 +2,9 @@ import { app, BrowserWindow, IpcMain, ipcMain, IpcRendererEvent } from "electron
 import { IpcMainEvent } from "electron/main";
 import path from "path";
 import * as mm from "music-metadata";
-declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
+import * as NodeID3 from "node-id3";
+
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -54,7 +56,9 @@ app.on("activate", () => {
 	}
 });
 
-// Event handler for asynchronous incoming messages
+//
+//
+// Files
 ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 	const outFile = {
 		name: path.basename(file.path, path.extname(file.path)),
@@ -80,9 +84,15 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 	}
 });
 
+//
+//
+// Tags
+let currentFilePath: string;
+
 ipcMain.on("load-meta", (event: IpcMainEvent, path) => {
 	mm.parseFile(path)
 		.then((value) => {
+			currentFilePath = path;
 			event.sender.send("render-meta", value);
 		})
 		.catch((error) => {
@@ -90,7 +100,28 @@ ipcMain.on("load-meta", (event: IpcMainEvent, path) => {
 		});
 });
 
-// window controls
+ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
+	const tags: NodeID3.Tags = {
+		title: meta.title,
+		artist: meta.artist,
+		trackNumber: meta.track.no,
+		album: meta.album,
+		performerInfo: meta.albumartist,
+		year: meta.year,
+		// image: "./example/mia_cover.jpg",
+	};
+
+	try {
+		console.log(currentFilePath);
+		NodeID3.update(tags, currentFilePath);
+	} catch (error) {
+		console.error(error);
+	}
+});
+
+//
+//
+// Window controls
 ipcMain.on("window-collapse", () => mainWindow.minimize());
 ipcMain.on("window-toggle-size", () => {
 	if (!mainWindow.isMaximized()) {

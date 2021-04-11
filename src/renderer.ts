@@ -15,6 +15,7 @@ const ui = {
 		tags: $("#tags-section"),
 		files: $("#files-section"),
 	},
+	saveButton: $("#tags-save"),
 	tagFileds: {
 		trackTitle: $("#track-title"),
 		trackArtist: $("#track-artist"),
@@ -66,8 +67,26 @@ ui.windowControls.close.on("click", (e) => {
 
 //
 //
-// File UI
+// Tag UI
+ui.saveButton.on("click", (e) => {
+	e.preventDefault();
+	e.stopPropagation();
 
+	ipcRenderer.send("save-meta", {
+		title: ui.tagFileds.trackTitle.val(),
+		artist: ui.tagFileds.trackArtist.val(),
+		track: {
+			no: ui.tagFileds.trackNumber.val(),
+		},
+		album: ui.tagFileds.albumTitle.val(),
+		albumartist: ui.tagFileds.albumArtist.val(),
+		year: ui.tagFileds.year.val(),
+	});
+});
+
+//
+//
+// File UI
 ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
 	// console.log("adding file " + file.name + "...");
 
