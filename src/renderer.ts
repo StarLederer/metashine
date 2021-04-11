@@ -1,4 +1,3 @@
-import "./assets/mp3-tag-assistant-icons/css/mp3-tag-assistant-icons.css";
 import "./index.css";
 import "./tags.css";
 import "./files.css";
