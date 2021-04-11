@@ -23,7 +23,7 @@ const ui = {
 		albumTitle: $("#album-title"),
 		albumArtist: $("#album-artist"),
 		year: $("#year"),
-		albumArt: $("#album-art"),
+		albumArt: $("#album-art-input"),
 	},
 	fileList: $("#file-list"),
 };
@@ -113,8 +113,6 @@ function onFileEntryClicked(e: JQuery.ClickEvent) {
  * @description Puts provided metadata into the tags section
  */
 ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta) => {
-	console.log(meta);
-
 	ui.tagFileds.trackTitle.val(meta.common.title);
 	ui.tagFileds.trackArtist.val(meta.common.artist);
 	ui.tagFileds.trackNumber.val(meta.common.track.no);
@@ -122,9 +120,10 @@ ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta) => {
 	ui.tagFileds.albumArtist.val(meta.common.albumartist);
 	ui.tagFileds.year.val(meta.common.year);
 
-	const base64String = _arrayBufferToBase64(meta.common.picture[0].data);
-	console.log(`data:${meta.common.picture[0].format};base64,${base64String}`);
-	ui.tagFileds.albumArt.attr("src", `data:${meta.common.picture[0].format};base64,${base64String}`);
+	if (meta.common.picture) {
+		const base64String = _arrayBufferToBase64(meta.common.picture[0].data);
+		ui.tagFileds.albumArt.html(`<img src="data:${meta.common.picture[0].format};base64,${base64String}" alt="Album art" />`);
+	} else ui.tagFileds.albumArt.html("");
 });
 
 function _arrayBufferToBase64(buffer: Array<number>): string {
@@ -136,3 +135,15 @@ function _arrayBufferToBase64(buffer: Array<number>): string {
 	}
 	return window.btoa(binary);
 }
+
+//
+//
+// Popups
+ipcRenderer.on("render-error", (event: IpcRendererEvent, error: Error) => {
+	alert(`
+		Error: ${error.name}\n
+		${error.message}\n
+		\n
+		Please send a screenshot of this to me
+	`);
+});

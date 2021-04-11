@@ -111,6 +111,11 @@ h2 {
 	font-weight: 700;
 }
 
+#beta-build-disclaimer {
+	font-size: 1em;
+	opacity: 0.5;
+}
+
 /* scroll bars */
 ::-webkit-scrollbar {
 	width: 0.25rem;

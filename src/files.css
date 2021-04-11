@@ -76,7 +76,7 @@ button#window-control-close:hover {
 }
 
 /* file entries */
-#files-section .row.file-entry div {
+#files-section .row.file-entry {
 	cursor: pointer;
 }
 

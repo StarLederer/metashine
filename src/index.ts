@@ -17,8 +17,10 @@ let mainWindow: BrowserWindow;
 const createWindow = (): void => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
-		height: 1200,
 		width: 1000,
+		height: 1200,
+		minWidth: 800,
+		minHeight: 200,
 		frame: false,
 		icon: "./src/assets/app-icon.png",
 		webPreferences: {
@@ -68,17 +70,13 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 		meta: {},
 	};
 
-	// console.log(outFile.name);
-	// console.log(outFile.type);
-	// console.log(outFile.location);
-
 	if (file.name.endsWith("mp3")) {
 		mm.parseFile(file.path)
 			.then((value) => {
 				outFile.meta = value;
 				event.sender.send("file-approved", outFile);
 			})
-			.catch((error) => {
+			.catch((error: Error) => {
 				console.error(error.message);
 			});
 	}
@@ -112,7 +110,6 @@ ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
 	};
 
 	try {
-		console.log(currentFilePath);
 		NodeID3.update(tags, currentFilePath);
 	} catch (error) {
 		console.error(error);

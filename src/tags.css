@@ -84,10 +84,12 @@
 
 	border-radius: 0.25rem;
 
+	opacity: 0.5;
+
 	overflow: hidden;
 }
 
-#album-art-input::before {
+/* #album-art-input::before {
 	content: "Drag an image here";
 
 	width: 100%;
@@ -102,7 +104,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-}
+} */
 
 #album-art-input img {
 	width: 100%;
