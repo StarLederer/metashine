@@ -82,6 +82,7 @@ button#window-control-close:hover {
 
 #files-section .row.file-entry div {
 	font-weight: 700;
+	user-select: text;
 }
 
 #files-section .row.file-entry:hover div {

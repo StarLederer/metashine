@@ -33,7 +33,7 @@ const createWindow = (): void => {
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
 	// Open the DevTools.
-	//mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -61,7 +61,7 @@ app.on("activate", () => {
 //
 //
 // Files
-ipcMain.on("file-received", (event: IpcMainEvent, file) => {
+ipcMain.on("file-received", (event: IpcMainEvent, file: File) => {
 	const outFile = {
 		name: path.basename(file.path, path.extname(file.path)),
 		type: path.extname(file.path.toLowerCase()).substring(1),
@@ -70,7 +70,7 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 		meta: {},
 	};
 
-	if (file.name.endsWith("mp3")) {
+	if (file.name.toLowerCase().endsWith("mp3")) {
 		mm.parseFile(file.path)
 			.then((value) => {
 				outFile.meta = value;
@@ -86,12 +86,36 @@ ipcMain.on("file-received", (event: IpcMainEvent, file) => {
 //
 // Tags
 let currentFilePath: string;
+let currentMeta: NodeID3.Tags;
 
-ipcMain.on("load-meta", (event: IpcMainEvent, path) => {
+ipcMain.on("load-meta", (event: IpcMainEvent, path: string) => {
+	currentFilePath = path;
+	resetCurentMeta();
+
 	mm.parseFile(path)
 		.then((value) => {
-			currentFilePath = path;
-			event.sender.send("render-meta", value);
+			currentMeta.title = value.common.title;
+			currentMeta.artist = value.common.artist;
+			if (value.common.track.no) currentMeta.trackNumber = value.common.track.no.toString();
+			// currentMeta.trackNumber = "69";
+			currentMeta.album = value.common.album;
+			currentMeta.performerInfo = value.common.albumartist;
+			if (value.common.year) currentMeta.year = value.common.year.toString();
+
+			const frontCover = mm.selectCover(value.common.picture);
+			if (frontCover) {
+				currentMeta.image = {
+					mime: frontCover.format,
+					type: {
+						id: 3,
+						name: frontCover.name,
+					},
+					description: frontCover.description,
+					imageBuffer: frontCover.data,
+				};
+			} else currentMeta.image = getNewFrontCover();
+
+			event.sender.send("render-meta", currentMeta);
 		})
 		.catch((error) => {
 			console.error(error.message);
@@ -100,14 +124,29 @@ ipcMain.on("load-meta", (event: IpcMainEvent, path) => {
 
 ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
 	const tags: NodeID3.Tags = {
+		// const tags = {
 		title: meta.title,
 		artist: meta.artist,
-		trackNumber: meta.track.no,
+		trackNumber: meta.trackNumber,
 		album: meta.album,
-		performerInfo: meta.albumartist,
+		performerInfo: meta.performerInfo,
 		year: meta.year,
-		// image: "./example/mia_cover.jpg",
+		image: null as any,
 	};
+
+	if (currentMeta.image) {
+		const currentCover = currentMeta.image as any;
+
+		tags.image = {
+			mime: currentCover.mime,
+			type: {
+				id: currentCover.type.id,
+				name: currentCover.type.name,
+			},
+			description: currentCover.description,
+			imageBuffer: currentCover.imageBuffer,
+		};
+	}
 
 	try {
 		NodeID3.update(tags, currentFilePath);
@@ -115,6 +154,40 @@ ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
 		console.error(error);
 	}
 });
+
+ipcMain.on("album-art-received", (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
+	const frontCover = currentMeta.image as any;
+
+	const fileNameLowerCase = name.toLowerCase();
+	if (fileNameLowerCase.endsWith("png")) {
+		frontCover.mime = "image/png";
+	} else if (fileNameLowerCase.endsWith("jpg") || fileNameLowerCase.endsWith("jpeg")) {
+		frontCover.mime = "image/jpeg";
+	} else return;
+
+	frontCover.imageBuffer = new Buffer(buffer);
+	currentMeta.image = frontCover;
+
+	event.sender.send("render-album-art", frontCover.mime, frontCover.imageBuffer);
+});
+
+function resetCurentMeta() {
+	currentMeta = {
+		image: getNewFrontCover(),
+	};
+}
+
+function getNewFrontCover() {
+	return {
+		mime: "",
+		type: {
+			id: 3,
+			name: "",
+		},
+		description: "",
+		imageBuffer: null as Buffer,
+	};
+}
 
 //
 //

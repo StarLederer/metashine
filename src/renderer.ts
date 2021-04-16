@@ -3,6 +3,7 @@ import "./tags.css";
 import "./files.css";
 import { ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
+import * as NodeID3 from "node-id3";
 
 const ui = {
 	windowControls: {
@@ -27,22 +28,24 @@ const ui = {
 	fileList: $("#file-list"),
 };
 
-document.addEventListener("drop", (event) => {
+//
+//
+// Files
+ui.selctions.files.on("dragenter dragover", (event) => {
+	event.preventDefault();
+	event.stopPropagation();
+});
+ui.selctions.files.on("drop", (event) => {
 	event.preventDefault();
 	event.stopPropagation();
 
-	for (let i = 0; i < event.dataTransfer.files.length; ++i) {
-		const f = event.dataTransfer.files[i];
+	for (let i = 0; i < event.originalEvent.dataTransfer.files.length; ++i) {
+		const f = event.originalEvent.dataTransfer.files[i];
 		ipcRenderer.send("file-received", {
 			path: f.path,
 			name: f.name,
 		});
 	}
-});
-
-document.addEventListener("dragover", (e) => {
-	e.preventDefault();
-	e.stopPropagation();
 });
 
 //
@@ -74,13 +77,44 @@ ui.saveButton.on("click", (e) => {
 	ipcRenderer.send("save-meta", {
 		title: ui.tagFileds.trackTitle.val(),
 		artist: ui.tagFileds.trackArtist.val(),
-		track: {
-			no: ui.tagFileds.trackNumber.val(),
-		},
+		trackNumber: ui.tagFileds.trackNumber.val(),
 		album: ui.tagFileds.albumTitle.val(),
-		albumartist: ui.tagFileds.albumArtist.val(),
+		performerInfo: ui.tagFileds.albumArtist.val(),
 		year: ui.tagFileds.year.val(),
 	});
+});
+
+ui.tagFileds.albumArt.on("dragenter dragover", (event) => {
+	event.preventDefault();
+	event.stopPropagation();
+});
+ui.tagFileds.albumArt.on("drop", (event) => {
+	event.preventDefault();
+	event.stopPropagation();
+
+	const file = event.originalEvent.dataTransfer.files[0];
+	file.arrayBuffer().then((buffer) => {
+		ipcRenderer.send("album-art-received", file.name, buffer);
+	});
+});
+
+ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta: NodeID3.Tags) => {
+	ui.tagFileds.trackTitle.val(meta.title);
+	ui.tagFileds.trackArtist.val(meta.artist);
+	ui.tagFileds.trackNumber.val(meta.trackNumber);
+	ui.tagFileds.albumTitle.val(meta.album);
+	ui.tagFileds.albumArtist.val(meta.performerInfo);
+	ui.tagFileds.year.val(meta.year);
+
+	const albumCover = meta.image as any;
+	if (albumCover.imageBuffer) {
+		const base64String = _arrayBufferToBase64(albumCover.imageBuffer);
+		ui.tagFileds.albumArt.html(`<img src="data:${albumCover.mime};base64,${base64String}" alt="Album art" />`);
+	} else ui.tagFileds.albumArt.html("");
+});
+ipcRenderer.on("render-album-art", (event: IpcRendererEvent, mime: string, buffer: Buffer) => {
+	const base64String = _arrayBufferToBase64(buffer);
+	ui.tagFileds.albumArt.html(`<img src="data:${mime};base64,${base64String}" alt="Album art" />`);
 });
 
 //
@@ -108,24 +142,7 @@ function onFileEntryClicked(e: JQuery.ClickEvent) {
 	ipcRenderer.send("load-meta", $(e.target).children().eq(3).text());
 }
 
-/**
- * @description Puts provided metadata into the tags section
- */
-ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta) => {
-	ui.tagFileds.trackTitle.val(meta.common.title);
-	ui.tagFileds.trackArtist.val(meta.common.artist);
-	ui.tagFileds.trackNumber.val(meta.common.track.no);
-	ui.tagFileds.albumTitle.val(meta.common.album);
-	ui.tagFileds.albumArtist.val(meta.common.albumartist);
-	ui.tagFileds.year.val(meta.common.year);
-
-	if (meta.common.picture) {
-		const base64String = _arrayBufferToBase64(meta.common.picture[0].data);
-		ui.tagFileds.albumArt.html(`<img src="data:${meta.common.picture[0].format};base64,${base64String}" alt="Album art" />`);
-	} else ui.tagFileds.albumArt.html("");
-});
-
-function _arrayBufferToBase64(buffer: Array<number>): string {
+function _arrayBufferToBase64(buffer: Buffer): string {
 	let binary = "";
 	const bytes = new Uint8Array(buffer);
 	const len = bytes.byteLength;
