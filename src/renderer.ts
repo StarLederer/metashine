@@ -135,11 +135,9 @@ function setAlbumArt(src: string) {
 //
 // File UI
 ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
-	// console.log("adding file " + file.name + "...");
-
 	const fileEntry = $(`
 						<div class="row file-entry">
-							<div class="name">${file.name}</div>
+							<div class="name">${file.name} <button class="copy-name">copy</button></div>
 							<div>${file.type}</div>
 							<div>${file.location}</div>
 							<div class="hidden">${file.path}</div>
@@ -148,6 +146,13 @@ ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 
 	ui.fileList.append(fileEntry);
 	fileEntry.on("click", onFileEntryClicked);
+	fileEntry
+		.children(".name")
+		.children(".copy-name")
+		.on("click", (event: JQuery.ClickEvent) => {
+			event.stopPropagation();
+			clipboard.writeText(file.name);
+		});
 });
 
 function onFileEntryClicked(e: JQuery.ClickEvent) {
