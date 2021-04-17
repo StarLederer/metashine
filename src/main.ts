@@ -90,6 +90,8 @@ let currentFilePath: string;
 let currentMeta = getNewMeta();
 
 ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, path: string) => {
+	if (path == currentFilePath) return;
+
 	currentFilePath = path;
 	currentMeta = getNewMeta();
 

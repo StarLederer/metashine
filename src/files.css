@@ -56,6 +56,7 @@ button#window-control-close:hover {
 	transition: 50ms ease-in-out;
 }
 
+/* row common */
 #files-section .row div {
 	height: 2rem;
 
@@ -78,6 +79,12 @@ button#window-control-close:hover {
 /* file entries */
 #files-section .row.file-entry {
 	cursor: pointer;
+}
+
+#files-section .row.file-entry .name {
+	user-select: text;
+	cursor: text;
+	pointer-events: all;
 }
 
 #files-section .row.file-entry div {

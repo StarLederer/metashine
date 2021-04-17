@@ -139,7 +139,7 @@ ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 
 	const fileEntry = $(`
 						<div class="row file-entry">
-							<div>${file.name}</div>
+							<div class="name">${file.name}</div>
 							<div>${file.type}</div>
 							<div>${file.location}</div>
 							<div class="hidden">${file.path}</div>
@@ -151,9 +151,14 @@ ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 });
 
 function onFileEntryClicked(e: JQuery.ClickEvent) {
+	//e.isPropagationStopped(false);
+
+	let element = e.target;
+	if (!$(e.target).hasClass("file-entry")) element = element.parentElement;
+
 	$(".file-entry").removeClass("selected");
-	$(e.target).addClass("selected");
-	ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(e.target).children().eq(3).text());
+	$(element).addClass("selected");
+	ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(element).children().eq(3).text());
 }
 
 function _arrayBufferToBase64(buffer: Buffer): string {
