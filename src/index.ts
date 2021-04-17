@@ -33,7 +33,7 @@ const createWindow = (): void => {
 	mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -86,11 +86,11 @@ ipcMain.on("file-received", (event: IpcMainEvent, file: File) => {
 //
 // Tags
 let currentFilePath: string;
-let currentMeta: NodeID3.Tags;
+let currentMeta = getNewMeta();
 
 ipcMain.on("load-meta", (event: IpcMainEvent, path: string) => {
 	currentFilePath = path;
-	resetCurentMeta();
+	currentMeta = getNewMeta();
 
 	mm.parseFile(path)
 		.then((value) => {
@@ -149,6 +149,7 @@ ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
 	}
 
 	try {
+		console.log(tags);
 		NodeID3.update(tags, currentFilePath);
 	} catch (error) {
 		console.error(error);
@@ -165,14 +166,14 @@ ipcMain.on("album-art-received", (event: IpcMainEvent, name: string, buffer: Arr
 		frontCover.mime = "image/jpeg";
 	} else return;
 
-	frontCover.imageBuffer = new Buffer(buffer);
+	frontCover.imageBuffer = Buffer.from(buffer);
 	currentMeta.image = frontCover;
 
 	event.sender.send("render-album-art", frontCover.mime, frontCover.imageBuffer);
 });
 
-function resetCurentMeta() {
-	currentMeta = {
+function getNewMeta(): NodeID3.Tags {
+	return {
 		image: getNewFrontCover(),
 	};
 }

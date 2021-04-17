@@ -1,7 +1,7 @@
 import "./index.css";
 import "./tags.css";
 import "./files.css";
-import { ipcRenderer, IpcRendererEvent } from "electron";
+import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 import * as NodeID3 from "node-id3";
 
@@ -84,11 +84,11 @@ ui.saveButton.on("click", (e) => {
 	});
 });
 
-ui.tagFileds.albumArt.on("dragenter dragover", (event) => {
+ui.tagFileds.albumArt.on("dragenter dragover", (event: JQuery.DragEvent) => {
 	event.preventDefault();
 	event.stopPropagation();
 });
-ui.tagFileds.albumArt.on("drop", (event) => {
+ui.tagFileds.albumArt.on("drop", (event: JQuery.DropEvent) => {
 	event.preventDefault();
 	event.stopPropagation();
 
@@ -96,6 +96,16 @@ ui.tagFileds.albumArt.on("drop", (event) => {
 	file.arrayBuffer().then((buffer) => {
 		ipcRenderer.send("album-art-received", file.name, buffer);
 	});
+});
+ui.tagFileds.albumArt.on("mouseup", (event: JQuery.MouseUpEvent) => {
+	if (event.which == 3) {
+		event.stopPropagation();
+
+		const availableFormats = clipboard.availableFormats();
+		if (availableFormats.includes("image/png") || availableFormats.includes("image/jpeg")) {
+			ipcRenderer.send("album-art-received", ".png", clipboard.readImage().toPNG());
+		}
+	}
 });
 
 ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta: NodeID3.Tags) => {
@@ -109,13 +119,16 @@ ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta: NodeID3.Tags) => {
 	const albumCover = meta.image as any;
 	if (albumCover.imageBuffer) {
 		const base64String = _arrayBufferToBase64(albumCover.imageBuffer);
-		ui.tagFileds.albumArt.html(`<img src="data:${albumCover.mime};base64,${base64String}" alt="Album art" />`);
+		setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
 	} else ui.tagFileds.albumArt.html("");
 });
 ipcRenderer.on("render-album-art", (event: IpcRendererEvent, mime: string, buffer: Buffer) => {
 	const base64String = _arrayBufferToBase64(buffer);
-	ui.tagFileds.albumArt.html(`<img src="data:${mime};base64,${base64String}" alt="Album art" />`);
+	setAlbumArt(`data:${mime};base64,${base64String}`);
 });
+function setAlbumArt(src: string) {
+	ui.tagFileds.albumArt.html(`<img src="${src}" alt="Album art" />`);
+}
 
 //
 //
