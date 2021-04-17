@@ -3,6 +3,7 @@ import { IpcMainEvent } from "electron/main";
 import path from "path";
 import * as mm from "music-metadata";
 import * as NodeID3 from "node-id3";
+import { IpcEvents } from "./common/IpcEvents";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
@@ -43,7 +44,7 @@ app.on("ready", createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// explicitly with Ctrl + Q.
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
 		app.quit();
@@ -61,7 +62,7 @@ app.on("activate", () => {
 //
 //
 // Files
-ipcMain.on("file-received", (event: IpcMainEvent, file: File) => {
+ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, file: File) => {
 	const outFile = {
 		name: path.basename(file.path, path.extname(file.path)),
 		type: path.extname(file.path.toLowerCase()).substring(1),
@@ -74,7 +75,7 @@ ipcMain.on("file-received", (event: IpcMainEvent, file: File) => {
 		mm.parseFile(file.path)
 			.then((value) => {
 				outFile.meta = value;
-				event.sender.send("file-approved", outFile);
+				event.sender.send(IpcEvents.mainFileApproved, outFile);
 			})
 			.catch((error: Error) => {
 				console.error(error.message);
@@ -88,7 +89,7 @@ ipcMain.on("file-received", (event: IpcMainEvent, file: File) => {
 let currentFilePath: string;
 let currentMeta = getNewMeta();
 
-ipcMain.on("load-meta", (event: IpcMainEvent, path: string) => {
+ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, path: string) => {
 	currentFilePath = path;
 	currentMeta = getNewMeta();
 
@@ -115,14 +116,14 @@ ipcMain.on("load-meta", (event: IpcMainEvent, path: string) => {
 				};
 			} else currentMeta.image = getNewFrontCover();
 
-			event.sender.send("render-meta", currentMeta);
+			event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
 		})
 		.catch((error) => {
 			console.error(error.message);
 		});
 });
 
-ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
+ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent, meta) => {
 	const tags: NodeID3.Tags = {
 		// const tags = {
 		title: meta.title,
@@ -156,7 +157,7 @@ ipcMain.on("save-meta", (event: IpcMainEvent, meta) => {
 	}
 });
 
-ipcMain.on("album-art-received", (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
+ipcMain.on(IpcEvents.rendererAlbumArtReceived, (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
 	const frontCover = currentMeta.image as any;
 
 	const fileNameLowerCase = name.toLowerCase();
@@ -169,7 +170,7 @@ ipcMain.on("album-art-received", (event: IpcMainEvent, name: string, buffer: Arr
 	frontCover.imageBuffer = Buffer.from(buffer);
 	currentMeta.image = frontCover;
 
-	event.sender.send("render-album-art", frontCover.mime, frontCover.imageBuffer);
+	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover.mime, frontCover.imageBuffer);
 });
 
 function getNewMeta(): NodeID3.Tags {
@@ -193,12 +194,12 @@ function getNewFrontCover() {
 //
 //
 // Window controls
-ipcMain.on("window-collapse", () => mainWindow.minimize());
-ipcMain.on("window-toggle-size", () => {
+ipcMain.on(IpcEvents.rendererWindowCollaps, () => mainWindow.minimize());
+ipcMain.on(IpcEvents.rendererWindowToggleSize, () => {
 	if (!mainWindow.isMaximized()) {
 		mainWindow.maximize();
 	} else {
 		mainWindow.unmaximize();
 	}
 });
-ipcMain.on("window-close", () => mainWindow.close());
+ipcMain.on(IpcEvents.rendererWindowClose, () => mainWindow.close());

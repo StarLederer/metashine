@@ -4,6 +4,7 @@ import "./files.css";
 import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 import * as NodeID3 from "node-id3";
+import { IpcEvents } from "./common/IpcEvents";
 
 const ui = {
 	windowControls: {
@@ -41,7 +42,7 @@ ui.selctions.files.on("drop", (event) => {
 
 	for (let i = 0; i < event.originalEvent.dataTransfer.files.length; ++i) {
 		const f = event.originalEvent.dataTransfer.files[i];
-		ipcRenderer.send("file-received", {
+		ipcRenderer.send(IpcEvents.rendererFileReceived, {
 			path: f.path,
 			name: f.name,
 		});
@@ -54,17 +55,17 @@ ui.selctions.files.on("drop", (event) => {
 ui.windowControls.collapse.on("click", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
-	ipcRenderer.send("window-collapse");
+	ipcRenderer.send(IpcEvents.rendererWindowCollaps);
 });
 ui.windowControls.toggleSize.on("click", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
-	ipcRenderer.send("window-toggle-size");
+	ipcRenderer.send(IpcEvents.rendererWindowToggleSize);
 });
 ui.windowControls.close.on("click", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
-	ipcRenderer.send("window-close");
+	ipcRenderer.send(IpcEvents.rendererWindowClose);
 });
 
 //
@@ -74,7 +75,7 @@ ui.saveButton.on("click", (e) => {
 	e.preventDefault();
 	e.stopPropagation();
 
-	ipcRenderer.send("save-meta", {
+	ipcRenderer.send(IpcEvents.rendererRequestSaveMeta, {
 		title: ui.tagFileds.trackTitle.val(),
 		artist: ui.tagFileds.trackArtist.val(),
 		trackNumber: ui.tagFileds.trackNumber.val(),
@@ -94,7 +95,7 @@ ui.tagFileds.albumArt.on("drop", (event: JQuery.DropEvent) => {
 
 	const file = event.originalEvent.dataTransfer.files[0];
 	file.arrayBuffer().then((buffer) => {
-		ipcRenderer.send("album-art-received", file.name, buffer);
+		ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, file.name, buffer);
 	});
 });
 ui.tagFileds.albumArt.on("mouseup", (event: JQuery.MouseUpEvent) => {
@@ -103,12 +104,12 @@ ui.tagFileds.albumArt.on("mouseup", (event: JQuery.MouseUpEvent) => {
 
 		const availableFormats = clipboard.availableFormats();
 		if (availableFormats.includes("image/png") || availableFormats.includes("image/jpeg")) {
-			ipcRenderer.send("album-art-received", ".png", clipboard.readImage().toPNG());
+			ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, ".png", clipboard.readImage().toPNG());
 		}
 	}
 });
 
-ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta: NodeID3.Tags) => {
+ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: NodeID3.Tags) => {
 	ui.tagFileds.trackTitle.val(meta.title);
 	ui.tagFileds.trackArtist.val(meta.artist);
 	ui.tagFileds.trackNumber.val(meta.trackNumber);
@@ -122,7 +123,7 @@ ipcRenderer.on("render-meta", (event: IpcRendererEvent, meta: NodeID3.Tags) => {
 		setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
 	} else ui.tagFileds.albumArt.html("");
 });
-ipcRenderer.on("render-album-art", (event: IpcRendererEvent, mime: string, buffer: Buffer) => {
+ipcRenderer.on(IpcEvents.mainRequestRenderAlbumArt, (event: IpcRendererEvent, mime: string, buffer: Buffer) => {
 	const base64String = _arrayBufferToBase64(buffer);
 	setAlbumArt(`data:${mime};base64,${base64String}`);
 });
@@ -133,7 +134,7 @@ function setAlbumArt(src: string) {
 //
 //
 // File UI
-ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
+ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 	// console.log("adding file " + file.name + "...");
 
 	const fileEntry = $(`
@@ -152,7 +153,7 @@ ipcRenderer.on("file-approved", (event: IpcRendererEvent, file) => {
 function onFileEntryClicked(e: JQuery.ClickEvent) {
 	$(".file-entry").removeClass("selected");
 	$(e.target).addClass("selected");
-	ipcRenderer.send("load-meta", $(e.target).children().eq(3).text());
+	ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(e.target).children().eq(3).text());
 }
 
 function _arrayBufferToBase64(buffer: Buffer): string {
@@ -168,7 +169,7 @@ function _arrayBufferToBase64(buffer: Buffer): string {
 //
 //
 // Popups
-ipcRenderer.on("render-error", (event: IpcRendererEvent, error: Error) => {
+ipcRenderer.on(IpcEvents.mainRequestRenderError, (event: IpcRendererEvent, error: Error) => {
 	alert(`
 		Error: ${error.name}\n
 		${error.message}\n
