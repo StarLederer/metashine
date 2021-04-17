@@ -1,4 +1,4 @@
-import "./index.css";
+import "./main.css";
 import "./tags.css";
 import "./files.css";
 import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
