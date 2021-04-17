@@ -5,6 +5,7 @@ import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
+import { NodeID3Image } from "./common/NodeID3Image";
 
 const ui = {
 	windowControls: {
@@ -117,7 +118,7 @@ ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: 
 	ui.tagFileds.albumArtist.val(meta.performerInfo);
 	ui.tagFileds.year.val(meta.year);
 
-	const albumCover = meta.image as any;
+	const albumCover = meta.image as NodeID3Image;
 	if (albumCover.imageBuffer) {
 		const base64String = _arrayBufferToBase64(albumCover.imageBuffer);
 		setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
@@ -184,6 +185,6 @@ ipcRenderer.on(IpcEvents.mainRequestRenderError, (event: IpcRendererEvent, error
 		Error: ${error.name}\n
 		${error.message}\n
 		\n
-		Please send a screenshot of this to me
+		Please send a screenshot of this to Herman
 	`);
 });

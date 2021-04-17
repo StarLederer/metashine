@@ -1,9 +1,12 @@
-import { app, BrowserWindow, IpcMain, ipcMain, IpcRendererEvent } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+// eslint-disable-next-line import/no-unresolved
 import { IpcMainEvent } from "electron/main";
 import path from "path";
 import * as mm from "music-metadata";
 import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
+import { SupportedFormat } from "./common/SupportedFormats";
+import { NodeID3Image } from "./common/NodeID3Image";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
@@ -44,7 +47,7 @@ app.on("ready", createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
-// explicitly with Ctrl + Q.
+// explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
 		app.quit();
@@ -68,34 +71,41 @@ ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, file: File) => 
 		type: path.extname(file.path.toLowerCase()).substring(1),
 		location: path.dirname(file.path),
 		path: file.path,
-		meta: {},
+		meta: null as mm.IAudioMetadata,
 	};
 
-	if (file.name.toLowerCase().endsWith("mp3")) {
-		mm.parseFile(file.path)
-			.then((value) => {
-				outFile.meta = value;
-				event.sender.send(IpcEvents.mainFileApproved, outFile);
-			})
-			.catch((error: Error) => {
-				console.error(error.message);
-			});
-	}
+	mm.parseFile(file.path)
+		.then((value: mm.IAudioMetadata) => {
+			outFile.meta = value;
+			event.sender.send(IpcEvents.mainFileApproved, outFile);
+		})
+		.catch((error: Error) => {
+			event.sender.send(IpcEvents.mainRequestRenderError, error);
+		});
 });
 
 //
 //
 // Tags
 let currentFilePath: string;
+let currentFileFormat: SupportedFormat;
 let currentMeta = getNewMeta();
 
-ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, path: string) => {
-	if (path == currentFilePath) return;
+ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, filePath: string) => {
+	if (filePath == currentFilePath) return;
 
-	currentFilePath = path;
+	currentFilePath = filePath;
 	currentMeta = getNewMeta();
+	switch (path.extname(filePath.toLowerCase()).substring(1)) {
+		case SupportedFormat.MP3:
+			currentFileFormat = SupportedFormat.MP3;
+			break;
+		case SupportedFormat.WAV:
+			currentFileFormat = SupportedFormat.WAV;
+			break;
+	}
 
-	mm.parseFile(path)
+	mm.parseFile(filePath)
 		.then((value) => {
 			currentMeta.title = value.common.title;
 			currentMeta.artist = value.common.artist;
@@ -115,13 +125,13 @@ ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, path: string
 					},
 					description: frontCover.description,
 					imageBuffer: frontCover.data,
-				};
+				} as NodeID3Image;
 			} else currentMeta.image = getNewFrontCover();
 
 			event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
 		})
-		.catch((error) => {
-			console.error(error.message);
+		.catch((error: Error) => {
+			event.sender.send(IpcEvents.mainRequestRenderError, error);
 		});
 });
 
@@ -134,11 +144,11 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent, meta) => {
 		album: meta.album,
 		performerInfo: meta.performerInfo,
 		year: meta.year,
-		image: null as any,
+		image: null as NodeID3Image,
 	};
 
 	if (currentMeta.image) {
-		const currentCover = currentMeta.image as any;
+		const currentCover = currentMeta.image as NodeID3Image;
 
 		tags.image = {
 			mime: currentCover.mime,
@@ -151,16 +161,22 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent, meta) => {
 		};
 	}
 
-	try {
+	if (currentFileFormat == SupportedFormat.MP3) {
 		console.log(tags);
-		NodeID3.update(tags, currentFilePath);
-	} catch (error) {
-		console.error(error);
+
+		const result = NodeID3.update(tags, currentFilePath);
+		if (result === true) {
+			// success
+		} else {
+			event.sender.send(IpcEvents.mainRequestRenderError, result as Error);
+		}
+	} else if (currentFileFormat == SupportedFormat.WAV) {
+		event.sender.send(IpcEvents.mainRequestRenderError, new Error("Saving WAV is not supperted yet"));
 	}
 });
 
 ipcMain.on(IpcEvents.rendererAlbumArtReceived, (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
-	const frontCover = currentMeta.image as any;
+	const frontCover = currentMeta.image as NodeID3Image;
 
 	const fileNameLowerCase = name.toLowerCase();
 	if (fileNameLowerCase.endsWith("png")) {
@@ -181,7 +197,7 @@ function getNewMeta(): NodeID3.Tags {
 	};
 }
 
-function getNewFrontCover() {
+function getNewFrontCover(): NodeID3Image {
 	return {
 		mime: "",
 		type: {
