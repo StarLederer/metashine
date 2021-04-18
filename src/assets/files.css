@@ -81,31 +81,6 @@ button#window-control-close:hover {
 	cursor: pointer;
 }
 
-/* #files-section .row.file-entry .name {
-	user-select: text;
-	cursor: text;
-	pointer-events: all;
-} */
-
-#files-section .row.file-entry .name .copy-name {
-	height: 1.5rem;
-	padding: 0 1rem;
-	position: absolute;
-	right: 0;
-
-	background: #571be5;
-	color: white;
-	opacity: 0;
-
-	border-radius: 0.75rem;
-
-	pointer-events: all;
-}
-
-#files-section .row.file-entry .name .copy-name:active {
-	background: #7f48ff;
-}
-
 #files-section .row.file-entry div {
 	font-weight: 700;
 	user-select: text;
@@ -113,10 +88,6 @@ button#window-control-close:hover {
 
 #files-section .row.file-entry:hover div {
 	color: #571be588;
-}
-
-#files-section .row.file-entry:hover .name .copy-name {
-	opacity: 1;
 }
 
 #files-section .row.file-entry.selected {

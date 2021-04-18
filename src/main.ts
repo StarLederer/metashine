@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 // eslint-disable-next-line import/no-unresolved
 import { IpcMainEvent } from "electron/main";
 import path from "path";
+// import fs from "fs";
 import * as mm from "music-metadata";
 import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
@@ -128,7 +129,7 @@ ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, filePath: st
 				} as NodeID3Image;
 			} else currentMeta.image = getNewFrontCover();
 
-			event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
+			event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta, value);
 		})
 		.catch((error: Error) => {
 			event.sender.send(IpcEvents.mainRequestRenderError, error);
@@ -171,7 +172,7 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent, meta) => {
 			event.sender.send(IpcEvents.mainRequestRenderError, result as Error);
 		}
 	} else if (currentFileFormat == SupportedFormat.WAV) {
-		event.sender.send(IpcEvents.mainRequestRenderError, new Error("Saving WAV is not supperted yet"));
+		event.sender.send(IpcEvents.mainRequestRenderError, new Error("Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3"));
 	}
 });
 
@@ -188,7 +189,12 @@ ipcMain.on(IpcEvents.rendererAlbumArtReceived, (event: IpcMainEvent, name: strin
 	frontCover.imageBuffer = Buffer.from(buffer);
 	currentMeta.image = frontCover;
 
-	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover.mime, frontCover.imageBuffer);
+	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover);
+});
+
+ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
+	const frontCover = getNewFrontCover();
+	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover);
 });
 
 function getNewMeta(): NodeID3.Tags {

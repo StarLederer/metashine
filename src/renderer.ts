@@ -1,6 +1,7 @@
-import "./main.css";
-import "./tags.css";
-import "./files.css";
+import "./assets/style.css";
+import "./assets/tags.css";
+import "./assets/files.css";
+import "./assets/context-menu.css";
 import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 import * as NodeID3 from "node-id3";
@@ -8,6 +9,7 @@ import { IpcEvents } from "./common/IpcEvents";
 import { NodeID3Image } from "./common/NodeID3Image";
 
 const ui = {
+	document: $(document),
 	windowControls: {
 		close: $("#window-control-close"),
 		toggleSize: $("#window-control-toggle-size"),
@@ -28,6 +30,7 @@ const ui = {
 		albumArt: $("#album-art-input"),
 	},
 	fileList: $("#file-list"),
+	contextMenu: $("#context-menu"),
 };
 
 //
@@ -55,17 +58,14 @@ ui.selctions.files.on("drop", (event) => {
 // Window controls
 ui.windowControls.collapse.on("click", (e) => {
 	e.preventDefault();
-	e.stopPropagation();
 	ipcRenderer.send(IpcEvents.rendererWindowCollaps);
 });
 ui.windowControls.toggleSize.on("click", (e) => {
 	e.preventDefault();
-	e.stopPropagation();
 	ipcRenderer.send(IpcEvents.rendererWindowToggleSize);
 });
 ui.windowControls.close.on("click", (e) => {
 	e.preventDefault();
-	e.stopPropagation();
 	ipcRenderer.send(IpcEvents.rendererWindowClose);
 });
 
@@ -74,7 +74,6 @@ ui.windowControls.close.on("click", (e) => {
 // Tag UI
 ui.saveButton.on("click", (e) => {
 	e.preventDefault();
-	e.stopPropagation();
 
 	ipcRenderer.send(IpcEvents.rendererRequestSaveMeta, {
 		title: ui.tagFileds.trackTitle.val(),
@@ -86,10 +85,34 @@ ui.saveButton.on("click", (e) => {
 	});
 });
 
+ui.tagFileds.albumArt.on("mouseup", (event: JQuery.MouseUpEvent) => {
+	if (event.which == 3) {
+		event.stopPropagation();
+		openContextMenu(event.pageX, event.pageY, [
+			{
+				name: "Paste",
+				click() {
+					const availableFormats = clipboard.availableFormats();
+					if (availableFormats.includes("image/png") || availableFormats.includes("image/jpeg")) {
+						ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, ".png", clipboard.readImage().toPNG());
+					}
+				},
+			},
+			{
+				name: "Remove",
+				click() {
+					ipcRenderer.send(IpcEvents.rendererRequestRemoveAlbumArt);
+				},
+			},
+		]);
+	}
+});
+
 ui.tagFileds.albumArt.on("dragenter dragover", (event: JQuery.DragEvent) => {
 	event.preventDefault();
 	event.stopPropagation();
 });
+
 ui.tagFileds.albumArt.on("drop", (event: JQuery.DropEvent) => {
 	event.preventDefault();
 	event.stopPropagation();
@@ -99,18 +122,10 @@ ui.tagFileds.albumArt.on("drop", (event: JQuery.DropEvent) => {
 		ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, file.name, buffer);
 	});
 });
-ui.tagFileds.albumArt.on("mouseup", (event: JQuery.MouseUpEvent) => {
-	if (event.which == 3) {
-		event.stopPropagation();
 
-		const availableFormats = clipboard.availableFormats();
-		if (availableFormats.includes("image/png") || availableFormats.includes("image/jpeg")) {
-			ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, ".png", clipboard.readImage().toPNG());
-		}
-	}
-});
+ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: NodeID3.Tags, mmTags) => {
+	console.log(mmTags);
 
-ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: NodeID3.Tags) => {
 	ui.tagFileds.trackTitle.val(meta.title);
 	ui.tagFileds.trackArtist.val(meta.artist);
 	ui.tagFileds.trackNumber.val(meta.trackNumber);
@@ -124,10 +139,14 @@ ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: 
 		setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
 	} else ui.tagFileds.albumArt.html("");
 });
-ipcRenderer.on(IpcEvents.mainRequestRenderAlbumArt, (event: IpcRendererEvent, mime: string, buffer: Buffer) => {
-	const base64String = _arrayBufferToBase64(buffer);
-	setAlbumArt(`data:${mime};base64,${base64String}`);
+
+ipcRenderer.on(IpcEvents.mainRequestRenderAlbumArt, (event: IpcRendererEvent, albumArt: NodeID3Image) => {
+	if (albumArt.imageBuffer) {
+		const base64String = _arrayBufferToBase64(albumArt.imageBuffer);
+		setAlbumArt(`data:${albumArt.mime};base64,${base64String}`);
+	} else ui.tagFileds.albumArt.html("");
 });
+
 function setAlbumArt(src: string) {
 	ui.tagFileds.albumArt.html(`<img src="${src}" alt="Album art" />`);
 }
@@ -138,7 +157,7 @@ function setAlbumArt(src: string) {
 ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 	const fileEntry = $(`
 						<div class="row file-entry">
-							<div class="name">${file.name} <button class="copy-name">copy</button></div>
+							<div class="name">${file.name}</div>
 							<div>${file.type}</div>
 							<div>${file.location}</div>
 							<div class="hidden">${file.path}</div>
@@ -146,25 +165,34 @@ ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
 						`);
 
 	ui.fileList.append(fileEntry);
-	fileEntry.on("click", onFileEntryClicked);
-	fileEntry
-		.children(".name")
-		.children(".copy-name")
-		.on("click", (event: JQuery.ClickEvent) => {
-			event.stopPropagation();
-			clipboard.writeText(file.name);
-		});
+	fileEntry.on("mouseup", onFileEntryClicked);
 });
 
-function onFileEntryClicked(e: JQuery.ClickEvent) {
-	//e.isPropagationStopped(false);
+function onFileEntryClicked(event: JQuery.MouseUpEvent) {
+	let element = event.target;
+	if (!$(event.target).hasClass("file-entry")) element = element.parentElement;
 
-	let element = e.target;
-	if (!$(e.target).hasClass("file-entry")) element = element.parentElement;
-
-	$(".file-entry").removeClass("selected");
-	$(element).addClass("selected");
-	ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(element).children().eq(3).text());
+	if (event.which == 1) {
+		$(".file-entry").removeClass("selected");
+		$(element).addClass("selected");
+		ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(element).children().eq(3).text());
+	} else if (event.which == 3) {
+		event.stopPropagation();
+		openContextMenu(event.pageX, event.pageY, [
+			{
+				name: "Copy name",
+				click() {
+					clipboard.writeText($(element).children(".name").html());
+				},
+			},
+			{
+				name: "Remove",
+				click() {
+					$(element).remove();
+				},
+			},
+		]);
+	}
 }
 
 function _arrayBufferToBase64(buffer: Buffer): string {
@@ -179,12 +207,51 @@ function _arrayBufferToBase64(buffer: Buffer): string {
 
 //
 //
+// Context menu
+let isContextMenuOpen = false;
+
+function openContextMenu(x: number, y: number, options: Array<any>) {
+	closeContextMenu();
+	ui.contextMenu.css({
+		left: `calc(${x}px - 2rem)`,
+		top: `calc(${y}px - 2rem)`,
+		// top: y,
+		display: "flex",
+	});
+	isContextMenuOpen = true;
+
+	options.forEach((element) => {
+		const optionButton = $(`
+			<button>
+				${element.name}
+			</button>
+		`);
+		optionButton.on("mouseup", element.click);
+		ui.contextMenu.append(optionButton);
+	});
+}
+
+function closeContextMenu() {
+	if (isContextMenuOpen) {
+		ui.contextMenu.css({ display: "none" });
+		ui.contextMenu.children().each((index, element) => {
+			$(element).off("mouseup");
+			$(element).remove();
+		});
+		isContextMenuOpen = false;
+	}
+}
+
+ui.document.on("mouseup", closeContextMenu);
+
+//
+//
 // Popups
 ipcRenderer.on(IpcEvents.mainRequestRenderError, (event: IpcRendererEvent, error: Error) => {
 	alert(`
 		Error: ${error.name}\n
 		${error.message}\n
 		\n
-		Please send a screenshot of this to Herman
+		Consider sending a screenshot of this to Herman
 	`);
 });

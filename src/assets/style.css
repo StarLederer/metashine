@@ -62,8 +62,8 @@ button.begging:hover {
 	transition: 100ms;
 }
 
-/* body */
-body {
+/* main-layout */
+#main-layout {
 	height: 100vh;
 	display: grid;
 	grid-template-columns: 24em auto;
@@ -120,11 +120,6 @@ h2 {
 ::-webkit-scrollbar {
 	width: 0.25rem;
 	/* height: 0.25rem; */
-}
-
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-thumb {
-	/* border-radius: 5px; */
 }
 
 ::-webkit-scrollbar-track {

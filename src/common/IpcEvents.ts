@@ -7,6 +7,7 @@ export const IpcEvents = {
 	rendererAlbumArtReceived: "album-art-received",
 	rendererFileReceived: "file-received",
 	rendererRequestLoadMeta: "load-meta",
+	rendererRequestRemoveAlbumArt: "remove-album-art",
 	rendererRequestSaveMeta: "save-meta",
 	rendererWindowClose: "window-close",
 	rendererWindowCollaps: "window-collapse",

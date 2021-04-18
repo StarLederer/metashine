@@ -1,0 +1,53 @@
+#context-menu {
+	position: fixed;
+
+	background: white;
+	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.05);
+
+	display: none;
+	flex-direction: column;
+	border-radius: 0.25rem;
+	overflow: hidden;
+}
+#context-menu button {
+	width: 20rem;
+	height: 4rem;
+	padding: 0 2rem;
+	/* padding-right: 6rem; */
+
+	color: #571be5;
+
+	text-align: left;
+	font-weight: 700;
+}
+
+#context-menu button:hover {
+	background: #571be5;
+	color: white;
+}
+
+#context-menu button:active {
+	background: #7f48ff;
+	color: white;
+}
+
+#context-menu button::after {
+	content: "";
+
+	width: calc(100% - 4rem);
+	height: 1px;
+	position: absolute;
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+
+	background: #571be5;
+	opacity: 0.1;
+
+	display: block;
+}
+
+#context-menu button:last-child:after {
+	display: none;
+}
