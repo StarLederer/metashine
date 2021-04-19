@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 // eslint-disable-next-line import/no-unresolved
 import { IpcMainEvent } from "electron/main";
 import path from "path";
@@ -72,6 +72,16 @@ const fileList: Array<string> = [];
 ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, filePath: string) => {
 	tryAddFile(filePath)
 });
+
+ipcMain.on(IpcEvents.rendererRequestRemoveFile, (event: IpcMainEvent, filePath: string) => {
+	if (fileList.includes(filePath)) {
+		// remove from list
+		event.sender.send(IpcEvents.mainRequestRemoveFileDOM, filePath);
+	}
+	else {
+		// Requesting to remove file that is not registered
+	}
+})
 
 function tryAddFile(filePath: string): boolean {
 	if (!fileList.includes(filePath)) {

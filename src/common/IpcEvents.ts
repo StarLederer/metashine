@@ -1,5 +1,6 @@
 export const IpcEvents = {
 	mainFileApproved: "file-approved",
+	mainRequestRemoveFileDOM: "main-request-remove-file-dom",
 	mainRequestRenderError: "render-meta",
 	mainRequestRenderAlbumArt: "render-album-art",
 	mainRequestRenderMeta: "render-error",
@@ -8,6 +9,7 @@ export const IpcEvents = {
 	rendererFileReceived: "file-received",
 	rendererRequestLoadMeta: "load-meta",
 	rendererRequestRemoveAlbumArt: "remove-album-art",
+	rendererRequestRemoveFile: "request-remove-file",
 	rendererRequestSaveMeta: "save-meta",
 
 	rendererTagTitleUpdated: "tag-title-updated",

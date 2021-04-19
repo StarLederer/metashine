@@ -2,7 +2,7 @@ import "./assets/style.css";
 import "./assets/tags.css";
 import "./assets/files.css";
 import "./assets/context-menu.css";
-import { clipboard, ipcRenderer, IpcRendererEvent } from "electron";
+import { clipboard, ipcMain, ipcRenderer, IpcRendererEvent } from "electron";
 import $ from "jquery";
 import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
@@ -147,17 +147,19 @@ function setAlbumArt(src: string) {
 // File UI
 ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file: ISuppotedFile) => {
 	const fileEntry = $(`
-						<div class="row file-entry">
+						<div class="row file-entry" id="${file.path}">
 							<div class="name">${file.name}</div>
 							<div>${file.format}</div>
 							<div>${file.location}</div>
-							<div class="hidden">${file.path}</div>
+							<div class="path hidden">${file.path}</div>
 						</div>
 						`);
 
 	ui.fileList.append(fileEntry);
 	fileEntry.on("mouseup", onFileEntryClicked);
 });
+
+ipcRenderer.on(IpcEvents.mainRequestRemoveFileDOM, (event: IpcRendererEvent, filePath: string) => $("#" + filePath).remove());
 
 function onFileEntryClicked(event: JQuery.MouseUpEvent) {
 	let element = event.target;
@@ -166,7 +168,7 @@ function onFileEntryClicked(event: JQuery.MouseUpEvent) {
 	if (event.which == 1) {
 		$(".file-entry").removeClass("selected");
 		$(element).addClass("selected");
-		ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(element).children().eq(3).text());
+		ipcRenderer.send(IpcEvents.rendererRequestLoadMeta, $(element).children(".path").text());
 	} else if (event.which == 3) {
 		event.stopPropagation();
 		openContextMenu(event.pageX, event.pageY, [
@@ -179,7 +181,8 @@ function onFileEntryClicked(event: JQuery.MouseUpEvent) {
 			{
 				name: "Remove",
 				click() {
-					$(element).remove();
+					const filePath = $(element).children(".path").text();
+					ipcRenderer.send(IpcEvents.rendererRequestRemoveFile, filePath);
 				},
 			},
 		]);
