@@ -1,7 +1,7 @@
 {
 	"name": "mp3-tag-assistant",
 	"productName": "mp3-tag-assistant",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "My Electron application description",
 	"main": ".webpack/main",
 	"scripts": {
@@ -70,6 +70,7 @@
 		"@electron-forge/maker-zip": "^6.0.0-beta.54",
 		"@electron-forge/plugin-webpack": "6.0.0-beta.54",
 		"@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+		"@types/jquery": "^3.5.5",
 		"@typescript-eslint/eslint-plugin": "^4.0.1",
 		"@typescript-eslint/parser": "^4.0.1",
 		"copy-webpack-plugin": "^6.3.2",
@@ -86,6 +87,7 @@
 	},
 	"dependencies": {
 		"electron-squirrel-startup": "^1.0.0",
+		"jquery": "^3.6.0",
 		"music-metadata": "^7.8.3",
 		"node-id3": "^0.2.2"
 	}

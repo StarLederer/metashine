@@ -21,11 +21,11 @@
 }
 
 /* fileds */
-.tag-edit-field {
+.tag-field {
 	transition: 500ms;
 }
 
-.tag-edit-field::before {
+.tag-field::before {
 	content: "";
 	width: 100%;
 	height: 1px;
@@ -34,12 +34,12 @@
 	display: block;
 }
 
-.tag-edit-field:first-child:before {
+.tag-field:first-child:before {
 	display: none;
 }
 
-.tag-edit-field label,
-.tag-edit-field span {
+.tag-field label,
+.tag-field span {
 	font-size: 0.75em;
 
 	opacity: 0.5;
@@ -50,7 +50,7 @@
 	padding-top: 2rem;
 }
 
-.tag-edit-field input {
+.tag-field input {
 	width: 100%;
 	height: 3rem;
 
@@ -63,7 +63,7 @@
 	padding-bottom: 1rem;
 }
 
-.tag-edit-field input::placeholder {
+.tag-field input::placeholder {
 	color: #000;
 	opacity: 0.1;
 }
@@ -110,6 +110,6 @@
 }
 
 /* tag field hover */
-.tag-edit-field:hover {
+.tag-field:hover {
 	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.05);
 }

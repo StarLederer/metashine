@@ -7,6 +7,8 @@ import $ from "jquery";
 import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
 import { NodeID3Image } from "./common/NodeID3Image";
+import { ISuppotedFile } from "./common/SupportedFile";
+import { IContextMenuOption } from "./renderer/IContextMenuOption";
 
 const ui = {
 	document: $(document),
@@ -21,6 +23,7 @@ const ui = {
 	},
 	saveButton: $("#tags-save"),
 	tagFileds: {
+		all: $(".tag-filed"),
 		trackTitle: $("#track-title"),
 		trackArtist: $("#track-artist"),
 		trackNumber: $("#track-number"),
@@ -46,27 +49,8 @@ ui.selctions.files.on("drop", (event) => {
 
 	for (let i = 0; i < event.originalEvent.dataTransfer.files.length; ++i) {
 		const f = event.originalEvent.dataTransfer.files[i];
-		ipcRenderer.send(IpcEvents.rendererFileReceived, {
-			path: f.path,
-			name: f.name,
-		});
+		ipcRenderer.send(IpcEvents.rendererFileReceived, f.path);
 	}
-});
-
-//
-//
-// Window controls
-ui.windowControls.collapse.on("click", (e) => {
-	e.preventDefault();
-	ipcRenderer.send(IpcEvents.rendererWindowCollaps);
-});
-ui.windowControls.toggleSize.on("click", (e) => {
-	e.preventDefault();
-	ipcRenderer.send(IpcEvents.rendererWindowToggleSize);
-});
-ui.windowControls.close.on("click", (e) => {
-	e.preventDefault();
-	ipcRenderer.send(IpcEvents.rendererWindowClose);
 });
 
 //
@@ -123,6 +107,13 @@ ui.tagFileds.albumArt.on("drop", (event: JQuery.DropEvent) => {
 	});
 });
 
+ui.tagFileds.trackTitle.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagTitleUpdated, $(event.target).val()));
+ui.tagFileds.trackArtist.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagArtistUpdated, $(event.target).val()));
+ui.tagFileds.trackNumber.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagTrackUpdated, $(event.target).val()));
+ui.tagFileds.albumTitle.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagAlbumUpdated, $(event.target).val()));
+ui.tagFileds.albumArtist.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagAlbumArtistUpdated, $(event.target).val()));
+ui.tagFileds.year.on("blur", (event: JQuery.BlurEvent) => ipcRenderer.send(IpcEvents.rendererTagYearUpdated, $(event.target).val()));
+
 ipcRenderer.on(IpcEvents.mainRequestRenderMeta, (event: IpcRendererEvent, meta: NodeID3.Tags, mmTags) => {
 	console.log(mmTags);
 
@@ -154,11 +145,11 @@ function setAlbumArt(src: string) {
 //
 //
 // File UI
-ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file) => {
+ipcRenderer.on(IpcEvents.mainFileApproved, (event: IpcRendererEvent, file: ISuppotedFile) => {
 	const fileEntry = $(`
 						<div class="row file-entry">
 							<div class="name">${file.name}</div>
-							<div>${file.type}</div>
+							<div>${file.format}</div>
 							<div>${file.location}</div>
 							<div class="hidden">${file.path}</div>
 						</div>
@@ -210,7 +201,7 @@ function _arrayBufferToBase64(buffer: Buffer): string {
 // Context menu
 let isContextMenuOpen = false;
 
-function openContextMenu(x: number, y: number, options: Array<any>) {
+function openContextMenu(x: number, y: number, options: Array<IContextMenuOption>) {
 	closeContextMenu();
 	ui.contextMenu.css({
 		left: `calc(${x}px - 2rem)`,
@@ -254,4 +245,20 @@ ipcRenderer.on(IpcEvents.mainRequestRenderError, (event: IpcRendererEvent, error
 		\n
 		Consider sending a screenshot of this to Herman
 	`);
+});
+
+//
+//
+// Window controls
+ui.windowControls.collapse.on("click", (e) => {
+	e.preventDefault();
+	ipcRenderer.send(IpcEvents.rendererWindowCollaps);
+});
+ui.windowControls.toggleSize.on("click", (e) => {
+	e.preventDefault();
+	ipcRenderer.send(IpcEvents.rendererWindowToggleSize);
+});
+ui.windowControls.close.on("click", (e) => {
+	e.preventDefault();
+	ipcRenderer.send(IpcEvents.rendererWindowClose);
 });

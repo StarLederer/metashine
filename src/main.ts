@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, ipcRenderer } from "electron";
 // eslint-disable-next-line import/no-unresolved
 import { IpcMainEvent } from "electron/main";
 import path from "path";
@@ -8,6 +8,7 @@ import * as NodeID3 from "node-id3";
 import { IpcEvents } from "./common/IpcEvents";
 import { SupportedFormat } from "./common/SupportedFormats";
 import { NodeID3Image } from "./common/NodeID3Image";
+import { ISuppotedFile } from "./common/SupportedFile";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
@@ -66,24 +67,49 @@ app.on("activate", () => {
 //
 //
 // Files
-ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, file: File) => {
-	const outFile = {
-		name: path.basename(file.path, path.extname(file.path)),
-		type: path.extname(file.path.toLowerCase()).substring(1),
-		location: path.dirname(file.path),
-		path: file.path,
+const fileList: Array<string> = [];
+
+ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, filePath: string) => {
+	tryAddFile(filePath)
+});
+
+function tryAddFile(filePath: string): boolean {
+	if (!fileList.includes(filePath)) {
+		fileList.push(filePath);
+		mainWindow.webContents.send(IpcEvents.mainFileApproved, getSupportedFileFomPath(filePath));
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function getSupportedFileFomPath(filePath: string): ISuppotedFile {
+	const supportedFile: ISuppotedFile = {
+		name: path.basename(filePath, path.extname(filePath)),
+		format: null as SupportedFormat,
+		location: path.dirname(filePath),
+		path: filePath,
 		meta: null as mm.IAudioMetadata,
 	};
 
-	mm.parseFile(file.path)
+	// Format
+	const lowerCaseExtname = path.extname(filePath).toLowerCase();
+	if (lowerCaseExtname.endsWith("mp3")) supportedFile.format = SupportedFormat.MP3;
+	else if (lowerCaseExtname.endsWith("wav")) supportedFile.format = SupportedFormat.WAV;
+
+	// Metadata
+	mm.parseFile(filePath)
 		.then((value: mm.IAudioMetadata) => {
-			outFile.meta = value;
-			event.sender.send(IpcEvents.mainFileApproved, outFile);
+			supportedFile.meta = value;
+			
 		})
 		.catch((error: Error) => {
-			event.sender.send(IpcEvents.mainRequestRenderError, error);
+			mainWindow.webContents.send(IpcEvents.mainRequestRenderError, error);
 		});
-});
+		
+	return supportedFile;
+}
 
 //
 //
@@ -91,6 +117,13 @@ ipcMain.on(IpcEvents.rendererFileReceived, (event: IpcMainEvent, file: File) => 
 let currentFilePath: string;
 let currentFileFormat: SupportedFormat;
 let currentMeta = getNewMeta();
+
+ipcMain.on(IpcEvents.rendererTagTitleUpdated, (event: IpcMainEvent, value: string) => currentMeta.title = value );
+ipcMain.on(IpcEvents.rendererTagArtistUpdated, (event: IpcMainEvent, value: string) => currentMeta.artist = value );
+ipcMain.on(IpcEvents.rendererTagTrackUpdated, (event: IpcMainEvent, value: string) => currentMeta.trackNumber = value );
+ipcMain.on(IpcEvents.rendererTagAlbumUpdated, (event: IpcMainEvent, value: string) => currentMeta.album = value );
+ipcMain.on(IpcEvents.rendererTagAlbumArtistUpdated, (event: IpcMainEvent, value: string) => currentMeta.performerInfo = value );
+ipcMain.on(IpcEvents.rendererTagYearUpdated, (event: IpcMainEvent, value: string) => currentMeta.year = value );
 
 ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, filePath: string) => {
 	if (filePath == currentFilePath) return;
@@ -136,36 +169,9 @@ ipcMain.on(IpcEvents.rendererRequestLoadMeta, (event: IpcMainEvent, filePath: st
 		});
 });
 
-ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent, meta) => {
-	const tags: NodeID3.Tags = {
-		// const tags = {
-		title: meta.title,
-		artist: meta.artist,
-		trackNumber: meta.trackNumber,
-		album: meta.album,
-		performerInfo: meta.performerInfo,
-		year: meta.year,
-		image: null as NodeID3Image,
-	};
-
-	if (currentMeta.image) {
-		const currentCover = currentMeta.image as NodeID3Image;
-
-		tags.image = {
-			mime: currentCover.mime,
-			type: {
-				id: currentCover.type.id,
-				name: currentCover.type.name,
-			},
-			description: currentCover.description,
-			imageBuffer: currentCover.imageBuffer,
-		};
-	}
-
+ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
 	if (currentFileFormat == SupportedFormat.MP3) {
-		console.log(tags);
-
-		const result = NodeID3.update(tags, currentFilePath);
+		const result = NodeID3.update(currentMeta, currentFilePath);
 		if (result === true) {
 			// success
 		} else {
@@ -193,8 +199,8 @@ ipcMain.on(IpcEvents.rendererAlbumArtReceived, (event: IpcMainEvent, name: strin
 });
 
 ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
-	const frontCover = getNewFrontCover();
-	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover);
+	currentMeta.image = getNewFrontCover();
+	event.sender.send(IpcEvents.mainRequestRenderAlbumArt, currentMeta.image);
 });
 
 function getNewMeta(): NodeID3.Tags {
