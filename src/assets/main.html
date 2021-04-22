@@ -1,0 +1,77 @@
+<div id="main-layout">
+  <!-- tags -->
+  <section id="tags-section">
+    <header>
+      <h2>Tags</h2>
+      <button class="begging" id="tags-save">save</button>
+    </header>
+    <main>
+      <div class="tag-field">
+        <label for="track-title"> Track </label>
+        <input type="text" id="track-title" placeholder="Unknown" />
+        <!-- <button>Suggested track Title?</button> -->
+      </div>
+
+      <div class="tag-field">
+        <label for="track-artist"> Track artist </label>
+        <input type="text" id="track-artist" placeholder="Unknown" />
+      </div>
+
+      <div class="tag-field">
+        <label for="track-number"> Track number </label>
+        <input type="text" id="track-number" placeholder="Unknown" />
+      </div>
+
+      <div class="tag-field">
+        <label for="album-title"> Album </label>
+        <input type="text" id="album-title" placeholder="Unknown" />
+      </div>
+
+      <div class="tag-field">
+        <label for="album-artist"> Album artist </label>
+        <input type="text" id="album-artist" placeholder="Unknown" />
+      </div>
+
+      <div class="tag-field">
+        <label for="year"> Year </label>
+        <input type="text" id="year" placeholder="Unknown" />
+      </div>
+
+      <div class="tag-field" id="album-art-field">
+        <span> Album art </span>
+        <div id="album-art-input"></div>
+      </div>
+    </main>
+  </section>
+
+  <!-- files -->
+  <section id="files-section">
+    <header>
+      <h2>Files</h2>
+      <div id="beta-build-disclaimer">Beta build</div>
+      <div id="window-controls">
+        <button id="window-control-colapse">
+          <i class="icon-windows-collapse"></i>
+        </button>
+        <button id="window-control-toggle-size">
+          <i class="icon-windows-maximize"></i>
+        </button>
+        <button id="window-control-close">
+          <i class="icon-windows-close"></i>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="table" id="file-list">
+        <div class="row table-head afterline">
+          <div>Name</div>
+          <div>Type</div>
+          <div>Location</div>
+          <div class="hidden">Path</div>
+        </div>
+      </div>
+    </main>
+  </section>
+</div>
+<div id="context-menu"></div>
