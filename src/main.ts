@@ -10,6 +10,9 @@ import { SupportedFormat } from "./common/SupportedFormats";
 import { NodeID3Image } from "./common/NodeID3Image";
 import { ISuppotedFile } from "./common/SupportedFile";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('update-electron-app')();
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.

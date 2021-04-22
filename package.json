@@ -2,7 +2,8 @@
 	"name": "mp3-tag-assistant",
 	"productName": "mp3-tag-assistant",
 	"version": "1.0.3",
-	"description": "My Electron application description",
+	"description": "Music meta tag editor",
+	"repository": "github:HermanLederer/mp3-tag-assistant",
 	"main": ".webpack/main",
 	"scripts": {
 		"start": "electron-forge start",
@@ -11,10 +12,11 @@
 		"publish": "electron-forge publish",
 		"lint": "eslint --ext .ts ."
 	},
-	"keywords": [],
+	"keywords": ["mp3", "tag", "editor", "application"],
 	"author": {
 		"name": "Herman Lederer",
-		"email": "germans.lederers@gmail.com"
+		"email": "germans.lederers@gmail.com",
+		"url": "https://hermanlederer.github.io/"
 	},
 	"license": "MIT",
 	"config": {
