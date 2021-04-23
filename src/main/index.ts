@@ -92,8 +92,12 @@ ipcMain.on(
 ipcMain.on(
   IpcEvents.rendererRequestRemoveFile,
   (event: IpcMainEvent, filePath: string) => {
-    if (fileList.includes(filePath)) {
-      // remove from list
+    const i = fileList.indexOf(filePath);
+    if (i >= 0) {
+      console.log('Original array: ' + fileList);
+      console.log('rem i: ' + i);
+      console.log('rem element: ' + fileList.splice(i, 1));
+      console.log('New array: ' + fileList);
       event.sender.send(IpcEvents.mainRequestRemoveFileDOM, filePath);
     } else {
       // Requesting to remove file that is not registered

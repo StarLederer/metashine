@@ -14,6 +14,25 @@ import { ISuppotedFile } from '../common/SupportedFile';
 
 import { IContextMenuOption } from './IContextMenuOption';
 
+//
+//
+// Util
+function stringToHashCode(s: string): number {
+  var hash = 0,
+    i,
+    chr;
+  if (s.length === 0) return hash;
+  for (i = 0; i < s.length; i++) {
+    chr = s.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+//
+//
+// Generate HTML
 $(document.head).append(
   `<link rel="stylesheet" href="${getStatic(
     'mp3-tag-assistant-icons/mp3-tag-assistant-icons.css'
@@ -23,6 +42,9 @@ $('#app').html(require('../assets/main.html'));
 
 var packageJson = require('../../package.json');
 
+//
+//
+// Fetch UI elements
 const ui = {
   document: $(document),
   betaBuildDisclaimer: $('#beta-build-disclaimer'),
@@ -50,6 +72,9 @@ const ui = {
   contextMenu: $('#context-menu'),
 };
 
+//
+//
+// Beta build disclaimer
 ui.betaBuildDisclaimer.html(`Beta build v${packageJson.version}`);
 
 //
@@ -200,7 +225,7 @@ ipcRenderer.on(
   IpcEvents.mainFileApproved,
   (event: IpcRendererEvent, file: ISuppotedFile) => {
     const fileEntry = $(`
-						<div class="row file-entry" id="${file.path}">
+						<div class="row file-entry" id="${stringToHashCode(file.path)}">
 							<div class="name">${file.name}</div>
 							<div>${file.format}</div>
 							<div>${file.location}</div>
@@ -215,7 +240,8 @@ ipcRenderer.on(
 
 ipcRenderer.on(
   IpcEvents.mainRequestRemoveFileDOM,
-  (event: IpcRendererEvent, filePath: string) => $('#' + filePath).remove()
+  (event: IpcRendererEvent, filePath: string) =>
+    $('#' + stringToHashCode(filePath)).remove()
 );
 
 function onFileEntryClicked(event: JQuery.MouseUpEvent) {
