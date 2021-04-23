@@ -1,4 +1,4 @@
-# Mp3 Tag Assistant
+# Metashine
 Open source application that helps you find, write and format mp3 tags to your liking.
 
 ![app screenshot](https://i.imgur.com/bQjdMud.png)
