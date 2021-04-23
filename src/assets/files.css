@@ -1,149 +1,173 @@
 #files-section {
-	background: #f8f8f8;
+  background: #f8f8f8;
 }
 
 /* window controls */
 #window-controls {
-	display: flex;
+  display: flex;
 }
 
 #window-controls button {
-	width: 2rem;
-	height: 2rem;
+  width: 2rem;
+  height: 2rem;
 
-	font-size: 0.75em;
+  font-size: 0.75em;
 
-	margin-left: 1em;
+  margin-left: 1em;
 
-	border-radius: 1rem;
+  border-radius: 1rem;
 }
 
 #window-controls button:hover {
-	background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 button#window-control-close:hover {
-	color: #e81123;
+  color: #e81123;
 }
 
 /* files section */
 #files-section header::after {
-	width: calc(100% - 4rem);
-	margin: 0 auto;
+  width: calc(100% - 4rem);
+  margin: 0 auto;
 }
 
 /* file list */
 #files-section .table {
-	width: calc(100% - 3rem + 0.125rem);
-	height: 100%;
-	padding-top: 3rem;
-	padding-right: 1rem;
-	left: 2rem;
+  width: calc(100% - 3rem + 0.125rem);
+  height: 100%;
+  padding-top: 3rem;
+  padding-right: 1rem;
+  left: 2rem;
 
-	overflow-x: visible;
-	overflow-y: scroll;
+  overflow-x: visible;
+  overflow-y: scroll;
 
-	border: none;
+  border: none;
 }
 
 #files-section .row {
-	height: 2rem;
+  height: 2rem;
 
-	display: grid;
-	grid-template-columns: 400px 50px auto;
-	grid-gap: 1rem;
+  display: grid;
+  grid-template-columns: 400px 50px auto;
+  grid-gap: 1rem;
 
-	transition: 50ms ease-in-out;
+  transition: 50ms ease-in-out;
 }
 
 /* row common */
 #files-section .row div {
-	height: 2rem;
+  height: 2rem;
 
-	color: #0008;
+  color: #0008;
 
-	font-size: 0.75rem;
-	white-space: nowrap;
+  font-size: 0.75rem;
+  white-space: nowrap;
 
-	display: flex;
-	align-items: center;
-	overflow: hidden;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
 
-	pointer-events: none;
+  pointer-events: none;
+}
+
+#files-section .section {
+  margin-bottom: 2rem;
 }
 
 #files-section .row div.hidden {
-	display: none;
+  display: none;
 }
 
 /* file entries */
 #files-section .row.file-entry {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 #files-section .row.file-entry div {
-	font-weight: 700;
-	user-select: text;
+  font-weight: 700;
 }
 
 #files-section .row.file-entry:hover div {
-	color: #571be588;
+  color: #571be588;
 }
 
 #files-section .row.file-entry.selected {
-	background: #571be508;
+  background: #571be508;
 }
 #files-section .row.file-entry.selected div {
-	color: #571be5;
+  color: #571be5;
 }
 
 #files-section .row.file-entry:hover {
-	background: #571be511;
+  background: #571be511;
 }
 
 /* bottom fade */
 #files-section::after {
-	content: "";
+  content: '';
 
-	width: 100%;
-	width: 100%;
-	height: 2rem;
-	position: absolute;
-	bottom: 0;
+  width: 100%;
+  width: 100%;
+  height: 2rem;
+  position: absolute;
+  bottom: 0;
 
-	background: linear-gradient(0deg, #f8f8f8ff 0%, #f8f8f8ff 0%, #f8f8f800 100%);
+  background: linear-gradient(0deg, #f8f8f8ff 0%, #f8f8f8ff 0%, #f8f8f800 100%);
 
-	pointer-events: none;
+  pointer-events: none;
 }
 
 /* table head */
 #files-section .table-head {
-	width: calc(100% - 28rem);
+  width: calc(100% - 28rem);
 
-	position: fixed;
-	top: 6rem;
+  position: fixed;
+  top: 6rem;
 
-	/* background: red; */
-	z-index: 1;
+  /* background: red; */
+  z-index: 1;
 }
 
 #files-section .table-head::before {
-	content: "";
+  content: '';
 
-	width: calc(100%);
-	height: 4rem;
-	position: absolute;
+  width: calc(100%);
+  height: 4rem;
+  position: absolute;
 
-	background: linear-gradient(180deg, #f8f8f8ff 0%, #f8f8f8ff 50%, #f8f8f800 100%);
-	/* background: red; */
+  background: linear-gradient(
+    180deg,
+    #f8f8f8ff 0%,
+    #f8f8f8ff 50%,
+    #f8f8f800 100%
+  );
+  /* background: red; */
 
-	pointer-events: none;
+  pointer-events: none;
 }
 
 #files-section .table-head::after {
-	width: calc(100%);
+  width: calc(100%);
 }
 
 #files-section .table-head div {
-	opacity: 0.5;
+  opacity: 0.5;
+}
+
+/* section head */
+#files-section .section-head {
+  /* margin-top: 1rem; */
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+}
+
+#readonly-list,
+#unsupported-list {
+  display: none;
 }

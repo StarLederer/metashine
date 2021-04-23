@@ -11,6 +11,7 @@ import * as NodeID3 from 'node-id3';
 import { IpcEvents } from '../common/IpcEvents';
 import { NodeID3Image } from '../common/NodeID3Image';
 import { ISuppotedFile } from '../common/SupportedFile';
+import { FileCategory } from '../common/FileCategory';
 
 import { IContextMenuOption } from './IContextMenuOption';
 
@@ -68,7 +69,11 @@ const ui = {
     year: $('#year'),
     albumArt: $('#album-art-input'),
   },
-  fileList: $('#file-list'),
+  fileLists: {
+    supported: $('#file-list'),
+    readonly: $('#readonly-list'),
+    unsupported: $('#unsupported-list'),
+  },
   contextMenu: $('#context-menu'),
 };
 
@@ -76,30 +81,6 @@ const ui = {
 //
 // Beta build disclaimer
 ui.betaBuildDisclaimer.html(`Beta build v${packageJson.version}`);
-
-//
-//
-// Files
-function cancelDragOverAndEnter(
-  event: JQuery.DragEnterEvent | JQuery.DragOverEvent
-) {
-  event.preventDefault();
-  event.stopPropagation();
-}
-ui.selctions.files.on('dragover', cancelDragOverAndEnter);
-ui.selctions.files.on('dragenter', cancelDragOverAndEnter);
-
-ui.selctions.files.on('drop', (event: JQuery.DropEvent) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  if (event.originalEvent && event.originalEvent.dataTransfer) {
-    for (let i = 0; i < event.originalEvent.dataTransfer.files.length; ++i) {
-      const f = event.originalEvent.dataTransfer.files[i];
-      ipcRenderer.send(IpcEvents.rendererFileReceived, f.path);
-    }
-  }
-});
 
 //
 //
@@ -187,8 +168,6 @@ ui.tagFileds.year.on('blur', (event: JQuery.BlurEvent) =>
 ipcRenderer.on(
   IpcEvents.mainRequestRenderMeta,
   (event: IpcRendererEvent, meta: NodeID3.Tags, mmTags) => {
-    console.log(mmTags);
-
     ui.tagFileds.trackTitle.val(meta.title as string);
     ui.tagFileds.trackArtist.val(meta.artist as string);
     ui.tagFileds.trackNumber.val(meta.trackNumber as string);
@@ -221,40 +200,86 @@ function setAlbumArt(src: string) {
 //
 //
 // File UI
+function cancelDragOverAndEnter(
+  event: JQuery.DragEnterEvent | JQuery.DragOverEvent
+) {
+  event.preventDefault();
+  event.stopPropagation();
+}
+ui.selctions.files.on('dragover', cancelDragOverAndEnter);
+ui.selctions.files.on('dragenter', cancelDragOverAndEnter);
+
+ui.selctions.files.on('drop', (event: JQuery.DropEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (event.originalEvent && event.originalEvent.dataTransfer) {
+    for (let i = 0; i < event.originalEvent.dataTransfer.files.length; ++i) {
+      const f = event.originalEvent.dataTransfer.files[i];
+      ipcRenderer.send(IpcEvents.rendererFileReceived, f.path);
+    }
+  }
+});
+
 ipcRenderer.on(
   IpcEvents.mainFileApproved,
-  (event: IpcRendererEvent, file: ISuppotedFile) => {
+  (event: IpcRendererEvent, file: ISuppotedFile, category: FileCategory) => {
     const fileEntry = $(`
-						<div class="row file-entry" id="${stringToHashCode(file.path)}">
-							<div class="name">${file.name}</div>
-							<div>${file.format}</div>
-							<div>${file.location}</div>
-							<div class="path hidden">${file.path}</div>
-						</div>
-						`);
+      <div class="row file-entry" id="${stringToHashCode(file.path)}">
+        <div class="name">${file.name}</div>
+        <div>${file.format}</div>
+        <div>${file.location}</div>
+        <div class="path hidden">${file.path}</div>
+      </div>
+    `);
 
-    ui.fileList.append(fileEntry);
-    fileEntry.on('mouseup', onFileEntryClicked);
+    switch (category) {
+      case FileCategory.Supported:
+        ui.fileLists.supported.append(fileEntry);
+        ui.fileLists.supported.show();
+        fileEntry.on('mouseup', (e) => onFileEntryClicked(e, true));
+        break;
+      case FileCategory.Readonly:
+        ui.fileLists.readonly.append(fileEntry);
+        ui.fileLists.readonly.show();
+        fileEntry.on('mouseup', (e) => onFileEntryClicked(e, true));
+        break;
+      default:
+        ui.fileLists.unsupported.append(fileEntry);
+        ui.fileLists.unsupported.show();
+        fileEntry.on('mouseup', (e) => onFileEntryClicked(e, false));
+        break;
+    }
   }
 );
 
 ipcRenderer.on(
   IpcEvents.mainRequestRemoveFileDOM,
-  (event: IpcRendererEvent, filePath: string) =>
-    $('#' + stringToHashCode(filePath)).remove()
+  (event: IpcRendererEvent, filePath: string) => {
+    const entry = $('#' + stringToHashCode(filePath));
+    const parent = entry.parent();
+    entry.remove();
+    if (parent.html().length <= 0) {
+      parent.hide();
+    }
+  }
 );
 
-function onFileEntryClicked(event: JQuery.MouseUpEvent) {
+function selectFileEntry(element: Element) {
+  $('.file-entry').removeClass('selected');
+  $(element).addClass('selected');
+  ipcRenderer.send(
+    IpcEvents.rendererRequestLoadMeta,
+    $(element).children('.path').text()
+  );
+}
+
+function onFileEntryClicked(event: JQuery.MouseUpEvent, selectable?: boolean) {
   let element = event.target;
   if (!$(event.target).hasClass('file-entry')) element = element.parentElement;
 
   if (event.which == 1) {
-    $('.file-entry').removeClass('selected');
-    $(element).addClass('selected');
-    ipcRenderer.send(
-      IpcEvents.rendererRequestLoadMeta,
-      $(element).children('.path').text()
-    );
+    if (selectable) selectFileEntry(element);
   } else if (event.which == 3) {
     event.stopPropagation();
     openContextMenu(event.pageX, event.pageY, [
@@ -272,6 +297,7 @@ function onFileEntryClicked(event: JQuery.MouseUpEvent) {
         },
       },
     ]);
+    if (selectable) selectFileEntry(element);
   }
 }
 

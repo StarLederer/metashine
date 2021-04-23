@@ -1,115 +1,115 @@
 #tags-section {
-	background: #ffffff;
+  background: #ffffff;
 }
 
 #tags-save {
-	width: 6rem;
-	height: 2rem;
+  width: 6rem;
+  height: 2rem;
 
-	background: #000000;
-	color: #ffffff;
+  background: #000000;
+  color: #ffffff;
 
-	font-weight: 700;
-	font-size: 0.75em;
+  font-weight: 700;
+  font-size: 0.75em;
 
-	border-radius: 1rem;
+  border-radius: 1rem;
 }
 
 #tags-section header #tags-save:hover {
-	background: #571be5;
-	color: #ffffff;
+  background: #571be5;
+  color: #ffffff;
 }
 
 /* fileds */
 .tag-field {
-	transition: 500ms;
+  transition: 500ms;
 }
 
 .tag-field::before {
-	content: "";
-	width: 100%;
-	height: 1px;
-	background: rgba(0, 0, 0, 0.0625);
-	position: absolute;
-	display: block;
+  content: '';
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.0625);
+  position: absolute;
+  display: block;
 }
 
 .tag-field:first-child:before {
-	display: none;
+  display: none;
 }
 
 .tag-field label,
 .tag-field span {
-	font-size: 0.75em;
+  font-size: 0.75em;
 
-	opacity: 0.5;
+  opacity: 0.5;
 
-	display: block;
+  display: block;
 
-	padding: 0 2rem;
-	padding-top: 2rem;
+  padding: 0 2rem;
+  padding-top: 2rem;
 }
 
 .tag-field input {
-	width: 100%;
-	height: 3rem;
+  width: 100%;
+  height: 3rem;
 
-	font-size: 1em;
-	font-weight: 700;
+  font-size: 1em;
+  font-weight: 700;
 
-	opacity: 0.87;
+  opacity: 0.87;
 
-	padding: 0 2rem;
-	padding-bottom: 1rem;
+  padding: 0 2rem;
+  padding-bottom: 1rem;
 }
 
 .tag-field input::placeholder {
-	color: #000;
-	opacity: 0.1;
+  color: #000;
+  opacity: 0.1;
 }
 
 /* album art */
 #album-art-field {
-	padding-bottom: 4rem;
+  padding-bottom: 4rem;
 }
 
 #album-art-input {
-	width: 20rem;
-	height: 20rem;
+  width: 20rem;
+  height: 20rem;
 
-	background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 
-	margin: 0 2rem;
-	margin-top: 2rem;
+  margin: 0 2rem;
+  margin-top: 2rem;
 
-	border-radius: 0.25rem;
+  border-radius: 0.25rem;
 
-	overflow: hidden;
+  overflow: hidden;
 }
 
 #album-art-input::before {
-	content: "Drag an image here";
+  content: 'Drag an image here';
 
-	width: 100%;
-	height: 100%;
-	position: absolute;
+  width: 100%;
+  height: 100%;
+  position: absolute;
 
-	opacity: 0.1;
+  opacity: 0.1;
 
-	font-size: 2em;
-	font-weight: 700;
+  font-size: 2em;
+  font-weight: 700;
 
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #album-art-input img {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 /* tag field hover */
 .tag-field:hover {
-	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.05);
 }

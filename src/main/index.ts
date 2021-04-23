@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import fs from 'fs';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
 import * as mm from 'music-metadata';
@@ -8,6 +9,7 @@ import { IpcEvents } from '../common/IpcEvents';
 import { SupportedFormat } from '../common/SupportedFormats';
 import { NodeID3Image } from '../common/NodeID3Image';
 import { ISuppotedFile } from '../common/SupportedFile';
+import { FileCategory } from '../common/FileCategory';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -94,10 +96,7 @@ ipcMain.on(
   (event: IpcMainEvent, filePath: string) => {
     const i = fileList.indexOf(filePath);
     if (i >= 0) {
-      console.log('Original array: ' + fileList);
-      console.log('rem i: ' + i);
-      console.log('rem element: ' + fileList.splice(i, 1));
-      console.log('New array: ' + fileList);
+      fileList.splice(i, 1);
       event.sender.send(IpcEvents.mainRequestRemoveFileDOM, filePath);
     } else {
       // Requesting to remove file that is not registered
@@ -106,16 +105,33 @@ ipcMain.on(
 );
 
 function tryAddFile(filePath: string): boolean {
-  if (!fileList.includes(filePath)) {
-    fileList.push(filePath);
-    mainWindow.webContents.send(
-      IpcEvents.mainFileApproved,
-      getSupportedFileFomPath(filePath)
-    );
-    return true;
-  } else {
-    return false;
+  if (fileList.includes(filePath)) return false;
+  if (fs.lstatSync(filePath).isDirectory()) return false;
+
+  const supportedFile = getSupportedFileFomPath(filePath);
+
+  let category: FileCategory;
+  switch (supportedFile.format) {
+    case SupportedFormat.MP3:
+      category = FileCategory.Supported;
+      break;
+    case SupportedFormat.WAV:
+      category = FileCategory.Readonly;
+      break;
+    case SupportedFormat.Unsupported:
+      category = FileCategory.Unsupported;
+      break;
   }
+
+  mainWindow.webContents.send(
+    IpcEvents.mainFileApproved,
+    supportedFile,
+    category
+  );
+
+  fileList.push(filePath);
+
+  return true;
 }
 
 function getSupportedFileFomPath(filePath: string): ISuppotedFile {
@@ -133,6 +149,8 @@ function getSupportedFileFomPath(filePath: string): ISuppotedFile {
     supportedFile.format = SupportedFormat.MP3;
   else if (lowerCaseExtname.endsWith('wav'))
     supportedFile.format = SupportedFormat.WAV;
+
+  if (supportedFile.format == SupportedFormat.Unsupported) return supportedFile;
 
   // Metadata
   mm.parseFile(filePath)
