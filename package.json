@@ -1,8 +1,8 @@
 {
   "name": "metashine",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Music meta tag editor",
-  "repository": "github:HermanLederer/mp3-tag-assistant",
+  "repository": "github:HermanLederer/metashine",
   "license": "MIT",
   "author": {
     "name": "Herman Lederer",

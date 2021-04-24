@@ -1,8 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+import { format as formatUrl } from 'url';
+
 import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import fs from 'fs';
-import * as path from 'path';
-import { format as formatUrl } from 'url';
+
 import * as mm from 'music-metadata';
 import * as NodeID3 from 'node-id3';
 
@@ -27,6 +29,7 @@ function createMainWindow() {
     icon: './src/assets/app-icon.png',
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 
@@ -44,6 +47,21 @@ function createMainWindow() {
         slashes: true,
       })
     );
+  }
+
+  if (!isDevelopment) {
+    // window.webContents.send('c', 'starting');
+    // autoUpdater.on('checking-for-update', () =>
+    //   window.webContents.send('c', 'checking')
+    // );
+    // autoUpdater.on('update-available', () =>
+    //   window.webContents.send('c', 'available')
+    // );
+    // autoUpdater.on('update-not-available', () =>
+    //   window.webContents.send('c', 'not available')
+    // );
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
   // window.on('closed', () => {
@@ -78,7 +96,6 @@ app.on('activate', () => {
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
   mainWindow = createMainWindow();
-  autoUpdater.checkForUpdatesAndNotify();
 });
 
 //
