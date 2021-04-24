@@ -259,7 +259,7 @@ ipcRenderer.on(
     const entry = $('#' + stringToHashCode(filePath));
     const parent = entry.parent();
     entry.remove();
-    if (parent.html().length <= 0) {
+    if (parent.children('.file-entry').length <= 0) {
       parent.hide();
     }
   }

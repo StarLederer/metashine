@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
@@ -77,6 +78,7 @@ app.on('activate', () => {
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
   mainWindow = createMainWindow();
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 //

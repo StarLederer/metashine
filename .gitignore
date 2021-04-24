@@ -2,6 +2,9 @@
 dist/
 thumbs.db
 
+# Access tokens
+token
+
 # Dependency directories
 node_modules/
 jspm_packages/

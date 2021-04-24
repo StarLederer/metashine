@@ -167,6 +167,7 @@ button#window-control-close:hover {
   align-items: center;
 }
 
+#file-list,
 #readonly-list,
 #unsupported-list {
   display: none;
