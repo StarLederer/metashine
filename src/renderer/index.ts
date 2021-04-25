@@ -167,7 +167,7 @@ ui.tagFileds.year.on('blur', (event: JQuery.BlurEvent) =>
 
 ipcRenderer.on(
   IpcEvents.mainRequestRenderMeta,
-  (event: IpcRendererEvent, meta: NodeID3.Tags, mmTags) => {
+  (event: IpcRendererEvent, meta: NodeID3.Tags) => {
     ui.tagFileds.trackTitle.val(meta.title as string);
     ui.tagFileds.trackArtist.val(meta.artist as string);
     ui.tagFileds.trackNumber.val(meta.trackNumber as string);
@@ -175,10 +175,12 @@ ipcRenderer.on(
     ui.tagFileds.albumArtist.val(meta.performerInfo as string);
     ui.tagFileds.year.val(meta.year as string);
 
-    const albumCover = meta.image as NodeID3Image;
-    if (albumCover.imageBuffer) {
-      const base64String = _arrayBufferToBase64(albumCover.imageBuffer);
-      setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
+    if (meta.image) {
+      const albumCover = meta.image as NodeID3Image;
+      if (albumCover.imageBuffer) {
+        const base64String = _arrayBufferToBase64(albumCover.imageBuffer);
+        setAlbumArt(`data:${albumCover.mime};base64,${base64String}`);
+      } else ui.tagFileds.albumArt.html('');
     } else ui.tagFileds.albumArt.html('');
   }
 );
@@ -265,22 +267,23 @@ ipcRenderer.on(
   }
 );
 
-function selectFileEntry(element: Element) {
-  $('.file-entry').removeClass('selected');
-  $(element).addClass('selected');
-  ipcRenderer.send(
-    IpcEvents.rendererRequestLoadMeta,
-    $(element).children('.path').text()
-  );
-}
-
 function onFileEntryClicked(event: JQuery.MouseUpEvent, selectable?: boolean) {
+  // Get file entry element
   let element = event.target;
   if (!$(event.target).hasClass('file-entry')) element = element.parentElement;
 
+  // Get file path
+  const filePath = $(element).children('.path').text();
+
+  // Left click
   if (event.which == 1) {
-    if (selectable) selectFileEntry(element);
-  } else if (event.which == 3) {
+    if (selectable) {
+      if (event.ctrlKey) toggleFileEntryInSelection(filePath);
+      else selectFileEntry(filePath);
+    }
+  }
+  // Right click
+  else if (event.which == 3) {
     event.stopPropagation();
     openContextMenu(event.pageX, event.pageY, [
       {
@@ -297,8 +300,25 @@ function onFileEntryClicked(event: JQuery.MouseUpEvent, selectable?: boolean) {
         },
       },
     ]);
-    if (selectable) selectFileEntry(element);
+    if (selectable) selectFileEntry(filePath);
   }
+}
+
+function selectFileEntry(filePath: string) {
+  ipcRenderer.send(IpcEvents.rendererSelectionFileSelected, filePath);
+}
+
+function toggleFileEntryInSelection(filePath: string) {
+  ipcRenderer.send(IpcEvents.rendererSelectionFileToggled, filePath);
+}
+
+ipcRenderer.on(IpcEvents.mainSelectionUpdated, updateFileSelection);
+
+function updateFileSelection(event: IpcRendererEvent, elements: string[]) {
+  $('.file-entry').removeClass('selected');
+  elements.forEach((element, i) => {
+    $('#' + stringToHashCode(element)).addClass('selected');
+  });
 }
 
 function _arrayBufferToBase64(buffer: Buffer): string {

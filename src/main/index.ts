@@ -186,9 +186,8 @@ function getSupportedFileFomPath(filePath: string): ISuppotedFile {
 //
 //
 // Tags
-let currentFilePath: string;
-let currentFileFormat: SupportedFormat;
-let currentMeta = getNewMeta();
+let currentFiles: string[] = [];
+let currentMeta: NodeID3.Tags = {};
 
 ipcMain.on(
   IpcEvents.rendererTagTitleUpdated,
@@ -216,30 +215,23 @@ ipcMain.on(
 );
 
 ipcMain.on(
-  IpcEvents.rendererRequestLoadMeta,
+  IpcEvents.rendererSelectionFileSelected,
   (event: IpcMainEvent, filePath: string) => {
-    if (filePath == currentFilePath) return;
+    // Clear selectrion and select the file
+    currentFiles = [];
+    currentFiles.push(filePath);
 
-    currentFilePath = filePath;
-    currentMeta = getNewMeta();
-    switch (path.extname(filePath.toLowerCase()).substring(1)) {
-      case SupportedFormat.MP3:
-        currentFileFormat = SupportedFormat.MP3;
-        break;
-      case SupportedFormat.WAV:
-        currentFileFormat = SupportedFormat.WAV;
-        break;
-    }
-
+    // Load tags
+    currentMeta = {};
     mm.parseFile(filePath)
       .then((value) => {
-        currentMeta.title = value.common.title;
-        currentMeta.artist = value.common.artist;
+        if (value.common.title) currentMeta.title = value.common.title;
+        if (value.common.artist) currentMeta.artist = value.common.artist;
         if (value.common.track.no)
           currentMeta.trackNumber = value.common.track.no.toString();
-        // currentMeta.trackNumber = "69";
-        currentMeta.album = value.common.album;
-        currentMeta.performerInfo = value.common.albumartist;
+        if (value.common.album) currentMeta.album = value.common.album;
+        if (value.common.albumartist)
+          currentMeta.performerInfo = value.common.albumartist;
         if (value.common.year) currentMeta.year = value.common.year.toString();
 
         const frontCover = mm.selectCover(value.common.picture);
@@ -253,38 +245,73 @@ ipcMain.on(
             description: frontCover.description,
             imageBuffer: frontCover.data,
           } as NodeID3Image;
-        } else currentMeta.image = getNewFrontCover();
+        }
 
-        event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta, value);
+        // Request tag section update
+        event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
       })
       .catch((error: Error) => {
         event.sender.send(IpcEvents.mainRequestRenderError, error);
       });
+
+    // Request render update
+    event.sender.send(IpcEvents.mainSelectionUpdated, currentFiles);
+  }
+);
+
+ipcMain.on(
+  IpcEvents.rendererSelectionFileToggled,
+  (event: IpcMainEvent, filePath: string) => {
+    const i = currentFiles.indexOf(filePath);
+
+    // Remove file from selectrion
+    if (i > -1) {
+      currentFiles.splice(i, 1);
+    }
+    // Add file to selection
+    else {
+      currentFiles.push(filePath);
+
+      // Clear current tags
+      currentMeta = {};
+      event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
+    }
+
+    // Request render update
+    event.sender.send(IpcEvents.mainSelectionUpdated, currentFiles);
   }
 );
 
 ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
-  if (currentFileFormat == SupportedFormat.MP3) {
-    const result = NodeID3.update(currentMeta, currentFilePath);
-    if (result === true) {
-      // success
-    } else {
-      event.sender.send(IpcEvents.mainRequestRenderError, result as Error);
+  currentFiles.forEach((filePath) => {
+    const supportedFile = getSupportedFileFomPath(filePath);
+
+    if (supportedFile.format == SupportedFormat.MP3) {
+      console.log(currentMeta);
+      const result = NodeID3.update(currentMeta, supportedFile.path);
+      if (result === true) {
+        // success
+      } else {
+        event.sender.send(IpcEvents.mainRequestRenderError, result as Error);
+      }
+    } else if (supportedFile.format == SupportedFormat.WAV) {
+      event.sender.send(
+        IpcEvents.mainRequestRenderError,
+        new Error(`
+          Cannot save ${filePath}!\n
+          Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3
+        `)
+      );
     }
-  } else if (currentFileFormat == SupportedFormat.WAV) {
-    event.sender.send(
-      IpcEvents.mainRequestRenderError,
-      new Error(
-        'Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3'
-      )
-    );
-  }
+  });
 });
 
 ipcMain.on(
   IpcEvents.rendererAlbumArtReceived,
   (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
-    const frontCover = currentMeta.image as NodeID3Image;
+    const frontCover = currentMeta.image
+      ? (currentMeta.image as NodeID3Image)
+      : getNewFrontCover();
 
     const fileNameLowerCase = name.toLowerCase();
     if (fileNameLowerCase.endsWith('png')) {
@@ -307,12 +334,6 @@ ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
   currentMeta.image = getNewFrontCover();
   event.sender.send(IpcEvents.mainRequestRenderAlbumArt, currentMeta.image);
 });
-
-function getNewMeta(): NodeID3.Tags {
-  return {
-    image: getNewFrontCover(),
-  };
-}
 
 function getNewFrontCover(): NodeID3Image {
   return {
