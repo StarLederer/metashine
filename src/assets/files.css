@@ -11,9 +11,9 @@
   width: 2rem;
   height: 2rem;
 
-  font-size: 0.75em;
+  font-size: 0.75rem;
 
-  margin-left: 1em;
+  margin-left: 0.5rem;
 
   border-radius: 1rem;
 }
@@ -28,17 +28,17 @@ button#window-control-close:hover {
 
 /* files section */
 #files-section header::after {
-  width: calc(100% - 4rem);
-  margin: 0 auto;
+  width: calc(100% - 3rem);
+  left: 1rem;
 }
 
 /* file list */
 #files-section .table {
-  width: calc(100% - 3rem + 0.125rem);
+  width: calc(100% - 2rem + 0.125rem);
   height: 100%;
   padding-top: 3rem;
   padding-right: 1rem;
-  left: 2rem;
+  left: 1rem;
 
   overflow-x: visible;
   overflow-y: scroll;
@@ -80,6 +80,60 @@ button#window-control-close:hover {
   display: none;
 }
 
+/* table head */
+#files-section .table-head {
+  width: calc(100% - 27rem);
+
+  position: fixed;
+  top: 4rem;
+
+  /* background: red; */
+  z-index: 1;
+}
+
+#files-section .table-head::before {
+  content: '';
+
+  width: calc(100%);
+  height: 4rem;
+  position: absolute;
+
+  background: linear-gradient(
+    180deg,
+    #f8f8f8ff 0%,
+    #f8f8f8ff 50%,
+    #f8f8f800 100%
+  );
+  /* background: red; */
+
+  pointer-events: none;
+}
+
+#files-section .table-head::after {
+  width: calc(100%);
+}
+
+#files-section .table-head div {
+  opacity: 0.5;
+}
+
+/* section head */
+#files-section .section-head {
+  margin-top: 1rem;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+}
+
+#file-list,
+#readonly-list,
+#unsupported-list {
+  display: none;
+}
+
 /* file entries */
 #files-section .row.file-entry {
   cursor: pointer;
@@ -117,58 +171,4 @@ button#window-control-close:hover {
   background: linear-gradient(0deg, #f8f8f8ff 0%, #f8f8f8ff 0%, #f8f8f800 100%);
 
   pointer-events: none;
-}
-
-/* table head */
-#files-section .table-head {
-  width: calc(100% - 28rem);
-
-  position: fixed;
-  top: 6rem;
-
-  /* background: red; */
-  z-index: 1;
-}
-
-#files-section .table-head::before {
-  content: '';
-
-  width: calc(100%);
-  height: 4rem;
-  position: absolute;
-
-  background: linear-gradient(
-    180deg,
-    #f8f8f8ff 0%,
-    #f8f8f8ff 50%,
-    #f8f8f800 100%
-  );
-  /* background: red; */
-
-  pointer-events: none;
-}
-
-#files-section .table-head::after {
-  width: calc(100%);
-}
-
-#files-section .table-head div {
-  opacity: 0.5;
-}
-
-/* section head */
-#files-section .section-head {
-  /* margin-top: 1rem; */
-
-  font-size: 0.75rem;
-  font-weight: 700;
-
-  display: flex;
-  align-items: center;
-}
-
-#file-list,
-#readonly-list,
-#unsupported-list {
-  display: none;
 }

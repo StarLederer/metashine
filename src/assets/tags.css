@@ -42,11 +42,11 @@
 .tag-field span {
   font-size: 0.75em;
 
-  opacity: 0.5;
+  opacity: 0.25;
 
   display: block;
 
-  padding: 0 2rem;
+  padding: 0 1rem;
   padding-top: 2rem;
 }
 
@@ -59,7 +59,7 @@
 
   opacity: 0.87;
 
-  padding: 0 2rem;
+  padding: 0 1rem;
   padding-bottom: 1rem;
 }
 
@@ -74,13 +74,13 @@
 }
 
 #album-art-input {
-  width: 20rem;
-  height: 20rem;
+  width: 22rem;
+  height: 22rem;
 
   background: rgba(0, 0, 0, 0.1);
 
-  margin: 0 2rem;
-  margin-top: 2rem;
+  margin: 0 1rem;
+  margin-top: 1rem;
 
   border-radius: 0.25rem;
 

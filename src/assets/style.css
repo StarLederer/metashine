@@ -74,11 +74,11 @@ button.begging:hover {
 section {
   height: 100%;
   display: grid;
-  grid-template-rows: 6rem auto;
+  grid-template-rows: 4rem auto;
 }
 
 header {
-  padding: 0 2rem;
+  padding: 0 1rem;
 
   display: flex;
   justify-content: space-between;
@@ -88,7 +88,7 @@ header {
 }
 
 main {
-  max-height: calc(100vh - 6rem);
+  max-height: calc(100vh - 4rem);
 
   overflow-x: hidden;
   overflow-y: auto;
@@ -108,8 +108,9 @@ header::after,
 }
 
 h2 {
-  font-size: 2em;
+  font-size: 1em;
   font-weight: 700;
+  opacity: 0.87;
 }
 
 #beta-build-disclaimer {
