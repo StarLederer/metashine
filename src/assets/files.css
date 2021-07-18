@@ -144,14 +144,14 @@ button#window-control-close:hover {
 }
 
 #files-section .row.file-entry:hover div {
-  color: #571be588;
+  color: var(--accent-o50);
 }
 
 #files-section .row.file-entry.selected {
-  background: #571be508;
+  background: var(--accent-o05);
 }
 #files-section .row.file-entry.selected div {
-  color: #571be5;
+  color: var(--accent);
 }
 
 #files-section .row.file-entry:hover {

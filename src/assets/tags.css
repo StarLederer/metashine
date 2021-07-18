@@ -16,7 +16,7 @@
 }
 
 #tags-section header #tags-save:hover {
-  background: #571be5;
+  background: var(--accent);
   color: #ffffff;
 }
 
