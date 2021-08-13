@@ -1,53 +1,45 @@
-#files-section {
+#files-tab {
+  height: 100%;
+}
+
+#right-section {
   background: #f8f8f8;
 }
 
 /* window controls */
-#window-controls {
-  display: flex;
-}
-
 #window-controls button {
   width: 2rem;
   height: 2rem;
 
   font-size: 0.75rem;
 
-  margin-left: 0.5rem;
-
   border-radius: 1rem;
 }
 
 #window-controls button:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(255, 255, 255);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 button#window-control-close:hover {
-  color: #e81123;
-}
-
-/* files section */
-#files-section header::after {
-  width: calc(100% - 3rem);
-  left: 1rem;
+  background: rgba(232, 17, 35, 0.1);
+  color: rgb(232, 17, 35);
 }
 
 /* file list */
-#files-section .table {
-  width: calc(100% - 2rem + 0.125rem);
-  height: 100%;
-  padding-top: 3rem;
-  padding-right: 1rem;
-  left: 1rem;
-
-  overflow-x: visible;
-  overflow-y: scroll;
+#right-section .table {
+  height: calc(100% - 2rem);
 
   border: none;
+
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
-#files-section .row {
+/* row common */
+#right-section .row {
   height: 2rem;
+  padding: 0 1rem;
 
   display: grid;
   grid-template-columns: 400px 50px auto;
@@ -56,8 +48,7 @@ button#window-control-close:hover {
   transition: 50ms ease-in-out;
 }
 
-/* row common */
-#files-section .row div {
+#right-section .row div {
   height: 2rem;
 
   color: #0008;
@@ -72,29 +63,23 @@ button#window-control-close:hover {
   pointer-events: none;
 }
 
-#files-section .section {
+#right-section .section {
   margin-bottom: 2rem;
 }
 
-#files-section .row div.hidden {
+#right-section .row div.hidden {
   display: none;
 }
 
 /* table head */
-#files-section .table-head {
-  width: calc(100% - 27rem);
-
-  position: fixed;
-  top: 4rem;
-
-  /* background: red; */
-  z-index: 1;
+#right-section .table-head {
+  padding: 0 1rem;
 }
 
-#files-section .table-head::before {
+#right-section .table-head::before {
   content: '';
 
-  width: calc(100%);
+  width: 100%;
   height: 4rem;
   position: absolute;
 
@@ -108,17 +93,16 @@ button#window-control-close:hover {
 
   pointer-events: none;
 }
-
-#files-section .table-head::after {
-  width: calc(100%);
+#right-section .table-head::after {
+  bottom: 0;
 }
 
-#files-section .table-head div {
+#right-section .table-head div {
   opacity: 0.5;
 }
 
 /* section head */
-#files-section .section-head {
+#right-section .section-head {
   margin-top: 1rem;
 
   font-size: 0.75rem;
@@ -135,31 +119,31 @@ button#window-control-close:hover {
 }
 
 /* file entries */
-#files-section .row.file-entry {
+#right-section .row.file-entry {
   cursor: pointer;
 }
 
-#files-section .row.file-entry div {
+#right-section .row.file-entry div {
   font-weight: 700;
 }
 
-#files-section .row.file-entry:hover div {
+#right-section .row.file-entry:hover div {
   color: var(--accent-o50);
 }
 
-#files-section .row.file-entry.selected {
+#right-section .row.file-entry.selected {
   background: var(--accent-o05);
 }
-#files-section .row.file-entry.selected div {
+#right-section .row.file-entry.selected div {
   color: var(--accent);
 }
 
-#files-section .row.file-entry:hover {
+#right-section .row.file-entry:hover {
   background: #571be511;
 }
 
 /* bottom fade */
-#files-section::after {
+/* #right-section::after {
   content: '';
 
   width: 100%;
@@ -171,4 +155,4 @@ button#window-control-close:hover {
   background: linear-gradient(0deg, #f8f8f8ff 0%, #f8f8f8ff 0%, #f8f8f800 100%);
 
   pointer-events: none;
-}
+} */

@@ -13,18 +13,18 @@ import { SupportedFormat } from '../common/SupportedFormats';
 import { NodeID3Image } from '../common/NodeID3Image';
 import { ISuppotedFile } from '../common/SupportedFile';
 import { FileCategory } from '../common/FileCategory';
+import { setUpAssistantProcess } from './assistantProcess';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow: BrowserWindow;
-
-function createMainWindow() {
+// Window common
+function createWindow(): BrowserWindow {
   const window = new BrowserWindow({
     width: 800,
     height: 600,
     minWidth: 800,
     minHeight: 200,
+    title: 'Metashine',
     frame: false,
     icon: './src/assets/app-icon.png',
     webPreferences: {
@@ -33,10 +33,23 @@ function createMainWindow() {
     },
   });
 
+  window.removeMenu();
+
   if (isDevelopment) {
     window.webContents.openDevTools();
+  } else {
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
+  return window;
+}
+
+//
+//
+// Main window
+function createMainWindow() {
+  const window = createWindow();
   if (isDevelopment) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
   } else {
@@ -48,37 +61,14 @@ function createMainWindow() {
       })
     );
   }
-
-  if (!isDevelopment) {
-    // window.webContents.send('c', 'starting');
-    // autoUpdater.on('checking-for-update', () =>
-    //   window.webContents.send('c', 'checking')
-    // );
-    // autoUpdater.on('update-available', () =>
-    //   window.webContents.send('c', 'available')
-    // );
-    // autoUpdater.on('update-not-available', () =>
-    //   window.webContents.send('c', 'not available')
-    // );
-    autoUpdater.allowPrerelease = true;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-
-  // window.on('closed', () => {
-  //   mainWindow = null;
-  // });
-
-  window.webContents.on('devtools-opened', () => {
-    window.focus();
-    setImmediate(() => {
-      window.focus();
-    });
-  });
-
   return window;
 }
 
-// quit application when all windows are closed
+// Global references to Metashine windows
+let mainWindow: BrowserWindow;
+// let assistantWindow: BrowserWindow;
+
+// Quit application when all windows are closed
 app.on('window-all-closed', () => {
   // on macOS it is common for applications to stay open until the user explicitly quits
   if (process.platform !== 'darwin') {
@@ -87,16 +77,21 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  // on macOS it is common to re-create a window even after all windows have been closed
+  // On macOS it is common to re-create a window even after all windows have been closed
   if (mainWindow === null) {
     mainWindow = createMainWindow();
   }
 });
 
-// create main BrowserWindow when electron is ready
+// Create main BrowserWindow when electron is ready
 app.on('ready', () => {
   mainWindow = createMainWindow();
 });
+
+//
+//
+// Assistant
+setUpAssistantProcess();
 
 //
 //
@@ -116,7 +111,7 @@ ipcMain.on(
     const i = fileList.indexOf(filePath);
     if (i >= 0) {
       fileList.splice(i, 1);
-      event.sender.send(IpcEvents.mainRequestRemoveFileDOM, filePath);
+      event.sender.send(IpcEvents.renderNoFileDOM, filePath);
     } else {
       // Requesting to remove file that is not registered
     }
@@ -177,7 +172,7 @@ function getSupportedFileFomPath(filePath: string): ISuppotedFile {
       supportedFile.meta = value;
     })
     .catch((error: Error) => {
-      mainWindow.webContents.send(IpcEvents.mainRequestRenderError, error);
+      mainWindow.webContents.send(IpcEvents.renderError, error);
     });
 
   return supportedFile;
@@ -248,10 +243,10 @@ ipcMain.on(
         }
 
         // Request tag section update
-        event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
+        event.sender.send(IpcEvents.renderMeta, currentMeta);
       })
       .catch((error: Error) => {
-        event.sender.send(IpcEvents.mainRequestRenderError, error);
+        event.sender.send(IpcEvents.renderError, error);
       });
 
     // Request render update
@@ -274,7 +269,7 @@ ipcMain.on(
 
       // Clear current tags
       currentMeta = {};
-      event.sender.send(IpcEvents.mainRequestRenderMeta, currentMeta);
+      event.sender.send(IpcEvents.renderMeta, currentMeta);
     }
 
     // Request render update
@@ -287,16 +282,15 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
     const supportedFile = getSupportedFileFomPath(filePath);
 
     if (supportedFile.format == SupportedFormat.MP3) {
-      console.log(currentMeta);
       const result = NodeID3.update(currentMeta, supportedFile.path);
       if (result === true) {
         // success
       } else {
-        event.sender.send(IpcEvents.mainRequestRenderError, result as Error);
+        event.sender.send(IpcEvents.renderError, result as Error);
       }
     } else if (supportedFile.format == SupportedFormat.WAV) {
       event.sender.send(
-        IpcEvents.mainRequestRenderError,
+        IpcEvents.renderError,
         new Error(`
           Cannot save ${filePath}!\n
           Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3
@@ -326,13 +320,13 @@ ipcMain.on(
     frontCover.imageBuffer = Buffer.from(buffer);
     currentMeta.image = frontCover;
 
-    event.sender.send(IpcEvents.mainRequestRenderAlbumArt, frontCover);
+    event.sender.send(IpcEvents.renderAlbumArt, frontCover);
   }
 );
 
 ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
   currentMeta.image = getNewFrontCover();
-  event.sender.send(IpcEvents.mainRequestRenderAlbumArt, currentMeta.image);
+  event.sender.send(IpcEvents.renderAlbumArt, currentMeta.image);
 });
 
 function getNewFrontCover(): NodeID3Image {
@@ -343,14 +337,14 @@ function getNewFrontCover(): NodeID3Image {
       name: '',
     },
     description: '',
-    imageBuffer: (null as unknown) as Buffer,
+    imageBuffer: null as unknown as Buffer,
   };
 }
 
 //
 //
 // Window controls
-ipcMain.on(IpcEvents.rendererWindowCollaps, () => mainWindow.minimize());
+ipcMain.on(IpcEvents.rendererWindowCollapse, () => mainWindow.minimize());
 ipcMain.on(IpcEvents.rendererWindowToggleSize, () => {
   if (!mainWindow.isMaximized()) {
     mainWindow.maximize();

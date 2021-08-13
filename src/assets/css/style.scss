@@ -1,11 +1,17 @@
-@import './colors.css';
+@import './common/colors.css';
+@import './common/afterlines.scss';
+@import './common/section-layout.scss';
+
+@import './tags.css';
+@import './files.css';
+@import './assistant.scss';
+@import './context-menu.css';
 
 * {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
   font-weight: 400;
 
-  color: #000000;
   background: transparent;
 
   margin: 0;
@@ -22,14 +28,21 @@
 
 html {
   font-size: 16px;
+  line-height: 1rem;
+  cursor: default;
 }
 
-header button {
+header {
+  -webkit-app-region: drag;
+}
+
+header input,
+header button,
+header button * {
   -webkit-app-region: no-drag;
 }
 
 button {
-  -webkit-app-region: no-drag;
   cursor: pointer;
   outline: none;
 }
@@ -38,10 +51,6 @@ input,
 label {
   cursor: text;
   outline: none;
-}
-
-button * {
-  -webkit-app-region: no-drag;
 }
 
 /* common */
@@ -69,55 +78,25 @@ button.begging:hover {
 #main-layout {
   height: 100vh;
   display: grid;
-  grid-template-columns: 24em auto;
+  grid-template-columns: 20rem auto;
 }
 
-/* sections */
-section {
-  height: 100%;
-  display: grid;
-  grid-template-rows: 4rem auto;
-}
-
-header {
-  padding: 0 1rem;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  -webkit-app-region: drag;
-}
-
-main {
-  max-height: calc(100vh - 4rem);
-
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-header::after,
-.afterline::after {
-  content: '';
-  width: 100%;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.05);
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  display: block;
-  z-index: 2;
-}
-
-h2 {
-  font-size: 1em;
-  font-weight: 700;
-  opacity: 0.87;
+header::after {
+  @include afterline-bottom();
 }
 
 #beta-build-disclaimer {
+  width: 100%;
+  height: 4rem;
+  left: 0;
+  top: 0;
+  position: absolute;
   font-size: 1em;
   opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 }
 
 /* scroll bars */
@@ -133,10 +112,10 @@ h2 {
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
 
-  transition: 0.5s;
+  transition: 300ms;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.5);
-  transition: 0.25s;
+  transition: 150ms;
 }

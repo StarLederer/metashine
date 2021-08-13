@@ -1,13 +1,10 @@
-#tags-section {
+#left-section {
   background: #ffffff;
 }
 
-#tags-save {
-  width: 6rem;
+/* nav buttons */
+#left-section header button {
   height: 2rem;
-
-  background: #000000;
-  color: #ffffff;
 
   font-weight: 700;
   font-size: 0.75em;
@@ -15,9 +12,24 @@
   border-radius: 1rem;
 }
 
-#tags-section header #tags-save:hover {
+#left-section header button:hover {
   background: var(--accent);
   color: #ffffff;
+}
+
+#left-section header button:active {
+  background: var(--accent-h1);
+  color: #ffffff;
+}
+
+#tags-save {
+  width: 6rem;
+  background: #000000;
+  color: #ffffff;
+}
+
+#open-assistant {
+  padding: 0 1rem;
 }
 
 /* fileds */
@@ -74,8 +86,8 @@
 }
 
 #album-art-input {
-  width: 22rem;
-  height: 22rem;
+  width: 18rem;
+  height: 18rem;
 
   background: rgba(0, 0, 0, 0.1);
 
@@ -96,7 +108,7 @@
 
   opacity: 0.1;
 
-  font-size: 2em;
+  font-size: 1em;
   font-weight: 700;
 
   display: flex;

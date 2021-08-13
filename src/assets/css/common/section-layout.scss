@@ -1,0 +1,66 @@
+/* sections */
+section {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 4rem auto;
+}
+
+header {
+  padding: 0 1rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* tabs and controls */
+header .header-tabs,
+header .header-controls {
+  display: flex;
+}
+
+header .header-tabs > * {
+  margin-right: 1rem;
+}
+header .header-controls > * {
+  margin-right: 0.5rem;
+}
+
+header .header-tabs > *:last-child,
+header .header-controls > *:last-child {
+  margin: 0;
+}
+
+/* tabs */
+header .header-tabs > * {
+  height: 2rem;
+  padding-right: 1rem;
+
+  color: rgba(0, 0, 0, 0.2);
+
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+header .header-tabs > *:not(:last-child)::after {
+  @include afterline-right();
+}
+
+/* section title */
+h2,
+header .header-tabs h2 {
+  color: rgba(0, 0, 0, 0.87);
+
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+
+  display: flex;
+  align-items: center;
+}
+
+main {
+  max-height: calc(100vh - 4rem);
+  overflow: auto;
+}

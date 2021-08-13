@@ -1,15 +1,17 @@
 export const IpcEvents = {
   mainFileApproved: 'file-approved',
   mainSelectionUpdated: 'main-request-update-selection',
-  mainRequestRemoveFileDOM: 'main-request-remove-file-dom',
-  mainRequestRenderError: 'render-meta',
-  mainRequestRenderAlbumArt: 'render-album-art',
-  mainRequestRenderMeta: 'render-error',
+  renderAlbumArt: 'render-album-art',
+  renderError: 'render-meta',
+  renderMeta: 'render-error',
+  renderNoFileDOM: 'main-request-remove-file-dom',
+  renderSoundcloudSearch: 'render-soundcloud-search',
 
   rendererAlbumArtReceived: 'album-art-received',
   rendererFileReceived: 'file-received',
   rendererRequestRemoveAlbumArt: 'remove-album-art',
   rendererRequestRemoveFile: 'request-remove-file',
+  processAssistantSearch: 'opent-assistat',
   rendererRequestSaveMeta: 'save-meta',
   rendererSelectionFileSelected: 'renderer-selection-file-selected',
   rendererSelectionFileToggled: 'renderer-selection-file-toggled',
@@ -22,6 +24,6 @@ export const IpcEvents = {
   rendererTagYearUpdated: 'tag-year-updated',
 
   rendererWindowClose: 'window-close',
-  rendererWindowCollaps: 'window-collapse',
+  rendererWindowCollapse: 'window-collapse',
   rendererWindowToggleSize: 'window-toggle-size',
 };

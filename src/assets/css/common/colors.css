@@ -1,0 +1,28 @@
+:root {
+  --accent-hue: 258;
+  --accent-sat: 80%;
+  --accent-lig: 50%;
+
+  --accent-sat-h1: 100%;
+  --accent-lig-h1: 64%;
+
+  --accent: hsl(var(--accent-hue), var(--accent-sat), var(--accent-lig));
+  --accent-h1: hsl(
+    var(--accent-hue),
+    var(--accent-sat-h1),
+    var(--accent-lig-h1)
+  );
+
+  --accent-o50: hsla(
+    var(--accent-hue),
+    var(--accent-sat),
+    var(--accent-lig),
+    88%
+  );
+  --accent-o05: hsla(
+    var(--accent-hue),
+    var(--accent-sat),
+    var(--accent-lig),
+    05%
+  );
+}

@@ -25,12 +25,12 @@
 }
 
 #context-menu button:hover {
-  background: var(--ms-accent);
+  background: var(--accent);
   color: white;
 }
 
 #context-menu button:active {
-  background: var(--ms-accent-h1);
+  background: var(--accent-h1);
   color: white;
 }
 

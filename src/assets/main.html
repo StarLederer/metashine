@@ -1,9 +1,11 @@
 <div id="main-layout">
   <!-- tags -->
-  <section id="tags-section">
+  <section id="left-section">
     <header>
       <h2>Tags</h2>
-      <button class="begging" id="tags-save">save</button>
+      <div class="header-controls">
+        <button id="tags-save" class="begging">save</button>
+      </div>
     </header>
     <main>
       <div class="tag-field">
@@ -44,12 +46,17 @@
     </main>
   </section>
 
-  <!-- files -->
-  <section id="files-section">
+  <!-- files & assistant -->
+  <section id="right-section">
     <header>
-      <h2>Files</h2>
+      <div class="header-tabs">
+        <button id="show-files"><h2>Files</h2></button>
+        <button id="show-assistant">Assistant</button>
+      </div>
+
       <div id="beta-build-disclaimer">Beta build</div>
-      <div id="window-controls">
+
+      <div id="window-controls" class="header-controls">
         <button id="window-control-colapse">
           <i class="icon-windows-collapse"></i>
         </button>
@@ -63,22 +70,39 @@
     </header>
 
     <main>
-      <div class="table">
+      <!-- files tab -->
+      <div id="files-tab">
         <div class="row table-head afterline">
           <div>Name</div>
           <div>Type</div>
           <div>Location</div>
           <div class="hidden">Path</div>
         </div>
-        <div id="file-list" class="section"></div>
-        <div id="readonly-list" class="section">
-          <div class="row section-head afterline">Read only</div>
+        <div class="table">
+          <div id="file-list" class="section"></div>
+          <div id="readonly-list" class="section">
+            <div class="row section-head afterline">Read only</div>
+          </div>
+          <div id="unsupported-list" class="section">
+            <div class="row section-head afterline">Unsupported</div>
+          </div>
         </div>
-        <div id="unsupported-list" class="section">
-          <div class="row section-head afterline">Unsupported</div>
-        </div>
+      </div>
+
+      <!-- assistant tab -->
+      <div id="assistant-tab" style="display: none">
+        <form action="" class="search afterline">
+          <input id="search-input" type="text" placeholder="Search" />
+          <div class="search-buttons">
+            <button id="search-soundcloud">Search Soundcloud</button>
+          </div>
+        </form>
+
+        <!-- <h3>Soundcloud</h3> -->
+        <div id="search-results"></div>
       </div>
     </main>
   </section>
 </div>
+
 <div id="context-menu"></div>
