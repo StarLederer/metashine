@@ -131,7 +131,6 @@ ui.sections.right.tabNav.assistant.on('click', (event: JQuery.ClickEvent) => {
   );
   ui.sections.right.tabs.files.css('display', 'none');
   ui.sections.right.tabs.assistant.css('display', 'block');
-  ui.sections.right.searchResults.empty();
   rightSection.selectedTab = 1;
 });
 

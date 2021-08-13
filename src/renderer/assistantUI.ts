@@ -16,6 +16,8 @@ function setupAssistantUI(params: AssistantUIParameters) {
   // Soundcloud search button
   params.searchSoundcloud.on('click', (event) => {
     event.preventDefault();
+    event.stopPropagation();
+    params.searchResults.empty();
     ipcRenderer.send(
       IpcEvents.processAssistantSearch,
       params.searchInput.val()
