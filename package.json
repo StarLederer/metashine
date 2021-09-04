@@ -37,18 +37,20 @@
     }
   },
   "dependencies": {
-    "@types/jquery": "^3.5.6",
+    "electron": "11.4.3",
     "electron-updater": "^4.3.8",
+    "eslint-config-airbnb-typescript": "^14.0.0",
     "jquery": "^3.6.0",
     "music-metadata": "^7.8.4",
     "node-id3": "^0.2.2",
     "soundcloud.ts": "^0.4.0",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "spotify-api.js": "^9.0.1"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.6",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "electron": "11.4.3",
     "electron-builder": "^22.4.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
@@ -58,6 +60,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.4.0",
     "node-sass": "^6.0.1",
+    "prettier": "^2.3.2",
     "sass-loader": "^10",
     "typescript": "^4.2.4",
     "webpack": "~4.42.1"

@@ -1,4 +1,4 @@
-export interface NodeID3Image {
+interface NodeID3Image {
   mime: string;
   type: {
     id: number;
@@ -7,3 +7,5 @@ export interface NodeID3Image {
   description: string;
   imageBuffer: Buffer;
 }
+
+export default NodeID3Image;

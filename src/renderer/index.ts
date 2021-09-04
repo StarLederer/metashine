@@ -1,19 +1,19 @@
 import '../assets/css/style.scss';
 
 import { clipboard, ipcRenderer, IpcRendererEvent } from 'electron';
-import getStatic from './getStatic';
 import $ from 'jquery';
+import getStatic from './getStatic';
 
 import { stringToHashCode } from '../common/util';
 
-import { IpcEvents } from '../common/IpcEvents';
-import { ISuppotedFile } from '../common/SupportedFile';
-import { FileCategory } from '../common/FileCategory';
+import IpcEvents from '../common/IpcEvents';
+import ISuppotedFile from '../common/SupportedFile';
+import FileCategory from '../common/FileCategory';
 
 import cancelDragOverAndEnter from './dragEventHandlers';
 import { setupTagUI } from './tagUI';
 import { setupContextMenu, openContextMenu } from './contextMenu';
-import { setupAssistantUI } from './assistantUI';
+import setupAssistantUI from './assistantUI';
 
 //
 //
@@ -23,9 +23,12 @@ $(document.head).append(
     'mp3-tag-assistant-icons/mp3-tag-assistant-icons.css'
   )}"></link>`
 );
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 $('#app').html(require('../assets/main.html'));
 
-var packageJson = require('../../package.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const packageJson = require('../../package.json');
 
 //
 //
@@ -137,6 +140,58 @@ ui.sections.right.tabNav.assistant.on('click', (event: JQuery.ClickEvent) => {
 //
 //
 // File UI
+function selectFileEntry(filePath: string) {
+  ipcRenderer.send(IpcEvents.rendererSelectionFileSelected, filePath);
+}
+
+function toggleFileEntryInSelection(filePath: string) {
+  ipcRenderer.send(IpcEvents.rendererSelectionFileToggled, filePath);
+}
+
+function updateFileSelection(event: IpcRendererEvent, elements: string[]) {
+  $('.file-entry').removeClass('selected');
+  elements.forEach((element) => {
+    $(`#${stringToHashCode(element)}`).addClass('selected');
+  });
+}
+
+function onFileEntryClicked(event: JQuery.MouseUpEvent, selectable?: boolean) {
+  // Get file entry element
+  let element = event.target;
+  if (!$(event.target).hasClass('file-entry')) element = element.parentElement;
+
+  // Get file path
+  const filePath = $(element).children('.path').text();
+
+  // Left click
+  if (event.which === 1) {
+    if (selectable) {
+      if (event.ctrlKey) toggleFileEntryInSelection(filePath);
+      else selectFileEntry(filePath);
+    }
+  }
+  // Right click
+  else if (event.which === 3) {
+    event.stopPropagation();
+    openContextMenu(event.pageX, event.pageY, [
+      {
+        name: 'Copy name',
+        click() {
+          clipboard.writeText($(element).children('.name').html());
+        },
+      },
+      {
+        name: 'Remove',
+        click() {
+          const removeFilePath = $(element).children('.path').text();
+          ipcRenderer.send(IpcEvents.rendererRequestRemoveFile, removeFilePath);
+        },
+      },
+    ]);
+    if (selectable) selectFileEntry(filePath);
+  }
+}
+
 ui.sections.right.tabs.files.on('dragover', cancelDragOverAndEnter);
 ui.sections.right.tabs.files.on('dragenter', cancelDragOverAndEnter);
 
@@ -187,7 +242,7 @@ ipcRenderer.on(
 ipcRenderer.on(
   IpcEvents.renderNoFileDOM,
   (event: IpcRendererEvent, filePath: string) => {
-    const entry = $('#' + stringToHashCode(filePath));
+    const entry = $(`#${stringToHashCode(filePath)}`);
     const parent = entry.parent();
     entry.remove();
     if (parent.children('.file-entry').length <= 0) {
@@ -196,59 +251,7 @@ ipcRenderer.on(
   }
 );
 
-function onFileEntryClicked(event: JQuery.MouseUpEvent, selectable?: boolean) {
-  // Get file entry element
-  let element = event.target;
-  if (!$(event.target).hasClass('file-entry')) element = element.parentElement;
-
-  // Get file path
-  const filePath = $(element).children('.path').text();
-
-  // Left click
-  if (event.which == 1) {
-    if (selectable) {
-      if (event.ctrlKey) toggleFileEntryInSelection(filePath);
-      else selectFileEntry(filePath);
-    }
-  }
-  // Right click
-  else if (event.which == 3) {
-    event.stopPropagation();
-    openContextMenu(event.pageX, event.pageY, [
-      {
-        name: 'Copy name',
-        click() {
-          clipboard.writeText($(element).children('.name').html());
-        },
-      },
-      {
-        name: 'Remove',
-        click() {
-          const filePath = $(element).children('.path').text();
-          ipcRenderer.send(IpcEvents.rendererRequestRemoveFile, filePath);
-        },
-      },
-    ]);
-    if (selectable) selectFileEntry(filePath);
-  }
-}
-
-function selectFileEntry(filePath: string) {
-  ipcRenderer.send(IpcEvents.rendererSelectionFileSelected, filePath);
-}
-
-function toggleFileEntryInSelection(filePath: string) {
-  ipcRenderer.send(IpcEvents.rendererSelectionFileToggled, filePath);
-}
-
 ipcRenderer.on(IpcEvents.mainSelectionUpdated, updateFileSelection);
-
-function updateFileSelection(event: IpcRendererEvent, elements: string[]) {
-  $('.file-entry').removeClass('selected');
-  elements.forEach((element, i) => {
-    $('#' + stringToHashCode(element)).addClass('selected');
-  });
-}
 
 //
 //
@@ -273,6 +276,7 @@ setupContextMenu({
 ipcRenderer.on(
   IpcEvents.renderError,
   (event: IpcRendererEvent, error: Error) => {
+    // eslint-disable-next-line no-alert
     alert(`
 		Error: ${error.name}\n
 		${error.message}\n

@@ -10,10 +10,10 @@ function arrayBufferToBase64(buffer: Buffer): string {
   return window.btoa(binary);
 }
 
-function urlToBuffer(url: string) {
+function urlToBuffer(url: string): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
-    https.get(url, function (res) {
-      var data: Uint8Array[] = [];
+    https.get(url, (res) => {
+      const data: Uint8Array[] = [];
 
       res
         .on('data', (chunk) => {
@@ -33,13 +33,15 @@ function urlToBuffer(url: string) {
 }
 
 function stringToHashCode(s: string): number {
-  var hash = 0,
-    i,
-    chr;
+  let hash = 0;
+  let i;
+  let chr;
   if (s.length === 0) return hash;
   for (i = 0; i < s.length; i++) {
     chr = s.charCodeAt(i);
+    // eslint-disable-next-line no-bitwise
     hash = (hash << 5) - hash + chr;
+    // eslint-disable-next-line no-bitwise
     hash |= 0; // Convert to 32bit integer
   }
   return hash;

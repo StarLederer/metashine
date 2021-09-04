@@ -8,12 +8,12 @@ import { autoUpdater } from 'electron-updater';
 import * as mm from 'music-metadata';
 import * as NodeID3 from 'node-id3';
 
-import { IpcEvents } from '../common/IpcEvents';
-import { SupportedFormat } from '../common/SupportedFormats';
-import { NodeID3Image } from '../common/NodeID3Image';
-import { ISuppotedFile } from '../common/SupportedFile';
-import { FileCategory } from '../common/FileCategory';
-import { setUpAssistantProcess } from './assistantProcess';
+import IpcEvents from '../common/IpcEvents';
+import SupportedFormat from '../common/SupportedFormats';
+import NodeID3Image from '../common/NodeID3Image';
+import ISuppotedFile from '../common/SupportedFile';
+import FileCategory from '../common/FileCategory';
+import setUpAssistantProcess from './assistantProcess';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -98,6 +98,67 @@ setUpAssistantProcess();
 // Files
 const fileList: Array<string> = [];
 
+function getSupportedFileFomPath(filePath: string): ISuppotedFile {
+  const supportedFile: ISuppotedFile = {
+    name: path.basename(filePath, path.extname(filePath)),
+    format: SupportedFormat.Unsupported,
+    location: path.dirname(filePath),
+    path: filePath,
+    meta: null,
+  };
+
+  // Format
+  const lowerCaseExtname = path.extname(filePath).toLowerCase();
+  if (lowerCaseExtname.endsWith('mp3'))
+    supportedFile.format = SupportedFormat.MP3;
+  else if (lowerCaseExtname.endsWith('wav'))
+    supportedFile.format = SupportedFormat.WAV;
+
+  if (supportedFile.format === SupportedFormat.Unsupported)
+    return supportedFile;
+
+  // Metadata
+  mm.parseFile(filePath)
+    .then((value: mm.IAudioMetadata) => {
+      supportedFile.meta = value;
+    })
+    .catch((error: Error) => {
+      mainWindow.webContents.send(IpcEvents.renderError, error);
+    });
+
+  return supportedFile;
+}
+
+function tryAddFile(filePath: string): boolean {
+  if (fileList.includes(filePath)) return false;
+  if (fs.lstatSync(filePath).isDirectory()) return false;
+
+  const supportedFile = getSupportedFileFomPath(filePath);
+
+  let category: FileCategory;
+  switch (supportedFile.format) {
+    case SupportedFormat.MP3:
+      category = FileCategory.Supported;
+      break;
+    case SupportedFormat.WAV:
+      category = FileCategory.Readonly;
+      break;
+    default:
+      category = FileCategory.Unsupported;
+      break;
+  }
+
+  mainWindow.webContents.send(
+    IpcEvents.mainFileApproved,
+    supportedFile,
+    category
+  );
+
+  fileList.push(filePath);
+
+  return true;
+}
+
 ipcMain.on(
   IpcEvents.rendererFileReceived,
   (event: IpcMainEvent, filePath: string) => {
@@ -118,66 +179,6 @@ ipcMain.on(
   }
 );
 
-function tryAddFile(filePath: string): boolean {
-  if (fileList.includes(filePath)) return false;
-  if (fs.lstatSync(filePath).isDirectory()) return false;
-
-  const supportedFile = getSupportedFileFomPath(filePath);
-
-  let category: FileCategory;
-  switch (supportedFile.format) {
-    case SupportedFormat.MP3:
-      category = FileCategory.Supported;
-      break;
-    case SupportedFormat.WAV:
-      category = FileCategory.Readonly;
-      break;
-    case SupportedFormat.Unsupported:
-      category = FileCategory.Unsupported;
-      break;
-  }
-
-  mainWindow.webContents.send(
-    IpcEvents.mainFileApproved,
-    supportedFile,
-    category
-  );
-
-  fileList.push(filePath);
-
-  return true;
-}
-
-function getSupportedFileFomPath(filePath: string): ISuppotedFile {
-  const supportedFile: ISuppotedFile = {
-    name: path.basename(filePath, path.extname(filePath)),
-    format: SupportedFormat.Unsupported,
-    location: path.dirname(filePath),
-    path: filePath,
-    meta: null,
-  };
-
-  // Format
-  const lowerCaseExtname = path.extname(filePath).toLowerCase();
-  if (lowerCaseExtname.endsWith('mp3'))
-    supportedFile.format = SupportedFormat.MP3;
-  else if (lowerCaseExtname.endsWith('wav'))
-    supportedFile.format = SupportedFormat.WAV;
-
-  if (supportedFile.format == SupportedFormat.Unsupported) return supportedFile;
-
-  // Metadata
-  mm.parseFile(filePath)
-    .then((value: mm.IAudioMetadata) => {
-      supportedFile.meta = value;
-    })
-    .catch((error: Error) => {
-      mainWindow.webContents.send(IpcEvents.renderError, error);
-    });
-
-  return supportedFile;
-}
-
 //
 //
 // Tags
@@ -186,27 +187,39 @@ let currentMeta: NodeID3.Tags = {};
 
 ipcMain.on(
   IpcEvents.rendererTagTitleUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.title = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.title = value;
+  }
 );
 ipcMain.on(
   IpcEvents.rendererTagArtistUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.artist = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.artist = value;
+  }
 );
 ipcMain.on(
   IpcEvents.rendererTagTrackUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.trackNumber = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.trackNumber = value;
+  }
 );
 ipcMain.on(
   IpcEvents.rendererTagAlbumUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.album = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.album = value;
+  }
 );
 ipcMain.on(
   IpcEvents.rendererTagAlbumArtistUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.performerInfo = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.performerInfo = value;
+  }
 );
 ipcMain.on(
   IpcEvents.rendererTagYearUpdated,
-  (event: IpcMainEvent, value: string) => (currentMeta.year = value)
+  (event: IpcMainEvent, value: string) => {
+    currentMeta.year = value;
+  }
 );
 
 ipcMain.on(
@@ -281,14 +294,14 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
   currentFiles.forEach((filePath) => {
     const supportedFile = getSupportedFileFomPath(filePath);
 
-    if (supportedFile.format == SupportedFormat.MP3) {
+    if (supportedFile.format === SupportedFormat.MP3) {
       const result = NodeID3.update(currentMeta, supportedFile.path);
       if (result === true) {
         // success
       } else {
         event.sender.send(IpcEvents.renderError, result as Error);
       }
-    } else if (supportedFile.format == SupportedFormat.WAV) {
+    } else if (supportedFile.format === SupportedFormat.WAV) {
       event.sender.send(
         IpcEvents.renderError,
         new Error(`
@@ -299,6 +312,18 @@ ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
     }
   });
 });
+
+function getNewFrontCover(): NodeID3Image {
+  return {
+    mime: '',
+    type: {
+      id: 3,
+      name: '',
+    },
+    description: '',
+    imageBuffer: null as unknown as Buffer,
+  };
+}
 
 ipcMain.on(
   IpcEvents.rendererAlbumArtReceived,
@@ -328,18 +353,6 @@ ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
   currentMeta.image = getNewFrontCover();
   event.sender.send(IpcEvents.renderAlbumArt, currentMeta.image);
 });
-
-function getNewFrontCover(): NodeID3Image {
-  return {
-    mime: '',
-    type: {
-      id: 3,
-      name: '',
-    },
-    description: '',
-    imageBuffer: null as unknown as Buffer,
-  };
-}
 
 //
 //

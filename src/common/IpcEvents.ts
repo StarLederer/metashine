@@ -1,4 +1,4 @@
-export const IpcEvents = {
+const IpcEvents = {
   mainFileApproved: 'file-approved',
   mainSelectionUpdated: 'main-request-update-selection',
   renderAlbumArt: 'render-album-art',
@@ -27,3 +27,5 @@ export const IpcEvents = {
   rendererWindowCollapse: 'window-collapse',
   rendererWindowToggleSize: 'window-toggle-size',
 };
+
+export default IpcEvents;

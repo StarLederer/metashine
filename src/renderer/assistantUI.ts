@@ -1,8 +1,8 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import $ from 'jquery';
-
-import { IpcEvents } from '../common/IpcEvents';
 import { SoundcloudTrackSearchV2 } from 'soundcloud.ts';
+
+import IpcEvents from '../common/IpcEvents';
 import { updateAlbumArt, updateTrackArtist, updateTrackTitle } from './tagUI';
 import { urlToBuffer } from '../common/util';
 
@@ -12,7 +12,7 @@ interface AssistantUIParameters {
   searchResults: JQuery<HTMLElement>;
 }
 
-function setupAssistantUI(params: AssistantUIParameters) {
+function setupAssistantUI(params: AssistantUIParameters): void {
   // Soundcloud search button
   params.searchSoundcloud.on('click', (event) => {
     event.preventDefault();
@@ -59,20 +59,18 @@ function setupAssistantUI(params: AssistantUIParameters) {
         `);
 
         // Album art
-        {
-          if (res.collection[i].artwork_url) {
-            urlToBuffer(res.collection[i].artwork_url)
-              .then((buffer) => {
-                searchCard.find('.album-art').on('click', (event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  updateAlbumArt(buffer, res.collection[i].artwork_url);
-                });
-              })
-              .catch((error) => {
-                console.log(error);
+        if (res.collection[i].artwork_url) {
+          urlToBuffer(res.collection[i].artwork_url)
+            .then((buffer) => {
+              searchCard.find('.album-art').on('click', (clickEvent) => {
+                clickEvent.preventDefault();
+                clickEvent.stopPropagation();
+                updateAlbumArt(buffer, res.collection[i].artwork_url);
               });
-          }
+            })
+            .catch((error) => {
+              event.sender.on(IpcEvents.renderError, error);
+            });
         }
 
         // Track title
@@ -90,12 +88,12 @@ function setupAssistantUI(params: AssistantUIParameters) {
             suggestions.push(...rawSuggestion.split(' - '));
 
           // Add suggestion buttons
-          for (let i = 0; i < suggestions.length; ++i) {
+          for (let j = 0; j < suggestions.length; ++j) {
             const button = $(`
-            <button>${suggestions[i]}</button>
+            <button>${suggestions[j]}</button>
           `);
             button.on('click', () => {
-              updateTrackTitle(suggestions[i]);
+              updateTrackTitle(suggestions[j]);
             });
             suggestionDiv.append(button);
           }
@@ -112,7 +110,7 @@ function setupAssistantUI(params: AssistantUIParameters) {
           searchCard.find('.track-artist-suggestions').append(button);
         }
 
-        searchCard.find('.preview').on('click', (event) => {
+        searchCard.find('.preview').on('click', () => {
           if (searchCard.hasClass('open')) {
             searchCard.removeClass('open');
             searchCard
@@ -120,8 +118,10 @@ function setupAssistantUI(params: AssistantUIParameters) {
               .style.removeProperty('height');
           } else {
             searchCard.addClass('open');
-            searchCard.children('.suggestions')[0].style.height =
-              searchCard.find('.container').outerHeight() + 'px';
+            searchCard.children('.suggestions')[0].style.height = `${searchCard
+              .find('.container')
+              .outerHeight()}px
+              `;
           }
         });
 
@@ -131,4 +131,4 @@ function setupAssistantUI(params: AssistantUIParameters) {
   );
 }
 
-export { setupAssistantUI };
+export default setupAssistantUI;

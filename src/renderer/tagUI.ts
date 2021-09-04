@@ -2,8 +2,8 @@ import { clipboard, ipcRenderer, IpcRendererEvent } from 'electron';
 import $ from 'jquery';
 import * as NodeID3 from 'node-id3';
 
-import { IpcEvents } from '../common/IpcEvents';
-import { NodeID3Image } from '../common/NodeID3Image';
+import IpcEvents from '../common/IpcEvents';
+import NodeID3Image from '../common/NodeID3Image';
 import { arrayBufferToBase64 } from '../common/util';
 import { openContextMenu } from './contextMenu';
 import cancelDragOverAndEnter from './dragEventHandlers';
@@ -23,7 +23,7 @@ interface TagUISetupParameters {
 
 let tagUIParams: TagUISetupParameters;
 
-function setupTagUI(params: TagUISetupParameters) {
+function setupTagUI(params: TagUISetupParameters): void {
   tagUIParams = params;
 
   params.saveButton.on('click', (event: JQuery.ClickEvent) => {
@@ -32,7 +32,7 @@ function setupTagUI(params: TagUISetupParameters) {
   });
 
   params.tagFields.albumArt.on('mouseup', (event: JQuery.MouseUpEvent) => {
-    if (event.which == 3) {
+    if (event.which === 3) {
       event.stopPropagation();
       openContextMenu(event.pageX, event.pageY, [
         {
@@ -98,6 +98,10 @@ function setupTagUI(params: TagUISetupParameters) {
     ipcRenderer.send(IpcEvents.rendererTagYearUpdated, $(event.target).val())
   );
 
+  function setAlbumArt(src: string) {
+    params.tagFields.albumArt.html(`<img src="${src}" alt="Album art" />`);
+  }
+
   ipcRenderer.on(
     IpcEvents.renderMeta,
     (event: IpcRendererEvent, meta: NodeID3.Tags) => {
@@ -127,23 +131,19 @@ function setupTagUI(params: TagUISetupParameters) {
       } else params.tagFields.albumArt.html('');
     }
   );
-
-  function setAlbumArt(src: string) {
-    params.tagFields.albumArt.html(`<img src="${src}" alt="Album art" />`);
-  }
 }
 
-function updateTrackTitle(value: string) {
+function updateTrackTitle(value: string): void {
   tagUIParams.tagFields.trackTitle.val(value);
   ipcRenderer.send(IpcEvents.rendererTagTitleUpdated, value);
 }
 
-function updateTrackArtist(value: string) {
+function updateTrackArtist(value: string): void {
   tagUIParams.tagFields.trackArtist.val(value);
   ipcRenderer.send(IpcEvents.rendererTagArtistUpdated, value);
 }
 
-function updateAlbumArt(buffer: Buffer, name: string) {
+function updateAlbumArt(buffer: Buffer, name: string): void {
   ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, name, buffer);
 }
 

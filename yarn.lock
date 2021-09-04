@@ -3296,6 +3296,11 @@ eslint-config-airbnb-base@^14.2.1:
     object.assign "^4.1.2"
     object.entries "^1.1.2"
 
+eslint-config-airbnb-typescript@^14.0.0:
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-typescript/-/eslint-config-airbnb-typescript-14.0.0.tgz#fc22246973b99f0820e2ad1ab929fdd011dfa039"
+  integrity sha512-d2Nit2ByZARGRYK6tgSNl3nnmGZPyvsgbsKFcmm+nAhvT8VjVpifG5jI4tzObUUPb0sWw0E1oO/0pSpBD/pIuQ==
+
 eslint-config-prettier@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.2.0.tgz#78de77d63bca8e9e59dae75a614b5299925bb7b3"
@@ -6603,6 +6608,11 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
+prettier@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.3.2.tgz#ef280a05ec253712e486233db5c6f23441e7342d"
+  integrity sha512-lnJzDfJ66zkMy58OL5/NY5zp70S7Nz6KqcKkXYzn2tMVrNxvbqaBpg7H3qHaLxCJ5lNMsGuM8+ohS7cZrthdLQ==
+
 pretty-error@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/pretty-error/-/pretty-error-2.1.1.tgz#5f4f87c8f91e5ae3f3ba87ab4cf5e03b1a17f1a3"
@@ -7636,6 +7646,19 @@ split-string@^3.0.1, split-string@^3.0.2:
   integrity sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==
   dependencies:
     extend-shallow "^3.0.0"
+
+spotify-api.js@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/spotify-api.js/-/spotify-api.js-9.0.1.tgz#f9c08922b6ef3cf95321304354c43ad99467d38e"
+  integrity sha512-+/oKnWWeas2y/un/z1SA8t4JNLd3S5aKOLd5HgLyZSt3wR29oSpUUD1Hue7Yfd4n5RoUgM8seDLxiD8OqUuGAw==
+  dependencies:
+    axios "^0.21.1"
+    spotify-types "^1.0.0"
+
+spotify-types@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/spotify-types/-/spotify-types-1.0.0.tgz#a7227644439b42f0653803c144e38dc043852bcd"
+  integrity sha512-WAAsmN6rhshF0QyNyBz8ujbk0FYgEMrF2/xSByvnKe15U9xqrXxzzuNDEf7i1e5B7/Tz0jeBGpHh6YfRRr2DUw==
 
 sprintf-js@^1.1.2:
   version "1.1.2"

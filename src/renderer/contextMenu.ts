@@ -10,16 +10,22 @@ interface ContextMenuSetupParams {
 
 let contextMenu: JQuery<HTMLElement>;
 
-function setupContextMenu(params: ContextMenuSetupParams) {
-  contextMenu = params.contextMenu;
-  params.document.on('mouseup', closeContextMenu);
+function closeContextMenu(): void {
+  if (isContextMenuOpen) {
+    contextMenu.css({ display: 'none' });
+    contextMenu.children().each((index, element) => {
+      $(element).off('mouseup');
+      $(element).remove();
+    });
+    isContextMenuOpen = false;
+  }
 }
 
 function openContextMenu(
   x: number,
   y: number,
   options: Array<IContextMenuOption>
-) {
+): void {
   closeContextMenu();
   contextMenu.css({
     left: `calc(${x}px - 2rem)`,
@@ -40,15 +46,9 @@ function openContextMenu(
   });
 }
 
-function closeContextMenu() {
-  if (isContextMenuOpen) {
-    contextMenu.css({ display: 'none' });
-    contextMenu.children().each((index, element) => {
-      $(element).off('mouseup');
-      $(element).remove();
-    });
-    isContextMenuOpen = false;
-  }
+function setupContextMenu(params: ContextMenuSetupParams): void {
+  contextMenu = params.contextMenu;
+  params.document.on('mouseup', closeContextMenu);
 }
 
 export { setupContextMenu, openContextMenu, closeContextMenu };

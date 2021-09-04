@@ -1,8 +1,8 @@
 import { ipcMain, IpcMainEvent } from 'electron';
 import Soundcloud, { SoundcloudTrackSearchV2 } from 'soundcloud.ts';
-import { IpcEvents } from '../common/IpcEvents';
+import IpcEvents from '../common/IpcEvents';
 
-function setUpAssistantProcess() {
+function setUpAssistantProcess(): void {
   ipcMain.on(
     IpcEvents.processAssistantSearch,
     (event: IpcMainEvent, searchString: string) => {
@@ -24,4 +24,4 @@ function setUpAssistantProcess() {
   );
 }
 
-export { setUpAssistantProcess };
+export default setUpAssistantProcess;
