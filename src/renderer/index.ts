@@ -75,8 +75,11 @@ const ui = {
         unsupported: $('#unsupported-list'),
       },
       searchInput: $('#search-input') as JQuery<HTMLInputElement>,
-      searchSCButton: $('#search-soundcloud'),
-      searchResults: $('#search-results'),
+      searchAll: $('#search-all'),
+      // searchSoundcloud: $('#search-soundcloud'),
+      // searchSpotify: $('#search-spotify'),
+      searchResultsSpotify: $('#search-results-spotify'),
+      searchResultsSoundcloud: $('#search-results-soundcloud'),
     },
   },
 
@@ -258,8 +261,11 @@ ipcRenderer.on(IpcEvents.mainSelectionUpdated, updateFileSelection);
 // Assistant
 setupAssistantUI({
   searchInput: ui.sections.right.searchInput,
-  searchSoundcloud: ui.sections.right.searchSCButton,
-  searchResults: ui.sections.right.searchResults,
+  searchAll: ui.sections.right.searchAll,
+  // searchSoundcloud: ui.sections.right.searchSoundcloud,
+  // searchSpotify: ui.sections.right.searchSpotify,
+  searchResultsSpotify: ui.sections.right.searchResultsSpotify,
+  searchResultsSoundcloud: ui.sections.right.searchResultsSoundcloud,
 });
 
 //

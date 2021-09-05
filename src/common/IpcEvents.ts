@@ -5,7 +5,8 @@ const IpcEvents = {
   renderError: 'render-meta',
   renderMeta: 'render-error',
   renderNoFileDOM: 'main-request-remove-file-dom',
-  renderSoundcloudSearch: 'render-soundcloud-search',
+  renderSearchSoundcloud: 'render-search-soundcloud',
+  renderSearchSpotify: 'render-search-spotify',
 
   rendererAlbumArtReceived: 'album-art-received',
   rendererFileReceived: 'file-received',

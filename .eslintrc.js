@@ -4,14 +4,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    'airbnb-base',
-    'airbnb-typescript/base',
-    'plugin:import/typescript',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
-  ],
+  extends: ['airbnb-base', 'airbnb-typescript/base', 'prettier'],
   overrides: [
     {
       files: ['*.ts', '*.tsx'],

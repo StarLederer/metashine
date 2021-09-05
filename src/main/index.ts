@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { format as formatUrl } from 'url';
 
+import dotenv from 'dotenv';
 import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import { autoUpdater } from 'electron-updater';
 
@@ -14,6 +15,8 @@ import NodeID3Image from '../common/NodeID3Image';
 import ISuppotedFile from '../common/SupportedFile';
 import FileCategory from '../common/FileCategory';
 import setUpAssistantProcess from './assistantProcess';
+
+dotenv.config();
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 

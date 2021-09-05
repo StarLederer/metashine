@@ -143,8 +143,37 @@ function updateTrackArtist(value: string): void {
   ipcRenderer.send(IpcEvents.rendererTagArtistUpdated, value);
 }
 
+function updateTrackNumber(value: string): void {
+  tagUIParams.tagFields.trackNumber.val(value);
+  ipcRenderer.send(IpcEvents.rendererTagTrackUpdated, value);
+}
+
+function updateAlbumTitle(value: string): void {
+  tagUIParams.tagFields.albumTitle.val(value);
+  ipcRenderer.send(IpcEvents.rendererTagAlbumUpdated, value);
+}
+
+function updateAlbumArtist(value: string): void {
+  tagUIParams.tagFields.albumArtist.val(value);
+  ipcRenderer.send(IpcEvents.rendererTagAlbumArtistUpdated, value);
+}
+
+function updateYear(value: string): void {
+  tagUIParams.tagFields.year.val(value);
+  ipcRenderer.send(IpcEvents.rendererTagYearUpdated, value);
+}
+
 function updateAlbumArt(buffer: Buffer, name: string): void {
   ipcRenderer.send(IpcEvents.rendererAlbumArtReceived, name, buffer);
 }
 
-export { setupTagUI, updateTrackTitle, updateTrackArtist, updateAlbumArt };
+export {
+  setupTagUI,
+  updateTrackTitle,
+  updateTrackArtist,
+  updateTrackNumber,
+  updateAlbumTitle,
+  updateAlbumArtist,
+  updateYear,
+  updateAlbumArt,
+};
