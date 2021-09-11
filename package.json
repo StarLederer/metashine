@@ -25,22 +25,28 @@
   "build": {
     "appId": "eu.hermanlederer.metashine",
     "productName": "Metashine",
-    "target": "NSIS",
-    "icon": "builder/app-icon.png",
     "directories": {
       "buildResources": "builder"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "512x512.png"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": "deb",
+      "icon": "icons.icns",
+      "synopsis": "Find, write and format auio meta tags to your liking.",
+      "category": "AudioVideo"
     }
   },
   "dependencies": {
     "dotenv": "^10.0.0",
-    "electron": "11.4.3",
     "electron-updater": "^4.3.8",
-    "eslint-config-airbnb-typescript": "^14.0.0",
     "jquery": "^3.6.0",
     "music-metadata": "^7.8.4",
     "node-id3": "^0.2.2",
@@ -52,11 +58,13 @@
     "@types/jquery": "^3.5.6",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
+    "electron": "11.4.3",
     "electron-builder": "^22.4.1",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
     "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-airbnb-typescript": "^14.0.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.4.0",
