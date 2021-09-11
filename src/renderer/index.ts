@@ -1,5 +1,6 @@
 import '../assets/css/style.scss';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { clipboard, ipcRenderer, IpcRendererEvent } from 'electron';
 import $ from 'jquery';
 import getStatic from './getStatic';

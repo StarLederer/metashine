@@ -2,9 +2,6 @@
 dist/
 thumbs.db
 
-# Access tokens
-token
-
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -19,4 +16,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-.env
+
+# Other
+

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { ipcMain, IpcMainEvent } from 'electron';
 import Soundcloud, { SoundcloudTrackSearchV2 } from 'soundcloud.ts';
 import * as Spotify from 'spotify-api.js';
@@ -5,22 +6,15 @@ import IpcEvents from '../common/IpcEvents';
 
 function setUpAssistantProcess(): void {
   // Soudcloud API
-  const soundcloud = new Soundcloud(
-    process.env.SOUNDCLOUD_CLIENT_ID,
-    process.env.SOUNDCLOUD_OAUTH_TOKEN
-  );
+  const soundcloud = new Soundcloud();
 
   // Spotify API
   const spotify = new Spotify.Client({
     refreshToken: true,
     token: {
-      clientID: process.env.SPOTIFY_CLIENT_ID as string,
-      clientSecret: process.env.SPOTIFY_SECRET as string,
-      // TODO: Check if the key is present.
-      // Other developers might get confused otherwise
-    },
-    onReady() {
-      // console.log(spotify);
+      clientID: 'e2323c89d0964354b86641fb730ef675',
+      clientSecret: '2e88b4690b194326aab451ea3d2e5ff2',
+      // not sure if i was supposed to keep these a secret, but here you go world
     },
   });
 

@@ -17,14 +17,14 @@
 }
 
 #window-controls button:hover {
-  background: rgb(255, 255, 255);
-  color: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 1);
 }
 
-button#window-control-close:hover {
+/* button#window-control-close:hover {
   background: rgba(232, 17, 35, 0.1);
   color: rgb(232, 17, 35);
-}
+} */
 
 /* file list */
 #right-section .table {
