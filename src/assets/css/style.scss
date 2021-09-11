@@ -3,7 +3,7 @@
 @import './common/section-layout.scss';
 
 @import './tags.css';
-@import './files.css';
+@import './files.scss';
 @import './assistant.scss';
 @import './context-menu.css';
 
@@ -102,20 +102,20 @@ header::after {
 /* scroll bars */
 ::-webkit-scrollbar {
   width: 0.25rem;
-  /* height: 0.25rem; */
+  height: 1rem;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: #eee;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-
+  background: #ddd;
+  // border-radius: 0.5rem;
   transition: 300ms;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.5);
+  background: #888;
   transition: 150ms;
 }
