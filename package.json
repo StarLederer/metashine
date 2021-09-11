@@ -40,7 +40,7 @@
     "linux": {
       "target": "deb",
       "icon": "icons.icns",
-      "synopsis": "Find, write and format auio meta tags to your liking.",
+      "synopsis": "Find, write and format audio meta tags to your liking.",
       "category": "AudioVideo"
     }
   },
