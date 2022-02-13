@@ -1,0 +1,156 @@
+#files-tab {
+  height: 100%;
+}
+
+#right-section {
+  background: #f8f8f8;
+}
+
+/* window controls */
+#window-controls button {
+  width: 2rem;
+  height: 2rem;
+
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 0.75rem;
+  border-radius: 1rem;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 1);
+  }
+}
+
+button#window-control-close:hover {
+  background: rgba(232, 17, 35, 0.1);
+  color: rgb(232, 17, 35);
+}
+
+/* file list */
+#right-section .table {
+  width: fit-content;
+  height: calc(100% - 2rem);
+
+  border: none;
+}
+
+/* row common */
+#right-section .row {
+  min-width: 100%;
+  height: 2rem;
+  padding: 0 1rem;
+
+  display: inline-flex;
+
+  transition: 50ms ease-in-out;
+}
+
+#right-section .row div {
+  height: 2rem;
+
+  color: #0008;
+
+  font-size: 0.75rem;
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  pointer-events: none;
+
+  &:nth-child(1) {
+    width: 400px;
+    margin-right: 1rem;
+  }
+
+  &:nth-child(2) {
+    width: 50px;
+    margin-right: 1rem;
+  }
+}
+
+#right-section .section {
+  margin-bottom: 2rem;
+}
+
+#right-section .row div.hidden {
+  display: none;
+}
+
+/* table head */
+#right-section .table-head::before {
+  content: '';
+
+  width: calc(100% - 1rem);
+  height: 4rem;
+  position: absolute;
+
+  background: linear-gradient(
+    180deg,
+    #f8f8f8ff 0%,
+    #f8f8f8ff 50%,
+    #f8f8f800 100%
+  );
+  /* background: red; */
+
+  pointer-events: none;
+}
+#right-section .table-head::after {
+  bottom: 0;
+}
+
+#right-section .table-head div {
+  opacity: 0.5;
+}
+
+/* section head */
+#right-section .section-head {
+  margin-top: 1rem;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+}
+
+/* file entries */
+#right-section .row.file-entry {
+  cursor: pointer;
+
+  div {
+    font-weight: 700;
+  }
+
+  &:hover {
+    background: #571be511;
+
+    div {
+      color: var(--accent-o50);
+    }
+  }
+
+  &.selected {
+    background: var(--accent-o05);
+
+    div {
+      color: var(--accent);
+    }
+  }
+}
+
+/* bottom fade */
+/* #right-section::after {
+  content: '';
+
+  width: 100%;
+  width: 100%;
+  height: 2rem;
+  position: absolute;
+  bottom: 0;
+
+  background: linear-gradient(0deg, #f8f8f8ff 0%, #f8f8f8ff 0%, #f8f8f800 100%);
+
+  pointer-events: none;
+} */

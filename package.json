@@ -1,8 +1,9 @@
 {
   "name": "metashine",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Music meta tag editor",
   "repository": "github:HermanLederer/metashine",
+  "private": true,
   "license": "MIT",
   "author": {
     "name": "Herman Lederer",
@@ -15,22 +16,32 @@
     "editor",
     "application"
   ],
+  "engines": {
+    "node": ">=v16.13",
+    "npm": ">=8.1"
+  },
+  "main": "packages/main/dist/index.js",
   "scripts": {
-    "dev": "electron-webpack dev",
-    "compile": "electron-webpack",
-    "dist": "yarn compile && electron-builder",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "release": "yarn compile && electron-builder"
+    "dev": "node scripts/dev.js",
+    "build": "cross-env MODE=production node scripts/build.js",
+    "precompile": "cross-env MODE=production pnpm run build",
+    "compile": "electron-builder",
+    "pretest": "npm run build",
+    "lint": "eslint . --ext js,ts,svelte",
+    "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
+    "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
+    "typecheck-renderer": "svelte-check --tsconfig packages/renderer/tsconfig.json",
+    "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
   },
   "build": {
     "appId": "eu.hermanlederer.metashine",
     "productName": "Metashine",
     "directories": {
-      "buildResources": "builder"
+      "buildResources": "buildResources"
     },
     "win": {
       "target": "nsis",
-      "icon": "512x512.png"
+      "icon": "icon.png"
     },
     "nsis": {
       "oneClick": false,
@@ -38,39 +49,49 @@
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
-      "target": "deb",
-      "icon": "icons.icns",
+      "target": [
+        {
+          "target": "deb"
+        },
+        {
+          "target": "pacman"
+        }
+      ],
+      "icon": "icon.icns",
       "synopsis": "Find, write and format audio meta tags to your liking.",
       "category": "AudioVideo"
     }
   },
-  "dependencies": {
-    "electron-updater": "^4.3.8",
-    "jquery": "^3.6.0",
-    "music-metadata": "^7.8.4",
-    "node-id3": "^0.2.2",
-    "soundcloud.ts": "^0.4.0",
-    "source-map-support": "^0.5.16",
-    "spotify-api.js": "^9.0.1"
-  },
+  "browserslist": [
+    "Chrome 94"
+  ],
   "devDependencies": {
-    "@types/jquery": "^3.5.6",
-    "@typescript-eslint/eslint-plugin": "^4.30.0",
-    "@typescript-eslint/parser": "^4.30.0",
-    "electron": "11.4.3",
-    "electron-builder": "^22.4.1",
-    "electron-webpack": "^2.8.2",
-    "electron-webpack-ts": "^4.0.1",
-    "eslint": "^7.24.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-airbnb-typescript": "^14.0.0",
-    "eslint-config-prettier": "^8.2.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.4.0",
-    "node-sass": "^6.0.1",
-    "prettier": "^2.3.2",
-    "sass-loader": "^10",
-    "typescript": "^4.2.4",
-    "webpack": "~4.42.1"
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.37",
+    "@tsconfig/svelte": "^2.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.11.0",
+    "@typescript-eslint/parser": "^5.11.0",
+    "cross-env": "^7.0.3",
+    "electron": "15.3.1",
+    "electron-builder": "22.13.1",
+    "esbuild": "^0.14.21",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-svelte3": "^3.4.0",
+    "sass": "^1.49.7",
+    "svelte": "^3.46.4",
+    "svelte-check": "^2.4.3",
+    "svelte-preprocess": "^4.10.3",
+    "tslib": "^2.3.1",
+    "tsup": "^5.11.13",
+    "typescript": "^4.5.5",
+    "vite": "^2.8.1"
+  },
+  "dependencies": {
+    "electron-updater": "4.6.2",
+    "music-metadata": "^7.11.8",
+    "node-id3": "^0.2.3",
+    "soundcloud.ts": "^0.4.5",
+    "spotify-api.js": "^9.0.3"
   }
 }
