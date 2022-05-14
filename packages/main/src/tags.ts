@@ -116,7 +116,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   );
 
   ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
-    currentFiles.forEach(async (filePath) => {
+    currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         if (supportedFile.format === SupportedFormat.MP3) {

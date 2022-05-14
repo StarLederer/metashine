@@ -53,7 +53,7 @@ const createWindow = async () => {
    * @see https://stackoverflow.com/a/67409223
    */
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    shell.openExternal(url).catch(() => {});
     return { action: 'deny' };
   });
 
@@ -94,7 +94,10 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(createWindow)
-  .catch((e) => console.error('Failed create window:', e));
+  .catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed create window:', e);
+  });
 
 // Auto-updates
 if (!isDevelopment) {
@@ -102,7 +105,10 @@ if (!isDevelopment) {
     .whenReady()
     .then(() => import('electron-updater'))
     .then(({ autoUpdater }) => autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) => console.error('Failed check updates:', e));
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.error('Failed check updates:', e);
+    });
 }
 
 //

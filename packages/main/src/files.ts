@@ -20,12 +20,14 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
 
   ipcMain.on(
     IpcEvents.rendererFileReceived,
-    async (event: IpcMainEvent, filePath: string) => {
-      try {
-        await addFile(filePath);
-      } catch (err) {
-        // eslint-disable-next-line no-empty
-      }
+    (event: IpcMainEvent, filePath: string) => {
+      (async () => {
+        try {
+          await addFile(filePath);
+        } catch (err) {
+          // eslint-disable-next-line no-empty
+        }
+      })().catch(() => {});
     },
   );
 
