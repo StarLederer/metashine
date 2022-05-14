@@ -34,6 +34,7 @@ const IpcEvents = {
       toToggleFile: 'renderer-selection-file-toggled',
       toRefresh: {
         files: 'rednerer-request-update-files',
+        selection: 'rednerer-request-update-selection',
       },
     },
     has: {

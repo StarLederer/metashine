@@ -77,6 +77,10 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
       event.sender.send(IpcEvents.main.has.updatedSelection, selectedFiles);
     },
   );
+
+  ipcMain.on(IpcEvents.renderer.wants.toRefresh.selection, (event: IpcMainEvent) => {
+    event.sender.send(IpcEvents.main.has.updatedSelection, selectedFiles);
+  });
 }
 
 export default setupFilesProcess;

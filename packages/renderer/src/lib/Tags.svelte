@@ -1,7 +1,6 @@
 <script lang="ts">
   import type * as NodeID3 from 'node-id3';
 
-  import { render } from 'sass';
   import type NodeID3Image from '../../../common/NodeID3Image';
   import IpcEvents from '../../../common/IpcEvents';
   import { arrayBufferToBase64 } from '../../../common/util';

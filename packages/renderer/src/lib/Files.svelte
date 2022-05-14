@@ -117,6 +117,8 @@
     ]);
   }
 
+  window.electron.send(IpcEvents.renderer.wants.toRefresh.selection);
+
   window.electron.on(
     IpcEvents.main.has.updatedSelection,
     (event, selection) => { selectedFiles = selection; },
