@@ -31,7 +31,7 @@
    * Load file list from main process
    */
   window.electron.on(
-    IpcEvents.mainFilesUpdated,
+    IpcEvents.main.has.updatedFiles,
     (event: any, files: ISuppotedFile[]) => {
       const supported: ISuppotedFile[] = [];
       const readonly: ISuppotedFile[] = [];
@@ -57,7 +57,7 @@
     },
   );
 
-  window.electron.send(IpcEvents.rendererRequestUpdateFiles);
+  window.electron.send(IpcEvents.renderer.wants.toRefresh.files);
 
   /**
    * File addition
@@ -66,13 +66,13 @@
     if (event.dataTransfer) {
       for (let i = 0; i < event.dataTransfer.files.length; ++i) {
         const f = event.dataTransfer.files[i] as File & { path: string };
-        window.electron.send(IpcEvents.rendererFileReceived, f.path);
+        window.electron.send(IpcEvents.renderer.has.receivedFile, f.path);
       }
     }
   }
 
   window.electron.on(
-    IpcEvents.mainFileApproved,
+    IpcEvents.main.has.approvedFile,
     (event: any, file: ISuppotedFile) => {
       switch (file.category) {
         case FileCategory.Supported:
@@ -96,8 +96,8 @@
 
   function clickFile(path: string): void {
     if (ctrl) {
-      window.electron.send(IpcEvents.rendererSelectionFileToggled, path);
-    } else window.electron.send(IpcEvents.rendererSelectionFileSelected, path);
+      window.electron.send(IpcEvents.renderer.wants.toToggleFile, path);
+    } else window.electron.send(IpcEvents.renderer.wants.toSelectFile, path);
   }
 
   function opneContextMenu(e: MouseEvent, name: string, path: string): void {
@@ -111,14 +111,14 @@
       {
         name: 'Remove',
         click() {
-          window.electron.send(IpcEvents.rendererRequestRemoveFile, path);
+          window.electron.send(IpcEvents.renderer.wants.toRemoveFile, path);
         },
       },
     ]);
   }
 
   window.electron.on(
-    IpcEvents.mainSelectionUpdated,
+    IpcEvents.main.has.updatedSelection,
     (event, selection) => { selectedFiles = selection; },
   );
 </script>

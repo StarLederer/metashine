@@ -114,12 +114,12 @@ if (!isDevelopment) {
 //
 //
 // Window controls
-ipcMain.on(IpcEvents.rendererWindowCollapse, () => mainWindow?.minimize());
-ipcMain.on(IpcEvents.rendererWindowToggleSize, () => {
+ipcMain.on(IpcEvents.renderer.wants.window.toCollapse, () => mainWindow?.minimize());
+ipcMain.on(IpcEvents.renderer.wants.window.toToggleSize, () => {
   if (!mainWindow?.isMaximized()) {
     mainWindow?.maximize();
   } else {
     mainWindow?.unmaximize();
   }
 });
-ipcMain.on(IpcEvents.rendererWindowClose, () => mainWindow?.close());
+ipcMain.on(IpcEvents.renderer.wants.window.toClose, () => mainWindow?.close());

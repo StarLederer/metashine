@@ -21,13 +21,13 @@ function setUpAssistantProcess(): void {
 
   // Search event
   ipcMain.on(
-    IpcEvents.processAssistantSearch,
+    IpcEvents.renderer.wants.toSearchForTags,
     (event: IpcMainEvent, searchString: string) => {
       soundcloud.tracks
         .searchV2({ q: searchString })
         .then((res: SoundcloudTrackSearchV2) => {
           res.collection = res.collection.slice(0, 5);
-          event.sender.send(IpcEvents.renderSearchSoundcloud, res);
+          event.sender.send(IpcEvents.main.wants.toRender.searchResultsFrom.soundcloud, res);
         })
         .catch((error) => {
           console.log(error);
@@ -36,7 +36,10 @@ function setUpAssistantProcess(): void {
       spotify.tracks
         .search(searchString)
         .then((res: Spotify.Track[]) => {
-          event.sender.send(IpcEvents.renderSearchSpotify, res.slice(0, 5));
+          event.sender.send(
+            IpcEvents.main.wants.toRender.searchResultsFrom.spotify,
+            res.slice(0, 5),
+          );
         })
         .catch((error) => {
           console.log(error);

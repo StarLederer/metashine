@@ -9,7 +9,7 @@
 
   let tab = 0;
 
-  window.electron.on(IpcEvents.renderError, (event, error: Error) => {
+  window.electron.on(IpcEvents.main.wants.toRender.error, (event, error: Error) => {
     alert(`
       Error: ${error.name}\n
       ${error.message}\n

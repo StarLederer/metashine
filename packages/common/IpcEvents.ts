@@ -1,34 +1,56 @@
 const IpcEvents = {
-  mainFileApproved: 'file-approved',
-  mainSelectionUpdated: 'main-request-update-selection',
-  mainFilesUpdated: 'main-files-updated',
-  rendererRequestUpdateFiles: 'rednerer-request-update-files',
-  renderAlbumArt: 'render-album-art',
-  renderError: 'render-meta',
-  renderMeta: 'render-error',
-  renderNoFileDOM: 'main-request-remove-file-dom',
-  renderSearchSoundcloud: 'render-search-soundcloud',
-  renderSearchSpotify: 'render-search-spotify',
+  main: {
+    wants: {
+      toRender: {
+        albumArt: 'render-album-art',
+        error: 'render-error',
+        meta: 'render-meta',
+        noFileDOM: 'main-request-remove-file-dom',
+        searchResultsFrom: {
+          soundcloud: 'render-search-soundcloud',
+          spotify: 'render-search-spotify',
+        },
+      },
+    },
+    has: {
+      approvedFile: 'file-approved',
+      updatedSelection: 'main-request-update-selection',
+      updatedFiles: 'main-files-updated',
+    },
+  },
 
-  rendererAlbumArtReceived: 'album-art-received',
-  rendererFileReceived: 'file-received',
-  rendererRequestRemoveAlbumArt: 'remove-album-art',
-  rendererRequestRemoveFile: 'request-remove-file',
-  processAssistantSearch: 'opent-assistat',
-  rendererRequestSaveMeta: 'save-meta',
-  rendererSelectionFileSelected: 'renderer-selection-file-selected',
-  rendererSelectionFileToggled: 'renderer-selection-file-toggled',
-
-  rendererTagTitleUpdated: 'tag-title-updated',
-  rendererTagArtistUpdated: 'tag-artist-updated',
-  rendererTagTrackUpdated: 'tag-track-updated',
-  rendererTagAlbumUpdated: 'tag-album-updated',
-  rendererTagAlbumArtistUpdated: 'tag-album-artist-updated',
-  rendererTagYearUpdated: 'tag-year-updated',
-
-  rendererWindowClose: 'window-close',
-  rendererWindowCollapse: 'window-collapse',
-  rendererWindowToggleSize: 'window-toggle-size',
+  renderer: {
+    wants: {
+      window: {
+        toClose: 'window-close',
+        toCollapse: 'window-collapse',
+        toToggleSize: 'window-toggle-size',
+      },
+      toSaveMeta: 'save-meta',
+      toSearchForTags: 'opent-assistat',
+      toRemoveAlbumArt: 'remove-album-art',
+      toRemoveFile: 'request-remove-file',
+      toSelectFile: 'renderer-selection-file-selected',
+      toToggleFile: 'renderer-selection-file-toggled',
+      toRefresh: {
+        files: 'rednerer-request-update-files',
+      },
+    },
+    has: {
+      updated: {
+        tag: {
+          title: 'tag-title-updated',
+          artist: 'tag-artist-updated',
+          track: 'tag-track-updated',
+          album: 'tag-album-updated',
+          albumArtist: 'tag-album-artist-updated',
+          year: 'tag-year-updated',
+        },
+      },
+      receivedFile: 'file-received',
+      receivedPicture: 'album-art-received',
+    },
+  },
 };
 
 export default IpcEvents;

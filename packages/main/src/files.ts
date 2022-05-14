@@ -13,13 +13,13 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
 
     const supportedFile = await getSupportedFileFomPath(filePath);
 
-    mainWindow.webContents.send(IpcEvents.mainFileApproved, supportedFile);
+    mainWindow.webContents.send(IpcEvents.main.has.approvedFile, supportedFile);
 
     loadedFiles.set(filePath, supportedFile);
   }
 
   ipcMain.on(
-    IpcEvents.rendererFileReceived,
+    IpcEvents.renderer.has.receivedFile,
     (event: IpcMainEvent, filePath: string) => {
       (async () => {
         try {
@@ -32,12 +32,12 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
   );
 
   ipcMain.on(
-    IpcEvents.rendererRequestRemoveFile,
+    IpcEvents.renderer.wants.toRemoveFile,
     (event: IpcMainEvent, filePath: string) => {
       if (loadedFiles.has(filePath)) {
         loadedFiles.delete(filePath);
         event.sender.send(
-          IpcEvents.mainFilesUpdated,
+          IpcEvents.main.has.updatedFiles,
           Array.from(loadedFiles.values()),
         );
       } else {
@@ -46,9 +46,9 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
     },
   );
 
-  ipcMain.on(IpcEvents.rendererRequestUpdateFiles, (event: IpcMainEvent) => {
+  ipcMain.on(IpcEvents.renderer.wants.toRefresh.files, (event: IpcMainEvent) => {
     event.sender.send(
-      IpcEvents.mainFilesUpdated,
+      IpcEvents.main.has.updatedFiles,
       Array.from(loadedFiles.values()),
     );
   });
@@ -60,21 +60,21 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
 
   // Select file
   ipcMain.on(
-    IpcEvents.rendererSelectionFileSelected,
+    IpcEvents.renderer.wants.toSelectFile,
     (event: IpcMainEvent, path: string) => {
       selectedFiles = [path];
-      event.sender.send(IpcEvents.mainSelectionUpdated, selectedFiles);
+      event.sender.send(IpcEvents.main.has.updatedSelection, selectedFiles);
     },
   );
 
   // toggle file
   ipcMain.on(
-    IpcEvents.rendererSelectionFileToggled,
+    IpcEvents.renderer.wants.toToggleFile,
     (event: IpcMainEvent, path: string) => {
       const i = selectedFiles.indexOf(path);
       if (i > -1) selectedFiles = selectedFiles.filter((p) => p !== path);
       else selectedFiles = [...selectedFiles, path];
-      event.sender.send(IpcEvents.mainSelectionUpdated, selectedFiles);
+      event.sender.send(IpcEvents.main.has.updatedSelection, selectedFiles);
     },
   );
 }

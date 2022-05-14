@@ -38,13 +38,12 @@
   let searchString;
 
   function search() {
-    window.electron.send(IpcEvents.processAssistantSearch, searchString ?? '');
+    window.electron.send(IpcEvents.renderer.wants.toSearchForTags, searchString ?? '');
   }
 
   // Spotify
-
   window.electron.on(
-    IpcEvents.renderSearchSpotify,
+    IpcEvents.main.wants.toRender.searchResultsFrom.spotify,
     (event: IpcRendererEvent, res: SpotifyTrack[]) => {
       const newSpotifyResults: SearchResult[] = [];
 
@@ -176,7 +175,7 @@
   }
 
   window.electron.on(
-    IpcEvents.renderSearchSoundcloud,
+    IpcEvents.main.wants.toRender.searchResultsFrom.soundcloud,
     (event: IpcRendererEvent, res: SoundcloudTrackSearchV2) => {
       const newSoundcloudResults: SearchResult[] = [];
 

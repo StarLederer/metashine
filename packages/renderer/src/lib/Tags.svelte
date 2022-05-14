@@ -1,6 +1,7 @@
 <script lang="ts">
   import type * as NodeID3 from 'node-id3';
 
+  import { render } from 'sass';
   import type NodeID3Image from '../../../common/NodeID3Image';
   import IpcEvents from '../../../common/IpcEvents';
   import { arrayBufferToBase64 } from '../../../common/util';
@@ -18,7 +19,7 @@
       label: 'Track',
       value: '',
       apply() {
-        window.electron.send(IpcEvents.rendererTagTitleUpdated, this.value);
+        window.electron.send(IpcEvents.renderer.has.updated.tag.title, this.value);
       },
     },
     {
@@ -26,7 +27,7 @@
       label: 'Tack artirst',
       value: '',
       apply() {
-        window.electron.send(IpcEvents.rendererTagArtistUpdated, this.value);
+        window.electron.send(IpcEvents.renderer.has.updated.tag.artist, this.value);
       },
     },
     {
@@ -34,7 +35,7 @@
       label: 'Track number',
       value: '',
       apply() {
-        window.electron.send(IpcEvents.rendererTagTrackUpdated, this.value);
+        window.electron.send(IpcEvents.renderer.has.updated.tag.track, this.value);
       },
     },
     {
@@ -42,7 +43,7 @@
       label: 'Album',
       value: '',
       apply() {
-        window.electron.send(IpcEvents.rendererTagAlbumUpdated, this.value);
+        window.electron.send(IpcEvents.renderer.has.updated.tag.album, this.value);
       },
     },
     {
@@ -51,7 +52,7 @@
       value: '',
       apply() {
         window.electron.send(
-          IpcEvents.rendererTagAlbumArtistUpdated,
+          IpcEvents.renderer.has.updated.tag.albumArtist,
           this.value,
         );
       },
@@ -61,7 +62,7 @@
       label: 'Year',
       value: '',
       apply() {
-        window.electron.send(IpcEvents.rendererTagYearUpdated, this.value);
+        window.electron.send(IpcEvents.renderer.has.updated.tag.year, this.value);
       },
     },
   ];
@@ -79,7 +80,7 @@
       const file = event.dataTransfer.files[0];
       file.arrayBuffer().then((buffer) => {
         window.electron.send(
-          IpcEvents.rendererAlbumArtReceived,
+          IpcEvents.renderer.has.receivedPicture,
           file.name,
           buffer,
         );
@@ -98,7 +99,7 @@
             || availableFormats.includes('image/jpeg')
           ) {
             window.electron.send(
-              IpcEvents.rendererAlbumArtReceived,
+              IpcEvents.renderer.has.receivedPicture,
               '.png',
               window.electron.clipboard.readImagePNG(),
             );
@@ -108,7 +109,7 @@
       {
         name: 'Remove',
         click() {
-          window.electron.send(IpcEvents.rendererRequestRemoveAlbumArt);
+          window.electron.send(IpcEvents.renderer.wants.toRemoveAlbumArt);
         },
       },
     ]);
@@ -118,7 +119,7 @@
    * Communication
    */
 
-  window.electron.on(IpcEvents.renderMeta, (event: any, meta: NodeID3.Tags) => {
+  window.electron.on(IpcEvents.main.wants.toRender.meta, (event: any, meta: NodeID3.Tags) => {
     tagFields[0].value = meta.title;
     tagFields[1].value = meta.artist;
     tagFields[2].value = meta.trackNumber;
@@ -137,7 +138,7 @@
   });
 
   window.electron.on(
-    IpcEvents.renderAlbumArt,
+    IpcEvents.main.wants.toRender.albumArt,
     (event: any, albumArt: NodeID3Image) => {
       if (albumArt.imageBuffer) {
         const base64String = arrayBufferToBase64(albumArt.imageBuffer);
@@ -152,36 +153,36 @@
   window.tags = {
     updateTrackTitle(value: string): void {
       tagFields[0].value = value;
-      window.electron.send(IpcEvents.rendererTagTitleUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.title, value);
     },
 
     updateTrackArtist(value: string): void {
       tagFields[1].value = value;
-      window.electron.send(IpcEvents.rendererTagArtistUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.artist, value);
     },
 
     updateTrackNumber(value: string): void {
       tagFields[2].value = value;
-      window.electron.send(IpcEvents.rendererTagTrackUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.track, value);
     },
 
     updateAlbumTitle(value: string): void {
       tagFields[3].value = value;
-      window.electron.send(IpcEvents.rendererTagAlbumUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.album, value);
     },
 
     updateAlbumArtist(value: string): void {
       tagFields[4].value = value;
-      window.electron.send(IpcEvents.rendererTagAlbumArtistUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.albumArtist, value);
     },
 
     updateYear(value: string): void {
       tagFields[5].value = value;
-      window.electron.send(IpcEvents.rendererTagYearUpdated, value);
+      window.electron.send(IpcEvents.renderer.has.updated.tag.year, value);
     },
 
     updateAlbumArt(buffer: ArrayBuffer, name: string): void {
-      window.electron.send(IpcEvents.rendererAlbumArtReceived, name, buffer);
+      window.electron.send(IpcEvents.renderer.has.receivedPicture, name, buffer);
     },
   };
 </script>
@@ -193,7 +194,7 @@
       <button
         id="tags-save"
         class="begging"
-        on:click={() => window.electron.send(IpcEvents.rendererRequestSaveMeta)}
+        on:click={() => window.electron.send(IpcEvents.renderer.wants.toSaveMeta)}
       >
         save
       </button>

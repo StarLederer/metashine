@@ -14,44 +14,44 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentMeta: NodeID3.Tags = {};
 
   ipcMain.on(
-    IpcEvents.rendererTagTitleUpdated,
+    IpcEvents.renderer.has.updated.tag.title,
     (event: IpcMainEvent, value: string) => {
       currentMeta.title = value;
     },
   );
   ipcMain.on(
-    IpcEvents.rendererTagArtistUpdated,
+    IpcEvents.renderer.has.updated.tag.artist,
     (event: IpcMainEvent, value: string) => {
       currentMeta.artist = value;
     },
   );
   ipcMain.on(
-    IpcEvents.rendererTagTrackUpdated,
+    IpcEvents.renderer.has.updated.tag.track,
     (event: IpcMainEvent, value: string) => {
       currentMeta.trackNumber = value;
     },
   );
   ipcMain.on(
-    IpcEvents.rendererTagAlbumUpdated,
+    IpcEvents.renderer.has.updated.tag.album,
     (event: IpcMainEvent, value: string) => {
       currentMeta.album = value;
     },
   );
   ipcMain.on(
-    IpcEvents.rendererTagAlbumArtistUpdated,
+    IpcEvents.renderer.has.updated.tag.albumArtist,
     (event: IpcMainEvent, value: string) => {
       currentMeta.performerInfo = value;
     },
   );
   ipcMain.on(
-    IpcEvents.rendererTagYearUpdated,
+    IpcEvents.renderer.has.updated.tag.year,
     (event: IpcMainEvent, value: string) => {
       currentMeta.year = value;
     },
   );
 
   ipcMain.on(
-    IpcEvents.rendererSelectionFileSelected,
+    IpcEvents.renderer.wants.toSelectFile,
     (event: IpcMainEvent, filePath: string) => {
       // Clear selectrion and select the file
       currentFiles = [];
@@ -82,19 +82,19 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
           }
 
           // Request tag section update
-          event.sender.send(IpcEvents.renderMeta, currentMeta);
+          event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
         })
         .catch((error: Error) => {
-          event.sender.send(IpcEvents.renderError, error);
+          event.sender.send(IpcEvents.main.wants.toRender.error, error);
         });
 
       // Request render update
-      event.sender.send(IpcEvents.mainSelectionUpdated, currentFiles);
+      event.sender.send(IpcEvents.main.has.updatedSelection, currentFiles);
     },
   );
 
   ipcMain.on(
-    IpcEvents.rendererSelectionFileToggled,
+    IpcEvents.renderer.wants.toToggleFile,
     (event: IpcMainEvent, filePath: string) => {
       const i = currentFiles.indexOf(filePath);
 
@@ -107,15 +107,15 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
 
         // Clear current tags
         currentMeta = {};
-        event.sender.send(IpcEvents.renderMeta, currentMeta);
+        event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
       }
 
       // Request render update
-      event.sender.send(IpcEvents.mainSelectionUpdated, currentFiles);
+      event.sender.send(IpcEvents.main.has.updatedSelection, currentFiles);
     },
   );
 
-  ipcMain.on(IpcEvents.rendererRequestSaveMeta, (event: IpcMainEvent) => {
+  ipcMain.on(IpcEvents.renderer.wants.toSaveMeta, (event: IpcMainEvent) => {
     currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
@@ -124,11 +124,11 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
           if (result === true) {
             // success
           } else {
-            event.sender.send(IpcEvents.renderError, result);
+            event.sender.send(IpcEvents.main.wants.toRender.error, result);
           }
         } else if (supportedFile.format === SupportedFormat.WAV) {
           event.sender.send(
-            IpcEvents.renderError,
+            IpcEvents.main.wants.toRender.error,
             new Error(`
               Cannot save ${filePath}!\n
               Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3
@@ -152,7 +152,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   }
 
   ipcMain.on(
-    IpcEvents.rendererAlbumArtReceived,
+    IpcEvents.renderer.has.receivedPicture,
     (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
       const frontCover = currentMeta.image
         ? (currentMeta.image as NodeID3Image)
@@ -171,13 +171,13 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       frontCover.imageBuffer = Buffer.from(buffer);
       currentMeta.image = frontCover;
 
-      event.sender.send(IpcEvents.renderAlbumArt, frontCover);
+      event.sender.send(IpcEvents.main.wants.toRender.albumArt, frontCover);
     },
   );
 
-  ipcMain.on(IpcEvents.rendererRequestRemoveAlbumArt, (event: IpcMainEvent) => {
+  ipcMain.on(IpcEvents.renderer.wants.toRemoveAlbumArt, (event: IpcMainEvent) => {
     currentMeta.image = getNewFrontCover();
-    event.sender.send(IpcEvents.renderAlbumArt, currentMeta.image);
+    event.sender.send(IpcEvents.main.wants.toRender.albumArt, currentMeta.image);
   });
 }
 
