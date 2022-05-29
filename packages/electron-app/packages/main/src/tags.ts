@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
+import * as mm2 from '../../../../native-addon';
+
 import * as mm from 'music-metadata';
 import * as NodeID3 from 'node-id3';
 
@@ -59,8 +61,12 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
 
       // Load tags
       currentMeta = {};
+      const a = mm2.loadTag(filePath);
+      console.log(a);
+
       mm.parseFile(filePath)
         .then((value) => {
+          console.log(value);
           if (value.common.title) currentMeta.title = value.common.title;
           if (value.common.artist) currentMeta.artist = value.common.artist;
           if (value.common.track.no) { currentMeta.trackNumber = value.common.track.no.toString(); }

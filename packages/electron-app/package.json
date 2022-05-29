@@ -1,0 +1,78 @@
+{
+  "name": "electron-app",
+  "private": true,
+  "main": "packages/main/dist/index.js",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "cross-env MODE=production node scripts/build.js",
+    "precompile": "cross-env MODE=production pnpm run build",
+    "compile": "electron-builder",
+    "pretest": "npm run build",
+    "lint": "eslint . --ext js,ts,svelte",
+    "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
+    "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
+    "typecheck-renderer": "svelte-check --tsconfig packages/renderer/tsconfig.json",
+    "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
+  },
+  "build": {
+    "appId": "eu.hermanlederer.metashine",
+    "productName": "Metashine",
+    "directories": {
+      "buildResources": "buildResources"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb"
+        },
+        {
+          "target": "pacman"
+        }
+      ],
+      "icon": "icon.icns",
+      "synopsis": "Find, write and format audio meta tags to your liking.",
+      "category": "AudioVideo"
+    }
+  },
+  "browserslist": [
+    "Chrome 94"
+  ],
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.37",
+    "@tsconfig/svelte": "^2.0.1",
+    "@types/node": "^17.0.36",
+    "@typescript-eslint/eslint-plugin": "^5.11.0",
+    "@typescript-eslint/parser": "^5.11.0",
+    "cross-env": "^7.0.3",
+    "electron": "15.3.1",
+    "electron-builder": "22.13.1",
+    "esbuild": "^0.14.21",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-svelte3": "^3.4.0",
+    "sass": "^1.49.7",
+    "svelte": "^3.46.4",
+    "svelte-check": "^2.4.3",
+    "svelte-preprocess": "^4.10.3",
+    "tslib": "^2.3.1",
+    "tsup": "^5.11.13",
+    "vite": "^2.8.1"
+  },
+  "dependencies": {
+    "electron-updater": "4.6.2",
+    "music-metadata": "^7.11.8",
+    "node-id3": "^0.2.3",
+    "soundcloud.ts": "^0.4.5",
+    "spotify-api.js": "^9.0.3"
+  }
+}
