@@ -24,7 +24,7 @@ module.exports = {
     {
       files: ['*.ts'],
       parserOptions: {
-        project: resolve(__dirname, './tsconfigsa.json'),
+        project: resolve(__dirname, './tsconfig.json'),
       },
       extends: [
         'airbnb-typescript/base',

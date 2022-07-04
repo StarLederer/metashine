@@ -7,12 +7,12 @@
     "build": "cross-env MODE=production node scripts/build.js",
     "precompile": "cross-env MODE=production pnpm run build",
     "compile": "electron-builder",
-    "pretest": "npm run build",
+    "pretest": "pnpm run build",
     "lint": "eslint . --ext js,ts,svelte",
     "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
     "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck-renderer": "svelte-check --tsconfig packages/renderer/tsconfig.json",
-    "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
+    "typecheck": "pnpm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
   },
   "build": {
     "appId": "eu.hermanlederer.metashine",
@@ -71,7 +71,6 @@
   "dependencies": {
     "@metashine/native-addon": "workspace:^0.1.0",
     "electron-updater": "4.6.2",
-    "music-metadata": "^7.12.3",
     "node-id3": "^0.2.3",
     "soundcloud.ts": "^0.4.6",
     "spotify-api.js": "^9.2.1",

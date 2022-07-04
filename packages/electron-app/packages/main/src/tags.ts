@@ -6,7 +6,6 @@ import * as mm2 from '@metashine/native-addon';
 import * as NodeID3 from 'node-id3';
 
 import IpcEvents from '../../common/IpcEvents';
-import SupportedFormat from '../../common/SupportedFormats';
 import type NodeID3Image from '../../common/NodeID3Image';
 import type { ISuppotedFile } from '../../common/SupportedFile';
 
@@ -61,23 +60,8 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       // Load tags
       currentMeta = {};
 
-      type Tag = { TYER: string;
-        TPE2: string;
-        TALB: string;
-        TRCK: string;
-        TPE1: string;
-        TIT2: string;
-
-        APIC: {
-          MIMEType: string,
-          pictureType: string,
-          description: string,
-          data: Buffer;
-        },
-      };
-
       try {
-        const tag = mm2.loadTag(filePath) as Tag;
+        const tag = mm2.loadTag(filePath);
         if (tag.TYER) currentMeta.year = tag.TYER;
         if (tag.TPE2) currentMeta.performerInfo = tag.TPE2;
         if (tag.TALB) currentMeta.album = tag.TALB;
@@ -134,21 +118,11 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
     currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
-        if (supportedFile.format === SupportedFormat.MP3) {
-          const result = NodeID3.update(currentMeta, supportedFile.path);
-          if (result === true) {
-            // success
-          } else {
-            event.sender.send(IpcEvents.main.wants.toRender.error, result);
-          }
-        } else if (supportedFile.format === SupportedFormat.WAV) {
-          event.sender.send(
-            IpcEvents.main.wants.toRender.error,
-            new Error(`
-              Cannot save ${filePath}!\n
-              Saving WAVs is not supported and there currently is no plan to add support for that. Please encode your music in MP3
-            `),
-          );
+        const result = NodeID3.update(currentMeta, supportedFile.path);
+        if (result === true) {
+          // success
+        } else {
+          event.sender.send(IpcEvents.main.wants.toRender.error, result);
         }
       }
     });

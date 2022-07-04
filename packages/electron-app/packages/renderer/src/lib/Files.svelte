@@ -1,7 +1,6 @@
 <script lang="ts">
   import IpcEvents from '../../../common/IpcEvents';
   import type { ISuppotedFile } from '../../../common/SupportedFile';
-  import FileCategory from '../../../common/FileCategory';
   import { stringToHashCode } from '../../../common/util';
 
   type Category = {
@@ -13,11 +12,6 @@
   const categories: Category[] = [
     {
       id: 'file-list',
-      addedFiles: [],
-    },
-    {
-      id: 'readonly-list',
-      title: 'Read only',
       addedFiles: [],
     },
     {
@@ -34,26 +28,18 @@
     IpcEvents.main.has.updatedFiles,
     (event: any, files: ISuppotedFile[]) => {
       const supported: ISuppotedFile[] = [];
-      const readonly: ISuppotedFile[] = [];
       const unsupported: ISuppotedFile[] = [];
 
       files.forEach((file) => {
-        switch (file.category) {
-          case FileCategory.Supported:
-            supported.push(file);
-            break;
-          case FileCategory.Readonly:
-            readonly.push(file);
-            break;
-          default:
-            unsupported.push(file);
-            break;
+        if (file.tag) {
+          supported.push(file);
+        } else {
+          unsupported.push(file);
         }
       });
 
       categories[0].addedFiles = supported;
-      categories[1].addedFiles = readonly;
-      categories[2].addedFiles = unsupported;
+      categories[1].addedFiles = unsupported;
     },
   );
 
@@ -74,16 +60,10 @@
   window.electron.on(
     IpcEvents.main.has.approvedFile,
     (event: any, file: ISuppotedFile) => {
-      switch (file.category) {
-        case FileCategory.Supported:
-          categories[0].addedFiles = [...categories[0].addedFiles, file];
-          break;
-        case FileCategory.Readonly:
-          categories[1].addedFiles = [...categories[1].addedFiles, file];
-          break;
-        default:
-          categories[2].addedFiles = [...categories[2].addedFiles, file];
-          break;
+      if (file.tag) {
+        categories[0].addedFiles = [...categories[0].addedFiles, file];
+      } else {
+        categories[1].addedFiles = [...categories[1].addedFiles, file];
       }
     },
   );
@@ -143,7 +123,7 @@
   <div class="table">
     <div class="row table-head afterline">
       <div>Name</div>
-      <div>Type</div>
+      <div>Tag</div>
       <div>Location</div>
       <div class="hidden">Path</div>
     </div>
@@ -165,7 +145,7 @@
               on:contextmenu={(e) => opneContextMenu(e, file.name, file.path)}
             >
               <div class="name">{file.name}</div>
-              <div>{file.format}</div>
+              <div>{file.tag ? 'ID3' : ''}</div>
               <div>{file.location}</div>
               <div class="path hidden">{file.path}</div>
             </div>

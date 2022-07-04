@@ -1,42 +1,26 @@
 import * as path from 'path';
-import * as mm from 'music-metadata';
-import SupportedFormat from './SupportedFormats';
-import FileCategory from './FileCategory';
+import { loadTag, ID3Tag } from '@metashine/native-addon';
 
 interface ISuppotedFile {
   name: string;
   path: string;
   location: string;
-  format: SupportedFormat;
-  category: FileCategory;
-  meta: mm.IAudioMetadata | null;
+  tag: ID3Tag | null;
 }
 
-async function getSupportedFileFomPath(filePath: string): Promise<ISuppotedFile> {
+function getSupportedFileFomPath(filePath: string): ISuppotedFile {
   const supportedFile: ISuppotedFile = {
     name: path.basename(filePath, path.extname(filePath)),
-    format: SupportedFormat.Unsupported,
-    category: FileCategory.Unsupported,
     location: path.dirname(filePath),
     path: filePath,
-    meta: null,
+    tag: null,
   };
 
-  // Format
-  const lowerCaseExtname = path.extname(filePath).toLowerCase();
-  if (lowerCaseExtname.endsWith('mp3')) {
-    supportedFile.format = SupportedFormat.MP3;
-    supportedFile.category = FileCategory.Supported;
-  } else if (lowerCaseExtname.endsWith('wav')) {
-    supportedFile.format = SupportedFormat.WAV;
-    supportedFile.category = FileCategory.Readonly;
-  }
-
-  if (supportedFile.format === SupportedFormat.Unsupported) { return supportedFile; }
-
   // Metadata
-  const metadata = await mm.parseFile(filePath);
-  supportedFile.meta = metadata;
+  try {
+    const tag = loadTag(filePath);
+    supportedFile.tag = tag;
+  } catch (_) { /* */ }
 
   return supportedFile;
 }
