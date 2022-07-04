@@ -2,10 +2,10 @@
   "name": "@metashine/native-addon",
   "version": "0.1.0",
   "description": "",
-  "main": "index.node",
-  "types": "index.d.ts",
+  "main": "dist/index.node",
+  "types": "@types/index.d.ts",
   "scripts": {
-    "build": "cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics",
+    "build": "cargo-cp-artifact -nc dist/index.node -- cargo build --message-format=json-render-diagnostics",
     "build-debug": "pnpm run build",
     "build-release": "pnpm run build --release",
     "test": "cargo test"
