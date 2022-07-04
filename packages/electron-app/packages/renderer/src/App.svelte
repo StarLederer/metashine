@@ -1,10 +1,12 @@
 <script lang="ts">
+  // eslint-disable-next-line import/no-relative-packages
+  import packageJson from '../../../../../package.json';
+
   import WindowControls from './lib/WindowControls.svelte';
   import Files from './lib/Files.svelte';
   import Assistant from './lib/assistant/Assistant.svelte';
   import Tags from './lib/Tags.svelte';
   import ContextMenu from './lib/ContextMenu.svelte';
-  import packageJson from '../../../package.json';
   import IpcEvents from '../../common/IpcEvents';
 
   let tab = 0;
