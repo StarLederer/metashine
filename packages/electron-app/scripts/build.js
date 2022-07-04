@@ -15,7 +15,7 @@ const esbuildConfig = {
   platform: 'node',
   target: 'node16',
   format: 'cjs',
-  external: [...builtinModules, 'electron'],
+  external: [...builtinModules, 'electron', '@metashine/*'],
 };
 
 esbuild.build({

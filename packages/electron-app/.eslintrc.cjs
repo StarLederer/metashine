@@ -1,4 +1,7 @@
+const { resolve } = require('path');
+
 module.exports = {
+  root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
@@ -21,7 +24,7 @@ module.exports = {
     {
       files: ['*.ts'],
       parserOptions: {
-        project: './tsconfig.json',
+        project: resolve(__dirname, './tsconfigsa.json'),
       },
       extends: [
         'airbnb-typescript/base',

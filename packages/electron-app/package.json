@@ -1,5 +1,5 @@
 {
-  "name": "electron-app",
+  "name": "@metashine/electron-app",
   "private": true,
   "main": "packages/main/dist/index.js",
   "scripts": {
@@ -47,32 +47,34 @@
     "Chrome 94"
   ],
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.37",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
     "@tsconfig/svelte": "^2.0.1",
-    "@types/node": "^17.0.36",
-    "@typescript-eslint/eslint-plugin": "^5.11.0",
-    "@typescript-eslint/parser": "^5.11.0",
+    "@types/node": "^17.0.45",
+    "@typescript-eslint/eslint-plugin": "^5.30.4",
+    "@typescript-eslint/parser": "^5.30.4",
     "cross-env": "^7.0.3",
     "electron": "15.3.1",
     "electron-builder": "22.13.1",
-    "esbuild": "^0.14.21",
-    "eslint": "^8.9.0",
-    "eslint-config-airbnb-typescript": "^16.1.0",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-svelte3": "^3.4.0",
-    "sass": "^1.49.7",
-    "svelte": "^3.46.4",
-    "svelte-check": "^2.4.3",
-    "svelte-preprocess": "^4.10.3",
-    "tslib": "^2.3.1",
-    "tsup": "^5.11.13",
-    "vite": "^2.8.1"
+    "esbuild": "^0.14.48",
+    "eslint": "^8.19.0",
+    "eslint-config-airbnb-typescript": "^16.2.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-svelte3": "^3.4.1",
+    "sass": "^1.53.0",
+    "svelte": "^3.48.0",
+    "svelte-check": "^2.8.0",
+    "svelte-preprocess": "^4.10.7",
+    "tslib": "^2.4.0",
+    "tsup": "^5.12.9",
+    "vite": "^2.9.13"
   },
   "dependencies": {
+    "@metashine/native-addon": "workspace:^0.1.0",
     "electron-updater": "4.6.2",
-    "music-metadata": "^7.11.8",
+    "music-metadata": "^7.12.3",
     "node-id3": "^0.2.3",
-    "soundcloud.ts": "^0.4.5",
-    "spotify-api.js": "^9.0.3"
+    "soundcloud.ts": "^0.4.6",
+    "spotify-api.js": "^9.2.1",
+    "typescript": "^4.7.4"
   }
 }

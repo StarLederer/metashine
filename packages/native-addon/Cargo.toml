@@ -1,5 +1,5 @@
 [package]
-name = "hello-neon"
+name = "native-addon"
 version = "0.1.0"
 license = "ISC"
 edition = "2018"

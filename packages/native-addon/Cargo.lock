@@ -48,14 +48,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hello-neon"
-version = "0.1.0"
-dependencies = [
- "id3",
- "neon",
-]
-
-[[package]]
 name = "id3"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -89,6 +81,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2b29bd4bc3f33391105ebee3589c19197c4271e3e5a9ec9bfe8127eeff8f082"
 dependencies = [
  "adler",
+]
+
+[[package]]
+name = "native-addon"
+version = "0.1.0"
+dependencies = [
+ "id3",
+ "neon",
 ]
 
 [[package]]

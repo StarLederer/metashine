@@ -1,8 +1,6 @@
-const baseConfig = require('../../.eslintrc.cjs');
+const { resolve } = require('path');
 
 module.exports = {
-  ...baseConfig,
-
   plugins: ['svelte3'],
 
   settings: {
@@ -25,13 +23,12 @@ module.exports = {
     {
       files: ['*.ts'],
       parserOptions: {
-        project: './tsconfig.json',
+        project: resolve(__dirname, './tsconfig.json'),
       },
     },
   ],
 
   rules: {
-    ...baseConfig.rules,
     'import/no-mutable-exports': 'off',
     'import/extensions': 'off',
   },

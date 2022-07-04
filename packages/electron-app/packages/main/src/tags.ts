@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
-import * as mm2 from '../../../../native-addon';
+import * as mm2 from '@metashine/native-addon';
 
-import * as mm from 'music-metadata';
 import * as NodeID3 from 'node-id3';
 
 import IpcEvents from '../../common/IpcEvents';
@@ -61,38 +60,48 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
 
       // Load tags
       currentMeta = {};
-      const a = mm2.loadTag(filePath);
-      console.log(a);
 
-      mm.parseFile(filePath)
-        .then((value) => {
-          console.log(value);
-          if (value.common.title) currentMeta.title = value.common.title;
-          if (value.common.artist) currentMeta.artist = value.common.artist;
-          if (value.common.track.no) { currentMeta.trackNumber = value.common.track.no.toString(); }
-          if (value.common.album) currentMeta.album = value.common.album;
-          if (value.common.albumartist) { currentMeta.performerInfo = value.common.albumartist; }
-          if (value.common.year) { currentMeta.year = value.common.year.toString(); }
+      type Tag = { TYER: string;
+        TPE2: string;
+        TALB: string;
+        TRCK: string;
+        TPE1: string;
+        TIT2: string;
 
-          const frontCover = mm.selectCover(value.common.picture);
-          if (frontCover) {
-            currentMeta.image = {
-              mime: frontCover.format,
-              type: {
-                id: 3,
-                name: frontCover.name,
-              },
-              description: frontCover.description,
-              imageBuffer: frontCover.data,
-            } as NodeID3Image;
-          }
+        APIC: {
+          MIMEType: string,
+          pictureType: string,
+          description: string,
+          data: Buffer;
+        },
+      };
 
-          // Request tag section update
-          event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
-        })
-        .catch((error: Error) => {
-          event.sender.send(IpcEvents.main.wants.toRender.error, error);
-        });
+      try {
+        const tag = mm2.loadTag(filePath) as Tag;
+        if (tag.TYER) currentMeta.year = tag.TYER;
+        if (tag.TPE2) currentMeta.performerInfo = tag.TPE2;
+        if (tag.TALB) currentMeta.album = tag.TALB;
+        if (tag.TRCK) currentMeta.trackNumber = tag.TRCK;
+        if (tag.TPE1) currentMeta.artist = tag.TPE1;
+        if (tag.TIT2) currentMeta.title = tag.TIT2;
+
+        if (tag.APIC) {
+          currentMeta.image = {
+            mime: tag.APIC.MIMEType,
+            type: {
+              id: 3,
+              name: tag.APIC.pictureType,
+            },
+            description: tag.APIC.description,
+            imageBuffer: tag.APIC.data,
+          } as NodeID3Image;
+        }
+
+        // Request tag section update
+        event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
+      } catch (error) {
+        event.sender.send(IpcEvents.main.wants.toRender.error, error);
+      }
 
       // Request render update
       event.sender.send(IpcEvents.main.has.updatedSelection, currentFiles);

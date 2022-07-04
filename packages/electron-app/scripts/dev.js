@@ -33,7 +33,7 @@ const esbuildConfig = {
   platform: 'node',
   target: 'node16',
   format: 'cjs',
-  external: [...builtinModules, 'electron'],
+  external: [...builtinModules, 'electron', '@metashine/*'],
 };
 
 /** Messages on stderr that match any of the contained patterns will be stripped from output */

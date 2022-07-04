@@ -1,10 +1,10 @@
-# hello-neon
+# native-addon
 
 This project was bootstrapped by [create-neon](https://www.npmjs.com/package/create-neon).
 
-## Installing hello-neon
+## Installing native-addon
 
-Installing hello-neon requires a [supported version of Node and Rust](https://github.com/neon-bindings/neon#platform-support).
+Installing native-addon requires a [supported version of Node and Rust](https://github.com/neon-bindings/neon#platform-support).
 
 You can install the project with npm. In the project directory, run:
 
@@ -14,7 +14,7 @@ $ npm install
 
 This fully installs the project, including installing any dependencies and running the build.
 
-## Building hello-neon
+## Building native-addon
 
 If you have already installed the project and only want to run the build, run:
 
@@ -24,9 +24,9 @@ $ npm run build
 
 This command uses the [cargo-cp-artifact](https://github.com/neon-bindings/cargo-cp-artifact) utility to run the Rust build and copy the built library into `./index.node`.
 
-## Exploring hello-neon
+## Exploring native-addon
 
-After building hello-neon, you can explore its exports at the Node REPL:
+After building native-addon, you can explore its exports at the Node REPL:
 
 ```sh
 $ npm install
@@ -70,7 +70,7 @@ Runs the unit tests by calling `cargo test`. You can learn more about [adding te
 The directory structure of this project is:
 
 ```
-hello-neon/
+native-addon/
 ├── Cargo.toml
 ├── README.md
 ├── index.node
