@@ -11,7 +11,7 @@ function setupFilesProcess(mainWindow: BrowserWindow, loadedFiles: Map<string, I
     if (loadedFiles.has(filePath)) throw new Error('File already added');
     if (!(await fs.stat(filePath)).isFile()) { throw new Error('Path does not point to a file'); }
 
-    const supportedFile = await getSupportedFileFomPath(filePath);
+    const supportedFile = getSupportedFileFomPath(filePath);
 
     mainWindow.webContents.send(IpcEvents.main.has.approvedFile, supportedFile);
 
