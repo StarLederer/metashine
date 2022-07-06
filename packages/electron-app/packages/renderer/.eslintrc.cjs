@@ -17,6 +17,13 @@ module.exports = {
     {
       files: ['*.svelte'],
       processor: 'svelte3/svelte3',
+      rules: {
+        'import/first': 'off',
+        'import/no-duplicates': 'off',
+        'import/no-mutable-exports': 'off',
+        'import/prefer-default-export': 'off',
+        'import/extensions': 'off',
+      },
     },
 
     // Typescript files
@@ -27,9 +34,4 @@ module.exports = {
       },
     },
   ],
-
-  rules: {
-    'import/no-mutable-exports': 'off',
-    'import/extensions': 'off',
-  },
 };

@@ -5,7 +5,7 @@
   import WindowControls from './lib/WindowControls.svelte';
   import Files from './lib/Files.svelte';
   import Assistant from './lib/assistant/Assistant.svelte';
-  import Tags from './lib/Tags.svelte';
+  import Tags from './lib/tag/Tag.svelte';
   import ContextMenu from './lib/ContextMenu.svelte';
   import IpcEvents from '../../common/IpcEvents';
 

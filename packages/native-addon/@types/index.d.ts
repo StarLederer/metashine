@@ -1,3 +1,10 @@
+type APICFrame = {
+  MIMEType: string,
+  pictureType: string,
+  description: string,
+  data?: ArrayBuffer;
+};
+
 type NativeID3v2_4_0Tag = {
   TIT1: string;
   TIT2: string;
@@ -49,12 +56,7 @@ type NativeID3v2_4_0Tag = {
   TSOP: string;
   TSOT: string;
 
-  APIC: {
-    MIMEType: string,
-    pictureType: string,
-    description: string,
-    data: Buffer;
-  },
+  APIC: APICFrame;
 };
 
 type NativeID3v2_3_0Tag = {
@@ -66,5 +68,5 @@ declare type ID3Tag = Partial<NativeID3v2_4_0Tag & NativeID3v2_3_0Tag>;
 declare module "@metashine/native-addon" {
   function loadTag(path: string): ID3Tag;
   function updateTag(): void;
-  export { loadTag, updateTag, ID3Tag };
+  export { loadTag, updateTag, ID3Tag, APICFrame };
 }

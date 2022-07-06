@@ -2,7 +2,6 @@ const IpcEvents = {
   main: {
     wants: {
       toRender: {
-        albumArt: 'render-album-art',
         error: 'render-error',
         meta: 'render-meta',
         noFileDOM: 'main-request-remove-file-dom',
@@ -39,14 +38,7 @@ const IpcEvents = {
     },
     has: {
       updated: {
-        tag: {
-          title: 'tag-title-updated',
-          artist: 'tag-artist-updated',
-          track: 'tag-track-updated',
-          album: 'tag-album-updated',
-          albumArtist: 'tag-album-artist-updated',
-          year: 'tag-year-updated',
-        },
+        id3tag: 'renderer-has-updated-id3tag',
       },
       receivedFile: 'file-received',
       receivedPicture: 'album-art-received',

@@ -43,7 +43,7 @@ const createWindow = async () => {
     mainWindow?.show();
 
     if (isDevelopment) {
-      mainWindow?.webContents.openDevTools();
+      // mainWindow?.webContents.openDevTools();
     }
   });
 

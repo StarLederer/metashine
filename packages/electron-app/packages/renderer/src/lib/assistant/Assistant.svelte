@@ -5,6 +5,7 @@
     SoundcloudTrackV2,
   } from 'soundcloud.ts';
   import type { Track as SpotifyTrack } from 'spotify-api.js';
+
   import type { SeachResultSuggestion, SearchResult } from './Result.svelte';
   import IpcEvents from '../../../../common/IpcEvents';
   import Result from './Result.svelte';
@@ -24,10 +25,28 @@
   async function applyAlbumArt(url: string, extension: string): Promise<void> {
     try {
       const res = await fetch(url);
-      const buffer = await res.arrayBuffer();
-      window.tags.updateAlbumArt(buffer, extension);
+      const data = await res.arrayBuffer();
+
+      let MIMEType;
+      if (extension === 'png') {
+        MIMEType = 'image/png';
+      } else if (
+        extension === 'jpg'
+        || extension === 'jpeg'
+      ) {
+        MIMEType = 'image/jpeg';
+      }
+
+      window.tags.updateFrame({
+        APIC: {
+          MIMEType,
+          pictureType: '3',
+          description: '',
+          data,
+        },
+      });
     } catch (error: any) {
-      console.log(error);
+      alert(error);
     }
   }
 
@@ -68,7 +87,7 @@
             {
               label: track.name,
               apply() {
-                window.tags.updateTrackTitle(track.name);
+                window.tags.updateFrame({ TIT2: track.name });
               },
             },
           ],
@@ -79,7 +98,7 @@
             {
               label: trackArtistsString,
               apply() {
-                window.tags.updateTrackArtist(trackArtistsString);
+                window.tags.updateFrame({ TPE1: trackArtistsString });
               },
             },
           ],
@@ -90,7 +109,7 @@
             {
               label: `${track.trackNumber}`,
               apply() {
-                window.tags.updateTrackNumber(`${track.trackNumber}`);
+                window.tags.updateFrame({ TRCK: `${track.trackNumber}` });
               },
             },
           ],
@@ -115,7 +134,7 @@
               {
                 label: track.album.name,
                 apply() {
-                  window.tags.updateAlbumTitle(track.album.name);
+                  window.tags.updateFrame({ TALB: track.album.name });
                 },
               },
             ],
@@ -126,7 +145,7 @@
               {
                 label: albumArtistString,
                 apply() {
-                  window.tags.updateAlbumArtist(albumArtistString);
+                  window.tags.updateFrame({ TPE2: albumArtistString });
                 },
               },
             ],
@@ -137,7 +156,7 @@
               {
                 label: track.album.releaseDate.split('-')[0],
                 apply() {
-                  window.tags.updateYear(track.album.releaseDate.split('-')[0]);
+                  window.tags.updateFrame({ TYER: track.album.releaseDate.split('-')[0] });
                 },
               },
             ],
@@ -189,7 +208,7 @@
           trackTitles.buttons.push({
             label: title,
             apply() {
-              window.tags.updateTrackTitle(title);
+              window.tags.updateFrame({ TIT2: title });
             },
           });
         });
@@ -202,7 +221,7 @@
           albumTitles.buttons.push({
             label: title,
             apply() {
-              window.tags.updateAlbumTitle(title);
+              window.tags.updateFrame({ TALB: title });
             },
           });
         });
@@ -219,7 +238,7 @@
               buttons: [{
                 label: track.user.username,
                 apply() {
-                  window.tags.updateTrackArtist(track.user.username);
+                  window.tags.updateFrame({ TPE2: track.user.username });
                 },
               }],
             },
@@ -229,19 +248,19 @@
                 {
                   label: '1',
                   apply() {
-                    window.tags.updateTrackNumber('1');
+                    window.tags.updateFrame({ TRCK: '1' });
                   },
                 },
                 {
                   label: '2',
                   apply() {
-                    window.tags.updateTrackNumber('2');
+                    window.tags.updateFrame({ TRCK: '1' });
                   },
                 },
                 {
                   label: '3',
                   apply() {
-                    window.tags.updateTrackNumber('3');
+                    window.tags.updateFrame({ TRCK: '1' });
                   },
                 },
               ],
@@ -253,7 +272,7 @@
                 {
                   label: track.user.username,
                   apply() {
-                    window.tags.updateAlbumArtist(track.user.username);
+                    window.tags.updateFrame({ TPE2: track.user.username });
                   },
                 },
               ],
@@ -265,7 +284,7 @@
                   {
                     label: track.release_date,
                     apply() {
-                      window.tags.updateYear(track.release_date);
+                      window.tags.updateFrame({ TYER: track.release_date });
                     },
                   },
                 ]

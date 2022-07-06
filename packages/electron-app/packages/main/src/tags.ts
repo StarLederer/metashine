@@ -1,52 +1,23 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
-import * as mm2 from '@metashine/native-addon';
+import { loadTag } from '@metashine/native-addon';
+import type { ID3Tag, APICFrame } from '@metashine/native-addon';
 
-import * as NodeID3 from 'node-id3';
+// import * as NodeID3 from 'node-id3';
 
 import IpcEvents from '../../common/IpcEvents';
-import type NodeID3Image from '../../common/NodeID3Image';
 import type { ISuppotedFile } from '../../common/SupportedFile';
 
 function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentFiles: string[] = [];
-  let currentMeta: NodeID3.Tags = {};
+  let currentMeta: ID3Tag = {};
 
   ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.title,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.title = value;
-    },
-  );
-  ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.artist,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.artist = value;
-    },
-  );
-  ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.track,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.trackNumber = value;
-    },
-  );
-  ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.album,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.album = value;
-    },
-  );
-  ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.albumArtist,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.performerInfo = value;
-    },
-  );
-  ipcMain.on(
-    IpcEvents.renderer.has.updated.tag.year,
-    (event: IpcMainEvent, value: string) => {
-      currentMeta.year = value;
+    IpcEvents.renderer.has.updated.id3tag,
+    (event: IpcMainEvent, value: ID3Tag) => {
+      Object.assign(currentMeta, value);
+      event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
     },
   );
 
@@ -61,25 +32,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       currentMeta = {};
 
       try {
-        const tag = mm2.loadTag(filePath);
-        if (tag.TYER) currentMeta.year = tag.TYER;
-        if (tag.TPE2) currentMeta.performerInfo = tag.TPE2;
-        if (tag.TALB) currentMeta.album = tag.TALB;
-        if (tag.TRCK) currentMeta.trackNumber = tag.TRCK;
-        if (tag.TPE1) currentMeta.artist = tag.TPE1;
-        if (tag.TIT2) currentMeta.title = tag.TIT2;
-
-        if (tag.APIC) {
-          currentMeta.image = {
-            mime: tag.APIC.MIMEType,
-            type: {
-              id: 3,
-              name: tag.APIC.pictureType,
-            },
-            description: tag.APIC.description,
-            imageBuffer: tag.APIC.data,
-          } as NodeID3Image;
-        }
+        currentMeta = loadTag(filePath);
 
         // Request tag section update
         event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
@@ -128,45 +81,43 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
     });
   });
 
-  function getNewFrontCover(): NodeID3Image {
+  function getNewFrontCover(): APICFrame {
     return {
-      mime: '',
-      type: {
-        id: 3,
-        name: '',
-      },
+      MIMEType: '',
+      pictureType: '3',
       description: '',
-      imageBuffer: null as unknown as Buffer,
+      data: undefined,
     };
   }
 
   ipcMain.on(
     IpcEvents.renderer.has.receivedPicture,
-    (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
-      const frontCover = currentMeta.image
-        ? (currentMeta.image as NodeID3Image)
-        : getNewFrontCover();
+    (event: IpcMainEvent, name: string, buffer: Buffer) => {
+      // const picture = currentMeta.APIC
+      //   ? currentMeta.image
+      //   : getNewFrontCover();
 
-      const fileNameLowerCase = name.toLowerCase();
-      if (fileNameLowerCase.endsWith('png')) {
-        frontCover.mime = 'image/png';
-      } else if (
-        fileNameLowerCase.endsWith('jpg')
-        || fileNameLowerCase.endsWith('jpeg')
-      ) {
-        frontCover.mime = 'image/jpeg';
-      } else return;
+      // const fileNameLowerCase = name.toLowerCase();
+      // if (fileNameLowerCase.endsWith('png')) {
+      //   frontCover.MIMEType = 'image/png';
+      // } else if (
+      //   fileNameLowerCase.endsWith('jpg')
+      //   || fileNameLowerCase.endsWith('jpeg')
+      // ) {
+      //   picture.MIMEType = 'image/jpeg';
+      // } else return;
 
-      frontCover.imageBuffer = Buffer.from(buffer);
-      currentMeta.image = frontCover;
+      // picture.data = Buffer.from(buffer);
 
-      event.sender.send(IpcEvents.main.wants.toRender.albumArt, frontCover);
+      // currentMeta.APIC = picture;
+
+      // event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
     },
   );
 
   ipcMain.on(IpcEvents.renderer.wants.toRemoveAlbumArt, (event: IpcMainEvent) => {
-    currentMeta.image = getNewFrontCover();
-    event.sender.send(IpcEvents.main.wants.toRender.albumArt, currentMeta.image);
+    currentMeta.APIC = getNewFrontCover();
+    event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
   });
 }
 
