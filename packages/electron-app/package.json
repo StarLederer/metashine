@@ -71,7 +71,6 @@
   "dependencies": {
     "@metashine/native-addon": "workspace:^0.1.0",
     "electron-updater": "4.6.2",
-    "node-id3": "^0.2.3",
     "soundcloud.ts": "^0.4.6",
     "spotify-api.js": "^9.2.1",
     "typescript": "^4.7.4"

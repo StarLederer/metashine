@@ -19,7 +19,6 @@ importers:
       eslint-config-airbnb-typescript: ^16.2.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-svelte3: ^3.4.1
-      node-id3: ^0.2.3
       sass: ^1.53.0
       soundcloud.ts: ^0.4.6
       spotify-api.js: ^9.2.1
@@ -33,7 +32,6 @@ importers:
     dependencies:
       '@metashine/native-addon': link:../native-addon
       electron-updater: 4.6.2
-      node-id3: 0.2.3
       soundcloud.ts: 0.4.6
       spotify-api.js: 9.2.1
       typescript: 4.7.4
@@ -2232,13 +2230,6 @@ packages:
     dev: true
     optional: true
 
-  /iconv-lite/0.6.2:
-    resolution: {integrity: sha512-2y91h5OpQlolefMPmUlivelittSWy0rP+oYVpn6A7GwVHNE8AWzoYOBNmlwks3LobaJxgHCYZAnyNo2GgpNRNQ==}
-    engines: {node: '>=0.10.0'}
-    dependencies:
-      safer-buffer: 2.1.2
-    dev: false
-
   /iconv-lite/0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
@@ -2782,12 +2773,6 @@ packages:
     dev: true
     optional: true
 
-  /node-id3/0.2.3:
-    resolution: {integrity: sha512-HhaCaW6/nSwTxsTKtZiL7tqV9y1qCRjig37Ep3o0EEunpg1egda1vD6TRBpJb29oXPeLuzaWTaCLIQ9QRk52Ag==}
-    dependencies:
-      iconv-lite: 0.6.2
-    dev: false
-
   /normalize-path/3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -3207,6 +3192,7 @@ packages:
 
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+    dev: true
 
   /sander/0.5.1:
     resolution: {integrity: sha512-3lVqBir7WuKDHGrKRDn/1Ye3kwpXaDOMsiRP1wd6wpZW56gJhsbp5RqQpA6JG/P+pkXizygnr1dKR8vzWaVsfA==}
