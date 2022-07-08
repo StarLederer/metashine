@@ -4,8 +4,6 @@ import type { IpcMainEvent } from 'electron';
 import { loadTag } from '@metashine/native-addon';
 import type { ID3Tag, APICFrame } from '@metashine/native-addon';
 
-// import * as NodeID3 from 'node-id3';
-
 import IpcEvents from '../../common/IpcEvents';
 import type { ISuppotedFile } from '../../common/SupportedFile';
 
@@ -92,26 +90,26 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
 
   ipcMain.on(
     IpcEvents.renderer.has.receivedPicture,
-    (event: IpcMainEvent, name: string, buffer: Buffer) => {
-      // const picture = currentMeta.APIC
-      //   ? currentMeta.image
-      //   : getNewFrontCover();
+    (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
+      const picture = currentMeta.APIC
+        ? currentMeta.APIC
+        : getNewFrontCover();
 
-      // const fileNameLowerCase = name.toLowerCase();
-      // if (fileNameLowerCase.endsWith('png')) {
-      //   frontCover.MIMEType = 'image/png';
-      // } else if (
-      //   fileNameLowerCase.endsWith('jpg')
-      //   || fileNameLowerCase.endsWith('jpeg')
-      // ) {
-      //   picture.MIMEType = 'image/jpeg';
-      // } else return;
+      const fileNameLowerCase = name.toLowerCase();
+      if (fileNameLowerCase.endsWith('png')) {
+        picture.MIMEType = 'image/png';
+      } else if (
+        fileNameLowerCase.endsWith('jpg')
+        || fileNameLowerCase.endsWith('jpeg')
+      ) {
+        picture.MIMEType = 'image/jpeg';
+      } else return;
 
-      // picture.data = Buffer.from(buffer);
+      picture.data = Buffer.from(buffer);
 
-      // currentMeta.APIC = picture;
+      currentMeta.APIC = picture;
 
-      // event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
+      event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
     },
   );
 
