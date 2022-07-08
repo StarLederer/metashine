@@ -1,6 +1,6 @@
 type APICFrame = {
   MIMEType: string,
-  pictureType: string,
+  pictureType: number,
   description: string,
   data?: ArrayBuffer;
 };

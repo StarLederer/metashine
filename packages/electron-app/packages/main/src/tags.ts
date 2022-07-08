@@ -81,7 +81,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   function getNewFrontCover(): APICFrame {
     return {
       MIMEType: '',
-      pictureType: '3',
+      pictureType: 3,
       description: '',
       data: undefined,
     };
