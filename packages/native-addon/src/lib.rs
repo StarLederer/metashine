@@ -90,7 +90,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
             id3::Content::Picture(content) => {
                 let js_picture = cx.empty_object();
                 let js_mime_type = cx.string(&content.mime_type);
-                let js_picture_type = cx.string(content.picture_type.to_string());
+                let js_picture_type = cx.number(u8::from(content.picture_type));
                 let js_description = cx.string(&content.description);
                 let js_data = u8_vec_to_buffer(&mut cx, &content.data)
                     .expect("Failed loading image data into Javascript runtime");

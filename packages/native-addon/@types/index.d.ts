@@ -67,6 +67,6 @@ declare type ID3Tag = Partial<NativeID3v2_4_0Tag & NativeID3v2_3_0Tag>;
 
 declare module "@metashine/native-addon" {
   function loadTag(path: string): ID3Tag;
-  function updateTag(): void;
+  function updateTag(path: string, update: ID3Tag): void;
   export { loadTag, updateTag, ID3Tag, APICFrame };
 }

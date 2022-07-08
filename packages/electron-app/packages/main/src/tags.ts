@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
-import { loadTag } from '@metashine/native-addon';
+import { loadTag, updateTag } from '@metashine/native-addon';
 import type { ID3Tag, APICFrame } from '@metashine/native-addon';
 
 import IpcEvents from '../../common/IpcEvents';
@@ -69,11 +69,10 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
     currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
-        const result = NodeID3.update(currentMeta, supportedFile.path);
-        if (result === true) {
-          // success
-        } else {
-          event.sender.send(IpcEvents.main.wants.toRender.error, result);
+        try {
+          updateTag(supportedFile.path, currentMeta);
+        } catch (error) {
+          event.sender.send(IpcEvents.main.wants.toRender.error, error);
         }
       }
     });
