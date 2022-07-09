@@ -56,11 +56,14 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
     let mut i: u32 = 0;
     tag.frames().for_each(|frame| {
         match frame.content() {
+            // Texts
             id3::Content::Text(content) => {
                 let js_string = cx.string(content);
                 transfer_frame_as_tuple!(i, frame.id(), js_string);
                 return;
             }
+
+            // Extended texts
             id3::Content::ExtendedText(content) => {
                 let js_value = cx.string(&content.value);
                 let js_description = cx.string(&content.description);
@@ -78,12 +81,18 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                 transfer_frame_as_tuple!(i, frame.id(), js_extended_text);
                 return;
             }
+
+            // Links
             id3::Content::Link(content) => {
                 let js_text = cx.string(content);
                 transfer_frame_as_tuple!(i, frame.id(), js_text);
                 return;
             }
+
+            // Extended links
             // id3::Content::ExtendedLink(content) => todo!(),
+
+            // Comments
             id3::Content::Comment(content) => {
                 let js_lang = cx.string(&content.lang);
                 let js_description = cx.string(&content.description);
@@ -103,9 +112,17 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                 transfer_frame_as_tuple!(i, frame.id(), js_comment);
                 return;
             }
+
+            // Popularimeters
             // id3::Content::Popularimeter(content) => todo!(),
+
+            // Lyrics
             // id3::Content::Lyrics(content) => todo!(),
+
+            // SynchronisedLyrics
             // id3::Content::SynchronisedLyrics(content) => todo!(),
+
+            // Pictures
             id3::Content::Picture(content) => {
                 let js_picture = cx.empty_object();
                 let js_mime_type = cx.string(&content.mime_type);
@@ -130,10 +147,41 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                 transfer_frame_as_tuple!(i, frame.id(), js_picture);
                 return;
             }
-            // id3::Content::EncapsulatedObject(content) => todo!(),
+
+            // Encapsulated objects
+            id3::Content::EncapsulatedObject(content) => {
+                let js_enc_object = cx.empty_object();
+                let js_mime_type = cx.string(&content.mime_type);
+                let js_filename = cx.string(&content.filename);
+                let js_description = cx.string(&content.description);
+                let js_data = u8_vec_to_buffer(&mut cx, &content.data)
+                    .expect("Failed loading image data into Javascript runtime");
+
+                js_enc_object
+                    .set(&mut cx, "MIMEType", js_mime_type).unwrap();
+                js_enc_object
+                    .set(&mut cx, "filename", js_filename).unwrap();
+                js_enc_object
+                    .set(&mut cx, "description", js_description).unwrap();
+                js_enc_object
+                    .set(&mut cx, "data", js_data).unwrap();
+
+                transfer_frame_as_tuple!(i, frame.id(), js_enc_object);
+            },
+
+            // Chapters
             // id3::Content::Chapter(content) => todo!(),
+
+            // MpegLocationLookupTables
             // id3::Content::MpegLocationLookupTable(content) => todo!(),
-            // id3::Content::Unknown(content) => todo!(),
+
+            // Unknown frames
+            id3::Content::Unknown(content) => {
+                let js_data = u8_vec_to_buffer(&mut cx, &content.data).unwrap();
+                transfer_frame_as_tuple!(i, frame.id(), js_data);
+            }
+
+            // Frames that are not implemented yet
             _ => {
                 panic!("Unsupporeted frame type {}", frame.to_string());
             }
