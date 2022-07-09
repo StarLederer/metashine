@@ -13,7 +13,7 @@ fn u8_vec_to_buffer<'a, C: Context<'a>>(cx: &mut C, vec: &Vec<u8>) -> JsResult<'
     Ok(buffer)
 }
 
-fn buffer_to_u8_vec<'a, C: Context<'a>>(cx: &mut C, buffer: &Handle<JsBuffer>) -> Vec<u8> {
+fn arraybuffer_to_u8_vec<'a, C: Context<'a>>(cx: &mut C, buffer: &Handle<JsArrayBuffer>) -> Vec<u8> {
     let vec: Vec<u8> = buffer.as_slice(cx).to_vec();
     return vec;
 }
@@ -37,12 +37,14 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
     };
 
     macro_rules! transfer_frame_as_tuple {
-        ($i:expr, $tag_id_content:expr, $tag_content:expr) => {
-            let js_key = cx.string($tag_id_content);
+        ($i:expr, $tag_type:expr, $tag_id:expr, $tag_content:expr) => {
+            let js_type = cx.string($tag_type);
+            let js_key = cx.string($tag_id);
 
             let js_tuple = cx.empty_array();
-            js_tuple.set(&mut cx, 0, js_key).unwrap();
-            js_tuple.set(&mut cx, 1, $tag_content).unwrap();
+            js_tuple.set(&mut cx, 0, js_type).unwrap();
+            js_tuple.set(&mut cx, 1, js_key).unwrap();
+            js_tuple.set(&mut cx, 2, $tag_content).unwrap();
 
             js_metadata
                 .set(&mut cx, $i, js_tuple)
@@ -59,7 +61,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
             // Texts
             id3::Content::Text(content) => {
                 let js_string = cx.string(content);
-                transfer_frame_as_tuple!(i, frame.id(), js_string);
+                transfer_frame_as_tuple!(i, "text", frame.id(), js_string);
                 return;
             }
 
@@ -78,14 +80,14 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                         "Failed writing an extended text frame description to Javascript runtime",
                     );
 
-                transfer_frame_as_tuple!(i, frame.id(), js_extended_text);
+                transfer_frame_as_tuple!(i, "extended text", frame.id(), js_extended_text);
                 return;
             }
 
             // Links
             id3::Content::Link(content) => {
                 let js_text = cx.string(content);
-                transfer_frame_as_tuple!(i, frame.id(), js_text);
+                transfer_frame_as_tuple!(i, "link", frame.id(), js_text);
                 return;
             }
 
@@ -109,7 +111,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                     .set(&mut cx, "text", js_text)
                     .expect("Failed writing a comment frame text to Javascript runtime");
 
-                transfer_frame_as_tuple!(i, frame.id(), js_comment);
+                transfer_frame_as_tuple!(i, "comment", frame.id(), js_comment);
                 return;
             }
 
@@ -144,7 +146,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                     .set(&mut cx, "data", js_data)
                     .expect("Failed writing picture frame picture data to Javascript runtime");
 
-                transfer_frame_as_tuple!(i, frame.id(), js_picture);
+                transfer_frame_as_tuple!(i, "picture", frame.id(), js_picture);
                 return;
             }
 
@@ -158,16 +160,16 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                     .expect("Failed loading image data into Javascript runtime");
 
                 js_enc_object
-                    .set(&mut cx, "MIMEType", js_mime_type).unwrap();
+                    .set(&mut cx, "MIMEType", js_mime_type)
+                    .unwrap();
+                js_enc_object.set(&mut cx, "filename", js_filename).unwrap();
                 js_enc_object
-                    .set(&mut cx, "filename", js_filename).unwrap();
-                js_enc_object
-                    .set(&mut cx, "description", js_description).unwrap();
-                js_enc_object
-                    .set(&mut cx, "data", js_data).unwrap();
+                    .set(&mut cx, "description", js_description)
+                    .unwrap();
+                js_enc_object.set(&mut cx, "data", js_data).unwrap();
 
-                transfer_frame_as_tuple!(i, frame.id(), js_enc_object);
-            },
+                transfer_frame_as_tuple!(i, "encapsulated object", frame.id(), js_enc_object);
+            }
 
             // Chapters
             // id3::Content::Chapter(content) => todo!(),
@@ -178,7 +180,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
             // Unknown frames
             id3::Content::Unknown(content) => {
                 let js_data = u8_vec_to_buffer(&mut cx, &content.data).unwrap();
-                transfer_frame_as_tuple!(i, frame.id(), js_data);
+                transfer_frame_as_tuple!(i, "unknown", frame.id(), js_data);
             }
 
             // Frames that are not implemented yet
@@ -191,132 +193,66 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
     return Ok(js_metadata);
 }
 
-fn update_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
+fn write_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let js_path: Handle<JsString> = cx.argument(0).expect("Incorrect argument 0 received");
     let path = js_path.value(&mut cx);
 
-    let js_tag: Handle<JsObject> = cx.argument(1).expect("Incorrect argument 1 received");
-    let mut tag = Tag::read_from_path(&path).expect("Failed reading tag");
+    let js_tag: Handle<JsArray> = cx.argument(1).expect("Incorrect argument 1 received");
+    let mut tag = Tag::new();
 
-    macro_rules! transfer_frame {
-        ($id:expr, $type:ty, $content:ident, $callback:tt) => {
-            match js_tag.get_opt(&mut cx, $id) as NeonResult<Option<Handle<$type>>> {
-                Ok(content_option) => {
-                    if let Some($content) = content_option $callback
+    let frame_tuples: Vec<Handle<JsValue>> = js_tag.to_vec(&mut cx).expect("");
+
+    frame_tuples.iter().for_each(|tuple| {
+        match tuple.downcast_or_throw::<JsArray, FunctionContext>(&mut cx) {
+            Ok(js_tuple) => {
+                let js_frame_type: Handle<JsString> = js_tuple.get(&mut cx, 0).unwrap();
+                let frame_type = js_frame_type.value(&mut cx);
+                let js_frame_name: Handle<JsString> = js_tuple.get(&mut cx, 1).unwrap();
+                let frame_name = js_frame_name.value(&mut cx);
+
+                // Texts
+                if frame_type == "text" {
+                    let js_frame_content: Handle<JsString> = js_tuple.get(&mut cx, 2).unwrap();
+                    let frame_content = js_frame_content.value(&mut cx);
+                    tag.add_frame(Frame::text(frame_name, frame_content));
                 }
-                Err(_) => {}
+                // Pictures
+                else if frame_type == "picture" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_mime_type: Handle<JsString> = js_frame_content
+                        .get(&mut cx, "MIMEType")
+                        .expect("APIC.MIMEType not provided");
+                    let js_picture_type: Handle<JsNumber> = js_frame_content
+                        .get(&mut cx, "pictureType")
+                        .expect("APIC.pictureType not provided");
+                    let js_description: Handle<JsString> = js_frame_content
+                        .get(&mut cx, "description")
+                        .expect("APIC.description not provided");
+                    let js_data: Handle<JsArrayBuffer> = js_frame_content
+                        .get(&mut cx, "data")
+                        .expect("APIC.data not provided");
+
+                    let mime_type = js_mime_type.value(&mut cx);
+                    // let picture_type = js_picture_type.value(&mut cx);
+                    let picture_type =
+                        id3::frame::PictureType::Undefined(js_picture_type.value(&mut cx) as u8);
+                    let description = js_description.value(&mut cx);
+                    let data: Vec<u8> = arraybuffer_to_u8_vec(&mut cx, &js_data);
+
+                    let picture = id3::frame::Picture {
+                        mime_type,
+                        picture_type,
+                        description,
+                        data,
+                    };
+                    tag.add_frame(Frame::with_content(
+                        "APIC",
+                        id3::Content::Picture(picture.clone()),
+                    ));
+                }
             }
-        };
-    }
-
-    // Text frames
-    macro_rules! transfer_t_frame {
-        ($id:expr) => {
-            transfer_frame!($id, JsString, content, {
-                tag.add_frame(Frame::text($id, content.value(&mut cx)));
-            })
-        };
-    }
-
-    // URL link frames
-    macro_rules! transfer_w_frame {
-        ($id:expr) => {
-            transfer_frame!($id, JsString, content, {
-                tag.add_frame(Frame::link($id, content.value(&mut cx)));
-            })
-        };
-    }
-
-    // https://id3.org/id3v2.4.0-frames
-    transfer_t_frame!("TIT1");
-    transfer_t_frame!("TIT2");
-    transfer_t_frame!("TIT3");
-    transfer_t_frame!("TALB");
-    transfer_t_frame!("TOAL");
-    transfer_t_frame!("TRCK");
-    transfer_t_frame!("TPOS");
-    transfer_t_frame!("TSST");
-    transfer_t_frame!("TSRC");
-
-    transfer_t_frame!("TPE1");
-    transfer_t_frame!("TPE2");
-    transfer_t_frame!("TPE3");
-    transfer_t_frame!("TPE4");
-    transfer_t_frame!("TOPE");
-    transfer_t_frame!("TEXT");
-    transfer_t_frame!("TOLY");
-    transfer_t_frame!("TCOM");
-    transfer_t_frame!("TMCL");
-    transfer_t_frame!("TIPL");
-    transfer_t_frame!("TENC");
-
-    transfer_t_frame!("TBPM");
-    transfer_t_frame!("TLEN");
-    transfer_t_frame!("TKEY");
-    transfer_t_frame!("TLAN");
-    transfer_t_frame!("TCON");
-    transfer_t_frame!("TFLT");
-    transfer_t_frame!("TMED");
-    transfer_t_frame!("TMOO");
-
-    transfer_t_frame!("TCOP");
-    transfer_t_frame!("TPRO");
-    transfer_t_frame!("TPUB");
-    transfer_t_frame!("TOWN");
-    transfer_t_frame!("TRSN");
-    transfer_t_frame!("TRSO");
-
-    transfer_t_frame!("TOFN");
-    transfer_t_frame!("TDLY");
-    transfer_t_frame!("TDEN");
-    transfer_t_frame!("TDOR");
-    transfer_t_frame!("TDRC");
-    transfer_t_frame!("TDRL");
-    transfer_t_frame!("TDTG");
-    transfer_t_frame!("TSSE");
-    transfer_t_frame!("TSOA");
-    transfer_t_frame!("TSOP");
-    transfer_t_frame!("TSOT");
-
-    transfer_w_frame!("WCOM");
-    transfer_w_frame!("WCOP");
-    transfer_w_frame!("WOAF");
-    transfer_w_frame!("WOAR");
-    transfer_w_frame!("WOAS");
-    transfer_w_frame!("WORS");
-    transfer_w_frame!("WPAY");
-    transfer_w_frame!("WPUB");
-
-    transfer_frame!("APIC", JsObject, content, {
-        let js_mime_type: Handle<JsString> = content
-            .get(&mut cx, "MIMEType")
-            .expect("APIC.MIMEType not provided");
-        let js_picture_type: Handle<JsNumber> = content
-            .get(&mut cx, "pictureType")
-            .expect("APIC.pictureType not provided");
-        let js_description: Handle<JsString> = content
-            .get(&mut cx, "description")
-            .expect("APIC.description not provided");
-        let js_data: Handle<JsBuffer> = content
-            .get(&mut cx, "data")
-            .expect("APIC.data not provided");
-
-        let mime_type = js_mime_type.value(&mut cx);
-        // let picture_type = js_picture_type.value(&mut cx);
-        let picture_type = id3::frame::PictureType::Undefined(js_picture_type.value(&mut cx) as u8);
-        let description = js_description.value(&mut cx);
-        let data: Vec<u8> = buffer_to_u8_vec(&mut cx, &js_data);
-
-        let picture = id3::frame::Picture {
-            mime_type,
-            picture_type,
-            description,
-            data,
-        };
-        tag.add_frame(Frame::with_content(
-            "APIC",
-            id3::Content::Picture(picture.clone()),
-        ));
+            Err(_) => {}
+        }
     });
 
     tag.write_to_path(&path, id3::Version::Id3v24)
@@ -328,6 +264,6 @@ fn update_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("loadTag", load_tag)?;
-    cx.export_function("updateTag", update_tag)?;
+    cx.export_function("writeTag", write_tag)?;
     Ok(())
 }

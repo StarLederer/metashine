@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ID3Tag } from '@metashine/native-addon';
+  import type { ID3Frame, ID3Tag } from '@metashine/native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
 
@@ -18,19 +18,20 @@
   window.electron.on(IpcEvents.main.wants.toRender.meta, (_, tag: ID3Tag) => {
     // WARNING: This pollutes currentTag with invalid
     // placeholders. They should not be returned to main
-    const arr = tag;
+    const arr = [...tag];
 
     order.forEach((id) => {
       if (findFrameIndexes(arr, id).length <= 0) {
         if (id.startsWith('T')) {
-          arr.push([id, '']);
+          arr.push(['text', id, '']);
         } else if (id === 'APIC') {
           arr.push([
+            'picture',
             id,
             {
               MIMEType: undefined,
               pictureType: 3,
-              description: undefined,
+              description: '',
               data: undefined,
             },
           ]);
@@ -39,8 +40,8 @@
     });
 
     arr.sort((a, b) => {
-      const indexA = order.indexOf(a[0]);
-      const indexB = order.indexOf(b[0]);
+      const indexA = order.indexOf(a[1]);
+      const indexB = order.indexOf(b[1]);
 
       if (indexA < 0) return 0;
       if (indexB < 0) return -1;
@@ -65,30 +66,22 @@
    */
   const onSaveClicked = () => {
     // Sanitize tag because we pollute them with empty placeholders
-    function isContentComplete(frame: any) {
-      if (typeof frame !== 'undefined') {
-        if (typeof frame === 'object') {
-          let frameComplete = true;
-          const values = Object.values(frame);
-
-          if (values.length <= 0) return false;
-
-          values.forEach((obj) => {
-            frameComplete = frameComplete && isContentComplete(obj);
-          });
-
-          return frameComplete;
-        }
-        return true;
+    function isContentComplete(frame: ID3Frame) {
+      if (frame[0] === 'text') {
+        if (frame[2].length > 0) return true;
       }
+      if (frame[0] === 'picture') {
+        if (frame[2].data) return true;
+      }
+
       return false;
     }
 
-    const sanitizedTag = [];
+    const sanitizedTag: ID3Tag = [];
     currentTag.forEach((frame) => {
       if (isContentComplete(frame)) {
         sanitizedTag.push(frame);
-      } else sanitizedTag.push([frame[0], undefined]);
+      }
     });
 
     // Communicate to main
@@ -108,10 +101,10 @@
   </header>
   <main>
     <!-- Regular frames -->
-    {#each currentTag as [name, value]}
-      {#if typeof value === 'string'}
+    {#each currentTag as [type, name, value]}
+      {#if type === 'text'}
         <TextFrame {name} bind:value />
-      {:else if name === 'APIC'}
+      {:else if type === 'picture'}
         <PictureFrame {name} bind:value />
       {:else}
         <OtherFrame {name} />
