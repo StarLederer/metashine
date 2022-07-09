@@ -22,7 +22,7 @@
 </script>
 
 <div class="tag-field">
-  <label for={name}>{locale.tags[name] ? `${locale.tags[name]} (${name})` : `Extra: ${name}`} </label>
+  <label for={name}>{locale.tags[name] ? `${locale.tags[name]} (${name})` : name} </label>
   <input
     type="text"
     id={name}
