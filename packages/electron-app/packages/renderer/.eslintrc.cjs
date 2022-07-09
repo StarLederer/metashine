@@ -23,6 +23,7 @@ module.exports = {
         'import/no-mutable-exports': 'off',
         'import/prefer-default-export': 'off',
         'import/extensions': 'off',
+        'no-use-before-define': 'off',
       },
     },
 
