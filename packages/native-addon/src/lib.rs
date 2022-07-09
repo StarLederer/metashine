@@ -18,33 +18,47 @@ fn buffer_to_u8_vec<'a, C: Context<'a>>(cx: &mut C, buffer: &Handle<JsBuffer>) -
     return vec;
 }
 
-fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
+fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
     let js_path: Handle<JsString> = cx.argument(0).expect("Incorrect argument 0 received");
     let path = js_path.value(&mut cx);
 
-    let metadata: Handle<JsObject> = cx.empty_object();
+    let js_metadata: Handle<JsArray> = cx.empty_array();
+
+    // Read tag or create a new one
     let tag;
-
-
     match Tag::read_from_path(&path) {
         Ok(t) => {
-          tag = t;
-        },
-        Err(error) => {
-          match error.kind {
-            id3::ErrorKind::NoTag => tag = Tag::new(),
-            _ => panic!("Error reading tag: {}", &error.description)
+            tag = t;
         }
+        Err(error) => match error.kind {
+            id3::ErrorKind::NoTag => tag = Tag::new(),
+            _ => panic!("Error reading tag: {}", &error.description),
         },
     };
 
+    macro_rules! transfer_frame_as_tuple {
+        ($i:expr, $tag_id_content:expr, $tag_content:expr) => {
+            let js_key = cx.string($tag_id_content);
+
+            let js_tuple = cx.empty_array();
+            js_tuple.set(&mut cx, 0, js_key).unwrap();
+            js_tuple.set(&mut cx, 1, $tag_content).unwrap();
+
+            js_metadata
+                .set(&mut cx, $i, js_tuple)
+                .expect("Failed writing a tag to JavaScript object");
+
+            $i += 1;
+        };
+    }
+
+    // Write frames to a JS object
+    let mut i: u32 = 0;
     tag.frames().for_each(|frame| {
         match frame.content() {
             id3::Content::Text(content) => {
-                let js_text = cx.string(content);
-                metadata
-                    .set(&mut cx, frame.id(), js_text)
-                    .expect("Failed writing a tag to JavaScript object");
+                let js_string = cx.string(content);
+                transfer_frame_as_tuple!(i, frame.id(), js_string);
                 return;
             }
             id3::Content::ExtendedText(content) => {
@@ -61,16 +75,12 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
                         "Failed writing an extended text frame description to Javascript runtime",
                     );
 
-                metadata
-                    .set(&mut cx, frame.id(), js_extended_text)
-                    .expect("Failed writing a frame to JavaScript object");
+                transfer_frame_as_tuple!(i, frame.id(), js_extended_text);
                 return;
             }
             id3::Content::Link(content) => {
                 let js_text = cx.string(content);
-                metadata
-                    .set(&mut cx, frame.id(), js_text)
-                    .expect("Failed writing a frame to JavaScript object");
+                transfer_frame_as_tuple!(i, frame.id(), js_text);
                 return;
             }
             // id3::Content::ExtendedLink(content) => todo!(),
@@ -90,9 +100,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
                     .set(&mut cx, "text", js_text)
                     .expect("Failed writing a comment frame text to Javascript runtime");
 
-                metadata
-                    .set(&mut cx, frame.id(), js_comment)
-                    .expect("Failed to write a tag to JavaScript object");
+                transfer_frame_as_tuple!(i, frame.id(), js_comment);
                 return;
             }
             // id3::Content::Popularimeter(content) => todo!(),
@@ -119,9 +127,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
                     .set(&mut cx, "data", js_data)
                     .expect("Failed writing picture frame picture data to Javascript runtime");
 
-                metadata
-                    .set(&mut cx, frame.id(), js_picture)
-                    .expect("Failed writing a tag to JavaScript object");
+                transfer_frame_as_tuple!(i, frame.id(), js_picture);
                 return;
             }
             // id3::Content::EncapsulatedObject(content) => todo!(),
@@ -130,12 +136,11 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
             // id3::Content::Unknown(content) => todo!(),
             _ => {
                 panic!("Unsupporeted frame type {}", frame.to_string());
-                // panic!("Unknown frame content {}. The file is probably corrupted.", frame.to_string());
             }
         }
     });
 
-    return Ok(metadata);
+    return Ok(js_metadata);
 }
 
 fn update_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
