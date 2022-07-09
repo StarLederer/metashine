@@ -28,28 +28,29 @@
     ],
   };
 
-  function dropAlbumArt(event: DragEvent) {
-    if (event.dataTransfer) {
-      const file = event.dataTransfer.files[0];
-      file.arrayBuffer().then((buffer) => {
-        let MIMEType;
+  function onDropAlbumArt(event: DragEvent) {
+    if (!event.dataTransfer) return;
 
-        const fileNameLowerCase = name.toLowerCase();
-        if (fileNameLowerCase.endsWith('png')) {
-          MIMEType = 'image/png';
-        } else if (
-          fileNameLowerCase.endsWith('jpg')
+    const file = event.dataTransfer.files[0];
+    file.arrayBuffer().then((buffer) => {
+      let MIMEType;
+
+      const fileNameLowerCase = file.name.toLowerCase();
+      if (fileNameLowerCase.endsWith('png')) {
+        MIMEType = 'image/png';
+      } else if (
+        fileNameLowerCase.endsWith('jpg')
           || fileNameLowerCase.endsWith('jpeg')
-        ) {
-          MIMEType = 'image/jpeg';
-        } else return;
+      ) {
+        MIMEType = 'image/jpeg';
+      } else return;
 
-        Object.assign(value, {
-          MIMEType,
-          data: buffer,
-        });
-      });
-    }
+      value = {
+        ...value,
+        MIMEType,
+        data: buffer,
+      };
+    });
   }
 
   function onContextMenu(e: MouseEvent) {
@@ -88,16 +89,15 @@
 
 <div
   class="tag-field picture-field"
-  on:dragenter|preventDefault={null}
-  on:dragover|preventDefault={null}
-  on:drop|preventDefault
 >
   <span>
     {locale.pictureTypes[value.pictureType]} ({name}: {value.pictureType})
   </span>
   <div
     class="picture-input"
-    on:drop={dropAlbumArt}
+    on:dragenter|preventDefault={() => {}}
+    on:dragover|preventDefault={() => {}}
+    on:drop={onDropAlbumArt}
     on:contextmenu={onContextMenu}
   >
     {#if value.data}
