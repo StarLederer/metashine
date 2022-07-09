@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
 import { loadTag, updateTag } from '@metashine/native-addon';
-import type { ID3Tag, APICFrame } from '@metashine/native-addon';
+import type { ID3Tag } from '@metashine/native-addon';
 
 import IpcEvents from '../../common/IpcEvents';
 import type { ISuppotedFile } from '../../common/SupportedFile';
@@ -12,9 +12,9 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentMeta: ID3Tag = [];
 
   ipcMain.on(
-    IpcEvents.renderer.has.updated.id3tag,
-    (event: IpcMainEvent, value: ID3Tag) => {
-      Object.assign(currentMeta, value);
+    IpcEvents.renderer.has.changedTag,
+    (event: IpcMainEvent, newTag: ID3Tag) => {
+      currentMeta = newTag;
       event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
     },
   );
@@ -70,54 +70,13 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          updateTag(supportedFile.path, currentMeta);
+          // updateTag(supportedFile.path, currentMeta);
+          console.log(currentMeta);
         } catch (error) {
           event.sender.send(IpcEvents.main.wants.toRender.error, error);
         }
       }
     });
-  });
-
-  function getNewFrontCover(): APICFrame {
-    return [
-      'APIC',
-      {
-        MIMEType: '',
-        pictureType: 3,
-        description: '',
-        data: undefined,
-      },
-    ];
-  }
-
-  ipcMain.on(
-    IpcEvents.renderer.has.receivedPicture,
-    (event: IpcMainEvent, name: string, buffer: ArrayBuffer) => {
-      const picture = currentMeta.APIC
-        ? currentMeta.APIC
-        : getNewFrontCover();
-
-      const fileNameLowerCase = name.toLowerCase();
-      if (fileNameLowerCase.endsWith('png')) {
-        picture.MIMEType = 'image/png';
-      } else if (
-        fileNameLowerCase.endsWith('jpg')
-        || fileNameLowerCase.endsWith('jpeg')
-      ) {
-        picture.MIMEType = 'image/jpeg';
-      } else return;
-
-      picture.data = Buffer.from(buffer);
-
-      currentMeta.APIC = picture;
-
-      event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
-    },
-  );
-
-  ipcMain.on(IpcEvents.renderer.wants.toRemoveAlbumArt, (event: IpcMainEvent) => {
-    currentMeta.APIC = getNewFrontCover();
-    event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
   });
 }
 

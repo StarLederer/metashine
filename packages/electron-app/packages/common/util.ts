@@ -1,3 +1,5 @@
+import { ID3Tag } from '@metashine/native-addon';
+
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -23,4 +25,12 @@ function stringToHashCode(s: string): number {
   return hash;
 }
 
-export { arrayBufferToBase64, stringToHashCode };
+function findFrameIndexes(tag: ID3Tag, frameID: string): number[] {
+  const indexes: number[] = [];
+  tag.forEach((frame, i) => {
+    if (frame[0] === frameID) indexes.push(i);
+  });
+  return indexes;
+}
+
+export { arrayBufferToBase64, stringToHashCode, findFrameIndexes };

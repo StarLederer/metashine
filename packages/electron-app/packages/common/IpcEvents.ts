@@ -27,7 +27,6 @@ const IpcEvents = {
       },
       toSaveMeta: 'save-meta',
       toSearchForTags: 'opent-assistat',
-      toRemoveAlbumArt: 'remove-album-art',
       toRemoveFile: 'request-remove-file',
       toSelectFile: 'renderer-selection-file-selected',
       toToggleFile: 'renderer-selection-file-toggled',
@@ -37,11 +36,8 @@ const IpcEvents = {
       },
     },
     has: {
-      updated: {
-        id3tag: 'renderer-has-updated-id3tag',
-      },
+      changedTag: 'renderer-has-changed-tag',
       receivedFile: 'file-received',
-      receivedPicture: 'album-art-received',
     },
   },
 };

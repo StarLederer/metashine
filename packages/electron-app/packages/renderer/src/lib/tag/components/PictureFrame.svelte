@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { APICFrame } from '@metashine/native-addon';
   import { arrayBufferToBase64 } from '../../../../../common/util';
 
   const locale = {
@@ -27,24 +28,81 @@
     ],
   };
 
+  function dropAlbumArt(event: DragEvent) {
+    if (event.dataTransfer) {
+      const file = event.dataTransfer.files[0];
+      file.arrayBuffer().then((buffer) => {
+        let MIMEType;
+
+        const fileNameLowerCase = name.toLowerCase();
+        if (fileNameLowerCase.endsWith('png')) {
+          MIMEType = 'image/png';
+        } else if (
+          fileNameLowerCase.endsWith('jpg')
+          || fileNameLowerCase.endsWith('jpeg')
+        ) {
+          MIMEType = 'image/jpeg';
+        } else return;
+
+        Object.assign(value, {
+          MIMEType,
+          data: buffer,
+        });
+      });
+    }
+  }
+
+  function onContextMenu(e: MouseEvent) {
+    window.contextMenu.open(e.x, e.y, [
+      {
+        name: 'Paste',
+        click() {
+          const availableFormats = window.electron.clipboard.availableFormats();
+          if (
+            availableFormats.includes('image/png')
+            || availableFormats.includes('image/jpeg')
+          ) {
+            value = {
+              ...value,
+              MIMEType: 'image/png',
+              data: window.electron.clipboard.readImagePNG(),
+            };
+          }
+        },
+      },
+      {
+        name: 'Remove',
+        click() {
+          value = {
+            ...value,
+            data: undefined,
+          };
+        },
+      },
+    ]);
+  }
+
   export let name: string;
-  export let mimeType: string;
-  // export let description: string;
-  export let pictureType: string;
-  export let data: ArrayBuffer;
+  export let value: APICFrame = null;
 </script>
 
 <div
   class="tag-field picture-field"
-  on:dragenter|preventDefault
-  on:dragover|preventDefault
+  on:dragenter|preventDefault={null}
+  on:dragover|preventDefault={null}
   on:drop|preventDefault
 >
-  <span> {locale.pictureTypes[pictureType]} ({name}: {pictureType}) </span>
-  <div class="picture-input" on:contextmenu|preventDefault>
-    {#if data}
+  <span>
+    {locale.pictureTypes[value.pictureType]} ({name}: {value.pictureType})
+  </span>
+  <div
+    class="picture-input"
+    on:drop={dropAlbumArt}
+    on:contextmenu={onContextMenu}
+  >
+    {#if value.data}
       <img
-        src={`data:${mimeType};base64,${arrayBufferToBase64(data)}`}
+        src={`data:${value.MIMEType};base64,${arrayBufferToBase64(value.data)}`}
         alt="Album art"
       />
     {/if}
