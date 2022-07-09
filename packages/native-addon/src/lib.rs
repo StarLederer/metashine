@@ -23,9 +23,20 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsObject> {
     let path = js_path.value(&mut cx);
 
     let metadata: Handle<JsObject> = cx.empty_object();
+    let tag;
 
-    let tag = Tag::read_from_path(&path)
-        .expect("Failed reading tag");
+
+    match Tag::read_from_path(&path) {
+        Ok(t) => {
+          tag = t;
+        },
+        Err(error) => {
+          match error.kind {
+            id3::ErrorKind::NoTag => tag = Tag::new(),
+            _ => panic!("Error reading tag: {}", &error.description)
+        }
+        },
+    };
 
     tag.frames().for_each(|frame| {
         match frame.content() {
