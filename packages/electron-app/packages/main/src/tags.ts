@@ -9,7 +9,7 @@ import type { ISuppotedFile } from '../../common/SupportedFile';
 
 function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentFiles: string[] = [];
-  let currentMeta: ID3Tag = {};
+  let currentMeta: ID3Tag = [];
 
   ipcMain.on(
     IpcEvents.renderer.has.updated.id3tag,
@@ -27,7 +27,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       currentFiles.push(filePath);
 
       // Load tags
-      currentMeta = {};
+      currentMeta = [];
 
       try {
         currentMeta = loadTag(filePath);
@@ -56,7 +56,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
         currentFiles.push(filePath);
 
         // Clear current tags
-        currentMeta = {};
+        currentMeta = [];
         event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
       }
 
@@ -79,12 +79,15 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   });
 
   function getNewFrontCover(): APICFrame {
-    return {
-      MIMEType: '',
-      pictureType: 3,
-      description: '',
-      data: undefined,
-    };
+    return [
+      'APIC',
+      {
+        MIMEType: '',
+        pictureType: 3,
+        description: '',
+        data: undefined,
+      },
+    ];
   }
 
   ipcMain.on(

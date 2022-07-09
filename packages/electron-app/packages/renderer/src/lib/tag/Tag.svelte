@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { ID3Tag } from '@metashine/native-addon';
+  import type { ID3Frame, ID3Tag } from '@metashine/native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
 
   import TextFrame from './components/TextFrame.svelte';
   import PictureFrame from './components/PictureFrame.svelte';
 
-  let currentTag: ID3Tag = {};
+  let currentTag: ID3Tag = [];
 
   /**
    * Pictures
@@ -71,23 +71,35 @@
 
   const order = ['APIC', 'TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2'];
 
+  function findFrames(tag: ID3Tag, frameID: string): ID3Frame[] {
+    const frames: ID3Frame[] = [];
+    tag.forEach((frame) => {
+      if (frame[0] === frameID) frames.push(frame);
+    });
+    return frames;
+  }
+
   $: sortedFrames = (() => {
+    const arr = currentTag;
+
     order.forEach((id) => {
-      if (!currentTag[id]) {
+      if (findFrames(arr, id).length <= 0) {
         if (id.startsWith('T')) {
-          currentTag[id] = '';
+          arr.push([id, '']);
         } else if (id === 'APIC') {
-          currentTag[id] = {
-            MIMEType: '',
-            pictureType: '3',
-            description: '',
-            data: null,
-          };
+          arr.push([
+            id,
+            {
+              MIMEType: '',
+              pictureType: '3',
+              description: '',
+              data: null,
+            },
+          ]);
         }
       }
     });
 
-    const arr = Object.entries(currentTag);
     arr.sort((a, b) => {
       const indexA = order.indexOf(a[0]);
       const indexB = order.indexOf(b[0]);
@@ -117,7 +129,7 @@
   </header>
   <main>
     <!-- Regular frames -->
-    {#each sortedFrames as [name, value]}
+    {#each currentTag as [name, value]}
       {#if typeof value === 'string'}
         <TextFrame
           {name}
@@ -132,11 +144,12 @@
     {/each}
 
     <!-- Pictures -->
-    {#each sortedFrames as [name, value]}
+    {#each currentTag as [name, value]}
       {#if typeof value === 'object' && value?.pictureType}
         <PictureFrame
           {name}
           mimeType={value.MIMEType}
+          pictureType={value.pictureType}
           data={value.data}
           on:drop={dropAlbumArt}
           on:contextmenu={albumArtContextMenu}
