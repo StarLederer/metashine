@@ -35,14 +35,13 @@
 </script>
 
 <div
-  class="tag-field"
-  id="album-art-field"
+  class="tag-field picture-field"
   on:dragenter|preventDefault
   on:dragover|preventDefault
   on:drop|preventDefault
 >
   <span> {locale.pictureTypes[pictureType]} ({name}: {pictureType}) </span>
-  <div id="album-art-input" on:contextmenu|preventDefault>
+  <div class="picture-input" on:contextmenu|preventDefault>
     {#if data}
       <img
         src={`data:${mimeType};base64,${arrayBufferToBase64(data)}`}

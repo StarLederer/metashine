@@ -5,6 +5,7 @@
 
   import TextFrame from './components/TextFrame.svelte';
   import PictureFrame from './components/PictureFrame.svelte';
+  import OtherFrame from './components/OtherFrame.svelte';
 
   let currentTag: ID3Tag = [];
 
@@ -69,7 +70,7 @@
     },
   };
 
-  const order = ['APIC', 'TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2'];
+  const order = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
 
   function findFrames(tag: ID3Tag, frameID: string): ID3Frame[] {
     const frames: ID3Frame[] = [];
@@ -140,12 +141,7 @@
             window.electron.send(IpcEvents.renderer.has.updated.id3tag, update);
           }}
         />
-      {/if}
-    {/each}
-
-    <!-- Pictures -->
-    {#each currentTag as [name, value]}
-      {#if typeof value === 'object' && value?.pictureType}
+      {:else if name === 'APIC'}
         <PictureFrame
           {name}
           mimeType={value.MIMEType}
@@ -154,6 +150,8 @@
           on:drop={dropAlbumArt}
           on:contextmenu={albumArtContextMenu}
         />
+      {:else}
+        <OtherFrame {name} />
       {/if}
     {/each}
   </main>
