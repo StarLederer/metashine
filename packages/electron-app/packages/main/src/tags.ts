@@ -9,13 +9,13 @@ import type { ISuppotedFile } from '../../common/SupportedFile';
 
 function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentFiles: string[] = [];
-  let currentMeta: ID3Tag = [];
+  let currentTag: ID3Tag = [];
 
   ipcMain.on(
     IpcEvents.renderer.has.changedTag,
     (event: IpcMainEvent, newTag: ID3Tag) => {
-      currentMeta = newTag;
-      event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
+      currentTag = newTag;
+      event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
     },
   );
 
@@ -27,13 +27,13 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       currentFiles.push(filePath);
 
       // Load tags
-      currentMeta = [];
+      currentTag = [];
 
       try {
-        currentMeta = loadTag(filePath);
+        currentTag = loadTag(filePath);
 
         // Request tag section update
-        event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
+        event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
       } catch (error) {
         event.sender.send(IpcEvents.main.wants.toRender.error, error);
       }
@@ -56,8 +56,8 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
         currentFiles.push(filePath);
 
         // Clear current tags
-        currentMeta = [];
-        event.sender.send(IpcEvents.main.wants.toRender.meta, currentMeta);
+        currentTag = [];
+        event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
       }
 
       // Request render update
@@ -70,7 +70,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          writeTag(supportedFile.path, currentMeta);
+          writeTag(supportedFile.path, currentTag);
         } catch (error) {
           event.sender.send(IpcEvents.main.wants.toRender.error, error);
         }
