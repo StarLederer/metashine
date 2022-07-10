@@ -27,12 +27,12 @@
       const res = await fetch(url);
       const data = await res.arrayBuffer();
 
-      let MIMEType;
-      if (extension === 'png') {
+      let MIMEType: string;
+      if (extension.endsWith('png')) {
         MIMEType = 'image/png';
       } else if (
-        extension === 'jpg'
-        || extension === 'jpeg'
+        extension.endsWith('jpg')
+        || extension.endsWith('jpeg')
       ) {
         MIMEType = 'image/jpeg';
       }
@@ -43,7 +43,7 @@
         {
           MIMEType,
           pictureType: 3,
-          description: undefined,
+          description: '',
           data,
         },
       ]);
