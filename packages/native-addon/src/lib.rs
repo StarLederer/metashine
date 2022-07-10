@@ -1,19 +1,16 @@
 use id3::{Frame, Tag, TagLike};
 use neon::{prelude::*, types::buffer::TypedArray};
 
-fn u8_vec_to_buffer<'a, C: Context<'a>>(cx: &mut C, vec: &Vec<u8>) -> JsResult<'a, JsBuffer> {
-    let buffer = JsBuffer::new(cx, vec.len())?;
-
-    for (i, s) in vec.iter().enumerate() {
-        let n = s.clone();
-        let v = cx.number(n);
-        buffer.set(cx, i as u32, v)?;
-    }
-
+fn u8_vec_to_arraybuffer<'a, C: Context<'a>>(cx: &mut C, vec: &Vec<u8>) -> JsResult<'a, JsArrayBuffer> {
+    let mut buffer = cx.array_buffer(vec.len())?;
+    buffer.as_mut_slice(cx).copy_from_slice(vec);
     Ok(buffer)
 }
 
-fn arraybuffer_to_u8_vec<'a, C: Context<'a>>(cx: &mut C, buffer: &Handle<JsArrayBuffer>) -> Vec<u8> {
+fn arraybuffer_to_u8_vec<'a, C: Context<'a>>(
+    cx: &mut C,
+    buffer: &Handle<JsArrayBuffer>,
+) -> Vec<u8> {
     let vec: Vec<u8> = buffer.as_slice(cx).to_vec();
     return vec;
 }
@@ -130,7 +127,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                 let js_mime_type = cx.string(&content.mime_type);
                 let js_picture_type = cx.number(u8::from(content.picture_type));
                 let js_description = cx.string(&content.description);
-                let js_data = u8_vec_to_buffer(&mut cx, &content.data)
+                let js_data = u8_vec_to_arraybuffer(&mut cx, &content.data)
                     .expect("Failed loading image data into Javascript runtime");
 
                 js_picture
@@ -156,7 +153,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
                 let js_mime_type = cx.string(&content.mime_type);
                 let js_filename = cx.string(&content.filename);
                 let js_description = cx.string(&content.description);
-                let js_data = u8_vec_to_buffer(&mut cx, &content.data)
+                let js_data = u8_vec_to_arraybuffer(&mut cx, &content.data)
                     .expect("Failed loading image data into Javascript runtime");
 
                 js_enc_object
@@ -179,7 +176,7 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
 
             // Unknown frames
             id3::Content::Unknown(content) => {
-                let js_data = u8_vec_to_buffer(&mut cx, &content.data).unwrap();
+                let js_data = u8_vec_to_arraybuffer(&mut cx, &content.data).unwrap();
                 transfer_frame_as_tuple!(i, "unknown", frame.id(), js_data);
             }
 
