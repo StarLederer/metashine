@@ -5,6 +5,7 @@
 const { createServer, createLogger } = require('vite');
 const { builtinModules } = require('module');
 const esbuild = require('esbuild');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 const electronPath = require('electron');
 const { spawn } = require('child_process');
 
@@ -33,7 +34,8 @@ const esbuildConfig = {
   platform: 'node',
   target: 'node16',
   format: 'cjs',
-  external: [...builtinModules, 'electron', '@metashine/*'],
+  external: [...builtinModules],
+  plugins: [nodeExternalsPlugin()],
 };
 
 /** Messages on stderr that match any of the contained patterns will be stripped from output */
@@ -55,7 +57,10 @@ const getWatcher = (entry, outdir, plugin) => esbuild.build({
   ...esbuildConfig,
   entryPoints: [entry],
   outdir,
-  plugins: [plugin],
+  plugins: [
+    ...esbuildConfig.plugins,
+    plugin,
+  ],
 });
 
 /**

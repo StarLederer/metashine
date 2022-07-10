@@ -2,6 +2,7 @@
 
 const { builtinModules } = require('module');
 const esbuild = require('esbuild');
+const { nodeExternalsPlugin } = require('esbuild-node-externals');
 const { build } = require('vite');
 
 process.env.MODE = process.env.MODE || 'production';
@@ -15,7 +16,8 @@ const esbuildConfig = {
   platform: 'node',
   target: 'node16',
   format: 'cjs',
-  external: [...builtinModules, 'electron', '@metashine/*'],
+  external: [...builtinModules],
+  plugins: [nodeExternalsPlugin()],
 };
 
 esbuild.build({
