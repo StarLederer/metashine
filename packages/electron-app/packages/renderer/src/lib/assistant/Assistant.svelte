@@ -6,7 +6,7 @@
   } from 'soundcloud.ts';
   import type { Track as SpotifyTrack } from 'spotify-api.js';
 
-  import type { SeachResultSuggestion, SearchResult } from './Result.svelte';
+  import type { SeachResultSuggestion, SearchResult } from './Result';
   import IpcEvents from '../../../../common/IpcEvents';
   import Result from './Result.svelte';
 
@@ -37,14 +37,16 @@
         MIMEType = 'image/jpeg';
       }
 
-      window.tags.updateFrame({
-        APIC: {
+      window.tags.updateFrame([
+        'picture',
+        'APIC',
+        {
           MIMEType,
-          pictureType: '3',
-          description: '',
+          pictureType: 3,
+          description: undefined,
           data,
         },
-      });
+      ]);
     } catch (error: any) {
       alert(error);
     }
@@ -87,7 +89,7 @@
             {
               label: track.name,
               apply() {
-                window.tags.updateFrame({ TIT2: track.name });
+                window.tags.updateFrame(['text', 'TIT2', track.name]);
               },
             },
           ],
@@ -98,7 +100,7 @@
             {
               label: trackArtistsString,
               apply() {
-                window.tags.updateFrame({ TPE1: trackArtistsString });
+                window.tags.updateFrame(['text', 'TPE1', trackArtistsString]);
               },
             },
           ],
@@ -109,7 +111,7 @@
             {
               label: `${track.trackNumber}`,
               apply() {
-                window.tags.updateFrame({ TRCK: `${track.trackNumber}` });
+                window.tags.updateFrame(['text', 'TRCK', `${track.trackNumber}`]);
               },
             },
           ],
@@ -134,7 +136,7 @@
               {
                 label: track.album.name,
                 apply() {
-                  window.tags.updateFrame({ TALB: track.album.name });
+                  window.tags.updateFrame(['text', 'TALB', track.album.name]);
                 },
               },
             ],
@@ -145,7 +147,7 @@
               {
                 label: albumArtistString,
                 apply() {
-                  window.tags.updateFrame({ TPE2: albumArtistString });
+                  window.tags.updateFrame(['text', 'TPE2', albumArtistString]);
                 },
               },
             ],
@@ -156,7 +158,7 @@
               {
                 label: track.album.releaseDate.split('-')[0],
                 apply() {
-                  window.tags.updateFrame({ TYER: track.album.releaseDate.split('-')[0] });
+                  window.tags.updateFrame(['text', 'TYER', track.album.releaseDate.split('-')[0]]);
                 },
               },
             ],
@@ -208,7 +210,7 @@
           trackTitles.buttons.push({
             label: title,
             apply() {
-              window.tags.updateFrame({ TIT2: title });
+              window.tags.updateFrame(['text', 'TIT2', title]);
             },
           });
         });
@@ -221,7 +223,7 @@
           albumTitles.buttons.push({
             label: title,
             apply() {
-              window.tags.updateFrame({ TALB: title });
+              window.tags.updateFrame(['text', 'TALB', title]);
             },
           });
         });
@@ -238,7 +240,7 @@
               buttons: [{
                 label: track.user.username,
                 apply() {
-                  window.tags.updateFrame({ TPE2: track.user.username });
+                  window.tags.updateFrame(['text', 'TPE2', track.user.username]);
                 },
               }],
             },
@@ -248,19 +250,19 @@
                 {
                   label: '1',
                   apply() {
-                    window.tags.updateFrame({ TRCK: '1' });
+                    window.tags.updateFrame(['text', 'TRCK', '1']);
                   },
                 },
                 {
                   label: '2',
                   apply() {
-                    window.tags.updateFrame({ TRCK: '1' });
+                    window.tags.updateFrame(['text', 'TRCK', '2']);
                   },
                 },
                 {
                   label: '3',
                   apply() {
-                    window.tags.updateFrame({ TRCK: '1' });
+                    window.tags.updateFrame(['text', 'TRCK', '3']);
                   },
                 },
               ],
@@ -272,7 +274,7 @@
                 {
                   label: track.user.username,
                   apply() {
-                    window.tags.updateFrame({ TPE2: track.user.username });
+                    window.tags.updateFrame(['text', 'TPE2', track.user.username]);
                   },
                 },
               ],
@@ -284,7 +286,7 @@
                   {
                     label: track.release_date,
                     apply() {
-                      window.tags.updateFrame({ TYER: track.release_date });
+                      window.tags.updateFrame(['text', 'TYER', track.release_date]);
                     },
                   },
                 ]

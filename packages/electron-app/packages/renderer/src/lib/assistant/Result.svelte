@@ -1,26 +1,6 @@
-<script lang="ts" context="module">
-  type SeachResultSuggestion = {
-    lablel: string;
-    buttons?: { label: string; apply: () => void }[];
-  };
-
-  type SearchResult = {
-    trackTitle: string;
-    trackArtist: string;
-    albumArtSrc?: string;
-    isOpen: boolean;
-    suggestions: SeachResultSuggestion[];
-    albumArt: {
-      url: string;
-      extension: string;
-    };
-  };
-
-  export type { SeachResultSuggestion, SearchResult };
-</script>
-
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from 'svelte';
+  import type { SearchResult } from './Result';
 
   const dispatch = createEventDispatcher();
 
@@ -38,9 +18,7 @@
           <h5>{suggestion.lablel}</h5>
           <div class="track-artist-suggestions">
             {#each suggestion.buttons as button}
-              <button
-                on:click={button.apply}>{button.label}</button
-              >
+              <button on:click={button.apply}>{button.label}</button>
             {/each}
           </div>
         {/if}

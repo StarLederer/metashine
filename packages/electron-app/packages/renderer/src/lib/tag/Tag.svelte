@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ID3Frame, ID3Tag } from '@metashine/native-addon';
+  import type { ID3Frame, ID3Picture, ID3Tag } from '@metashine/native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
 
@@ -56,8 +56,37 @@
    * Global instance
    */
   window.tags = {
-    updateFrame(update): void {
-      // Object.assign(currentTag, update);
+    updateFrame(update: ID3Frame): void {
+      if (update[0] === 'text') {
+        for (let i = 0; i < currentTag.length; ++i) {
+          if (currentTag[i][0] === 'text' && currentTag[i][1] === update[1]) {
+            currentTag[i] = update;
+            return;
+          }
+        }
+      } else if (update[0] === 'picture') {
+        for (let i = 0; i < currentTag.length; ++i) {
+          if (
+            currentTag[i][0] === 'picture'
+            && currentTag[i][1] === update[1]
+          ) {
+            const currentFrame = currentTag[i] as ID3Picture;
+            if (currentFrame[2].pictureType === update[2].pictureType) {
+              currentTag[i] = [
+                'picture',
+                'APIC',
+                {
+                  ...currentFrame,
+                  ...update[2],
+                },
+              ];
+
+              return;
+            }
+          }
+        }
+      }
+      currentTag = [...currentTag, update];
     },
   };
 
