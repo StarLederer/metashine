@@ -59,6 +59,8 @@
    */
   window.tags = {
     updateFrame(update: ID3Frame): void {
+      unsavedChanges = true;
+
       if (update[0] === 'text') {
         for (let i = 0; i < currentTag.length; ++i) {
           if (currentTag[i][0] === 'text' && currentTag[i][1] === update[1]) {
