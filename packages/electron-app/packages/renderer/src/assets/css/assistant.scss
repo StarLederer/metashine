@@ -2,6 +2,7 @@
   height: 100%;
 
   .search {
+
     // Input field
     input {
       width: 100%;
@@ -43,6 +44,7 @@
     // Soundcloud
     #search-soundcloud {
       background: linear-gradient(#f70, #f30);
+
       &:hover {
         background: #f50;
       }
@@ -51,6 +53,7 @@
     // Spotidy
     #search-spotify {
       background: #1db954;
+
       &:hover {
         background: #1ed760;
       }
@@ -70,65 +73,39 @@
   //   padding: 0 1rem;
   //   padding-top: 1rem;
   // }
+}
 
-  .search-result {
-    margin: 0 1rem;
-    margin-bottom: -5rem;
+.search-result {
+  margin: 0 1rem;
+  margin-bottom: -5rem;
+  display: flex;
+  flex-direction: column-reverse;
+  transition: 500ms;
+
+  // Preview
+  .preview {
+    height: 6rem;
+    padding: 1rem;
+
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
+
     display: flex;
-    flex-direction: column-reverse;
-    transition: 500ms;
+    transition: 500ms, background-color 100ms;
+    cursor: pointer;
 
-    // Preview
-    .preview {
-      height: 6rem;
-      padding: 1rem;
-
-      background-color: white;
-      border-radius: 1rem;
-      box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
-
-      display: flex;
-      transition: 500ms, background-color 100ms;
-      cursor: pointer;
-
-      &:hover {
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
-      }
-
-      // Album art section
-      & > img {
-        height: 4rem;
-        width: 4rem;
-        margin-right: 1rem;
-        border-radius: 1rem;
-      }
-
-      & > .track-info {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        span {
-          // font-weight: bold;
-        }
-
-        span:not(:last-child) {
-          margin-bottom: 0.25rem;
-        }
-
-        .track-artist {
-          color: rgba(0, 0, 0, 0.2);
-          font-size: 0.75rem;
-        }
-
-        .track-title {
-          color: rgba(0, 0, 0, 0.6);
-        }
-      }
+    &:hover {
+      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
     }
 
-    // Album art
-    .preview > img {
+    // Album art section
+    &>.album-art {
+      height: 4rem;
+      width: 4rem;
+      margin-right: 1rem;
+
+      border-radius: 1rem;
       background: var(--accent);
       transition: 100ms;
 
@@ -142,76 +119,99 @@
       }
     }
 
-    // Suggestions
-    .suggestions {
-      height: 7rem;
-      margin: 0 1rem;
-      position: relative;
-      top: -6rem;
-
-      background: #fdfdfd;
-      border-radius: 1rem;
-
-      transition: 500ms;
+    &>.track-info {
       display: flex;
-      align-items: flex-end;
+      flex-direction: column;
+      justify-content: center;
+
+      span {
+        // font-weight: bold;
+      }
+
+      span:not(:last-child) {
+        margin-bottom: 0.25rem;
+      }
+
+      .track-artist {
+        color: rgba(0, 0, 0, 0.2);
+        font-size: 0.75rem;
+      }
+
+      .track-title {
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+
+  // Suggestions
+  .suggestions {
+    height: 7rem;
+    margin: 0 1rem;
+    position: relative;
+    top: -6rem;
+
+    background: #fdfdfd;
+    border-radius: 1rem;
+
+    transition: 500ms;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+
+    .container {
+      padding: 0 1rem;
+      padding-bottom: 0.5rem;
+      padding-top: 7rem;
       overflow: hidden;
-
-      .container {
-        padding: 0 1rem;
-        padding-bottom: 0.5rem;
-        padding-top: 7rem;
-        overflow: hidden;
-        transition: inherit;
-      }
-
-      h5,
-      button {
-        margin-bottom: 0.5rem;
-      }
-
-      button {
-        height: 2rem;
-        padding: 0 1rem;
-        margin-right: 0.5rem;
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 1rem;
-        box-shadow: inset 0 0 0 1px black;
-
-        &:hover {
-          color: white;
-          background-color: var(--accent);
-          box-shadow: none;
-        }
-
-        &:active {
-          color: white;
-          background-color: var(--accent-h1);
-          box-shadow: none;
-        }
-      }
+      transition: inherit;
     }
 
-    &:hover {
-      .suggestions {
-        // height: 8rem;
-        margin: 0 0.5rem;
-        box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
-      }
+    h5,
+    button {
+      margin-bottom: 0.5rem;
     }
 
-    &.open {
-      .preview {
+    button {
+      height: 2rem;
+      padding: 0 1rem;
+      margin-right: 0.5rem;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 1rem;
+      box-shadow: inset 0 0 0 1px black;
+
+      &:hover {
+        color: white;
+        background-color: var(--accent);
         box-shadow: none;
-        border-radius: 1rem 1rem 0 0;
       }
 
-      .suggestions {
-        margin: 0;
-        position: relative;
-        // background: white;
-        box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
+      &:active {
+        color: white;
+        background-color: var(--accent-h1);
+        box-shadow: none;
       }
+    }
+  }
+
+  &:hover {
+    .suggestions {
+      // height: 8rem;
+      margin: 0 0.5rem;
+      box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &.open {
+    .preview {
+      box-shadow: none;
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .suggestions {
+      margin: 0;
+      position: relative;
+      // background: white;
+      box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.1);
     }
   }
 }

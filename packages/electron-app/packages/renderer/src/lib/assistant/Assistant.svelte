@@ -9,6 +9,7 @@
   import type { SeachResultSuggestion, SearchResult } from './Result';
   import IpcEvents from '../../../../common/IpcEvents';
   import Result from './Result.svelte';
+  import Placeholder from './Placeholder.svelte';
 
   /**
    * Search results
@@ -30,10 +31,7 @@
       let MIMEType: string;
       if (extension.endsWith('png')) {
         MIMEType = 'image/png';
-      } else if (
-        extension.endsWith('jpg')
-        || extension.endsWith('jpeg')
-      ) {
+      } else if (extension.endsWith('jpg') || extension.endsWith('jpeg')) {
         MIMEType = 'image/jpeg';
       }
 
@@ -59,7 +57,10 @@
   let searchString;
 
   function search() {
-    window.electron.send(IpcEvents.renderer.wants.toSearchForTags, searchString ?? '');
+    window.electron.send(
+      IpcEvents.renderer.wants.toSearchForTags,
+      searchString ?? '',
+    );
   }
 
   // Spotify
@@ -111,7 +112,11 @@
             {
               label: `${track.trackNumber}`,
               apply() {
-                window.tags.updateFrame(['text', 'TRCK', `${track.trackNumber}`]);
+                window.tags.updateFrame([
+                  'text',
+                  'TRCK',
+                  `${track.trackNumber}`,
+                ]);
               },
             },
           ],
@@ -158,7 +163,11 @@
               {
                 label: track.album.releaseDate.split('-')[0],
                 apply() {
-                  window.tags.updateFrame(['text', 'TYER', track.album.releaseDate.split('-')[0]]);
+                  window.tags.updateFrame([
+                    'text',
+                    'TYER',
+                    track.album.releaseDate.split('-')[0],
+                  ]);
                 },
               },
             ],
@@ -237,12 +246,18 @@
             trackTitles,
             {
               lablel: 'Possible track artists',
-              buttons: [{
-                label: track.user.username,
-                apply() {
-                  window.tags.updateFrame(['text', 'TPE2', track.user.username]);
+              buttons: [
+                {
+                  label: track.user.username,
+                  apply() {
+                    window.tags.updateFrame([
+                      'text',
+                      'TPE2',
+                      track.user.username,
+                    ]);
+                  },
                 },
-              }],
+              ],
             },
             {
               lablel: 'Possible track numbers',
@@ -274,7 +289,11 @@
                 {
                   label: track.user.username,
                   apply() {
-                    window.tags.updateFrame(['text', 'TPE2', track.user.username]);
+                    window.tags.updateFrame([
+                      'text',
+                      'TPE2',
+                      track.user.username,
+                    ]);
                   },
                 },
               ],
@@ -286,7 +305,11 @@
                   {
                     label: track.release_date,
                     apply() {
-                      window.tags.updateFrame(['text', 'TYER', track.release_date]);
+                      window.tags.updateFrame([
+                        'text',
+                        'TYER',
+                        track.release_date,
+                      ]);
                     },
                   },
                 ]
@@ -332,6 +355,10 @@
         }}
       />
     {/each}
+
+    {#if results.spotify.length <= 0}
+      <Placeholder />
+    {/if}
   </div>
 
   <h3>Soundcloud</h3>
@@ -344,5 +371,9 @@
         }}
       />
     {/each}
+
+    {#if results.spotify.length <= 0}
+      <Placeholder />
+    {/if}
   </div>
 </div>
