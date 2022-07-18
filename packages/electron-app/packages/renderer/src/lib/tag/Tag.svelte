@@ -127,7 +127,11 @@
   <header>
     <h2>Tags</h2>
     <div class="header-controls">
-      <button id="tags-save" class="begging" on:click={onSaveClicked}>
+      <button
+        id="tags-save"
+        class:begging={unsavedChanges}
+        on:click={onSaveClicked}
+      >
         save
         <div class="unsaved-changes" class:visible={unsavedChanges} />
       </button>
@@ -169,6 +173,16 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
+
+    &:hover {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    &:active {
+      background: var(--accent-h1);
+      color: #ffffff;
+    }
 
     .unsaved-changes {
       width: 2rem;

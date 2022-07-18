@@ -12,16 +12,6 @@
   border-radius: 1rem;
 }
 
-#left-section header button:hover {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-#left-section header button:active {
-  background: var(--accent-h1);
-  color: #ffffff;
-}
-
 #open-assistant {
   padding: 0 1rem;
 }
