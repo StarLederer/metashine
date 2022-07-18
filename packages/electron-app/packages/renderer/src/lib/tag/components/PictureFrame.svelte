@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import type { APICFrame } from '@metashine/native-addon';
   import { arrayBufferToBase64 } from '../../../../../common/util';
+
+  const dispatch = createEventDispatcher();
 
   const locale = {
     pictureTypes: [
@@ -40,7 +43,7 @@
         MIMEType = 'image/png';
       } else if (
         fileNameLowerCase.endsWith('jpg')
-          || fileNameLowerCase.endsWith('jpeg')
+        || fileNameLowerCase.endsWith('jpeg')
       ) {
         MIMEType = 'image/jpeg';
       } else return;
@@ -50,6 +53,7 @@
         MIMEType,
         data: buffer,
       };
+      dispatch('change', { value });
     });
   }
 
@@ -68,6 +72,7 @@
               MIMEType: 'image/png',
               data: window.electron.clipboard.readImagePNG(),
             };
+            dispatch('change', { value });
           }
         },
       },
@@ -87,9 +92,7 @@
   export let value: APICFrame = null;
 </script>
 
-<div
-  class="tag-field picture-field"
->
+<div class="tag-field picture-field">
   <span>
     {locale.pictureTypes[value.pictureType]} ({name}: {value.pictureType})
   </span>

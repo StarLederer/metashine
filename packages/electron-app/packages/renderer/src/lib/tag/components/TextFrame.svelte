@@ -1,8 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
-
   // TODO: this should be internationalized
   const locale = {
     tags: {
@@ -28,8 +24,6 @@
     id={name}
     placeholder="Unknown"
     bind:value
-    on:blur={() => {
-      dispatch('change', { value });
-    }}
+    on:input
   />
 </div>

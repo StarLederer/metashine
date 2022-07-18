@@ -16,6 +16,8 @@
   const order = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
 
   window.electron.on(IpcEvents.main.wants.toRender.meta, (_, tag: ID3Tag) => {
+    unsavedChanges = false;
+
     // WARNING: This pollutes currentTag with invalid
     // placeholders. They should not be returned to main
     const arr = [...tag];
@@ -93,6 +95,8 @@
   /**
    *
    */
+  let unsavedChanges = false;
+
   const onSaveClicked = () => {
     // Sanitize tag because we pollute them with empty placeholders
     function isContentComplete(frame: ID3Frame) {
@@ -125,6 +129,7 @@
     <div class="header-controls">
       <button id="tags-save" class="begging" on:click={onSaveClicked}>
         save
+        <div class="unsaved-changes" class:visible={unsavedChanges} />
       </button>
     </div>
   </header>
@@ -132,12 +137,56 @@
     <!-- Regular frames -->
     {#each currentTag as [type, name, value]}
       {#if type === 'text'}
-        <TextFrame {name} bind:value />
+        <TextFrame
+          {name}
+          bind:value
+          on:input={() => {
+            unsavedChanges = true;
+          }}
+        />
       {:else if type === 'picture'}
-        <PictureFrame {name} bind:value />
+        <PictureFrame
+          {name}
+          bind:value
+          on:change={() => {
+            unsavedChanges = true;
+          }}
+        />
       {:else}
         <OtherFrame {name} />
       {/if}
     {/each}
   </main>
 </section>
+
+<style lang="scss">
+  #tags-save {
+    width: 6rem;
+    background: #000000;
+    color: #ffffff;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    .unsaved-changes {
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+      right: 0;
+
+      border-radius: 50%;
+      background: #ffffff;
+      opacity: 0;
+      transform: scale(0);
+      transition: 100ms;
+
+      &.visible {
+        opacity: 1;
+        transform: scale(0.125);
+        // margin-inline-start: 1rem;
+      }
+    }
+  }
+</style>
