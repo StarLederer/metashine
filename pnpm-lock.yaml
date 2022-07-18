@@ -2,6 +2,9 @@ lockfileVersion: 5.4
 
 importers:
 
+  .:
+    specifiers: {}
+
   packages/electron-app:
     specifiers:
       '@metashine/native-addon': workspace:^0.1.0
@@ -58,6 +61,12 @@ importers:
       tslib: 2.4.0
       tsup: 5.12.9_typescript@4.7.4
       vite: 2.9.13_sass@1.53.0
+
+  packages/native-addon:
+    specifiers:
+      cargo-cp-artifact: ^0.1.6
+    devDependencies:
+      cargo-cp-artifact: 0.1.6
 
 packages:
 
@@ -843,6 +852,11 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /cargo-cp-artifact/0.1.6:
+    resolution: {integrity: sha512-CQw0doK/aaF7j041666XzuilHxqMxaKkn+I5vmBsd8SAwS0cO5CqVEVp0xJwOKstyqWZ6WK4Ww3O6p26x/Goyg==}
+    hasBin: true
+    dev: true
+
   /chalk/4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
@@ -991,7 +1005,7 @@ packages:
     dev: true
 
   /core-util-is/1.0.2:
-    resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
+    resolution: {integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=}
     requiresBuild: true
     dev: true
     optional: true
@@ -2259,6 +2273,7 @@ packages:
 
   /ieee754/1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+    requiresBuild: true
     dev: true
     optional: true
 
