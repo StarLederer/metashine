@@ -27,6 +27,25 @@ declare module "@metashine/native-addon" {
     string
   ];
 
+  type ID3ExtendedLink = [
+    "extended link",
+    string,
+    {
+      description: string;
+      link: string;
+    }
+  ];
+
+  type ID3Lyrics = [
+    "lyrics",
+    string,
+    {
+      lang: string;
+      description: string;
+      text: ArrayBuffer;
+    }
+  ];
+
   type ID3Comment = [
     "comment",
     string,
@@ -60,7 +79,15 @@ declare module "@metashine/native-addon" {
     ArrayBuffer,
   ];
 
-  type ID3Frame = ID3Text | ID3ExtendedText | ID3Link | ID3Comment | ID3Picture | IDEncapsulatedObject | ID3Unknown;
+  type ID3Frame = ID3Text
+    | ID3ExtendedText
+    | ID3Link
+    | ID3ExtendedLink
+    | ID3Lyrics
+    | ID3Comment
+    | ID3Picture
+    | IDEncapsulatedObject
+    | ID3Unknown;
 
   type ID3Tag = ID3Frame[];
 
@@ -75,6 +102,8 @@ declare module "@metashine/native-addon" {
     ID3Text,
     ID3ExtendedText,
     ID3Link,
+    ID3ExtendedLink,
+    ID3Lyrics,
     ID3Comment,
     ID3Picture,
     IDEncapsulatedObject,

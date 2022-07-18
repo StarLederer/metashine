@@ -1,7 +1,10 @@
 use id3::{Frame, Tag, TagLike};
 use neon::{prelude::*, types::buffer::TypedArray};
 
-fn u8_vec_to_arraybuffer<'a, C: Context<'a>>(cx: &mut C, vec: &Vec<u8>) -> JsResult<'a, JsArrayBuffer> {
+fn u8_vec_to_arraybuffer<'a, C: Context<'a>>(
+    cx: &mut C,
+    vec: &Vec<u8>,
+) -> JsResult<'a, JsArrayBuffer> {
     let mut buffer = cx.array_buffer(vec.len())?;
     buffer.as_mut_slice(cx).copy_from_slice(vec);
     Ok(buffer)
@@ -89,7 +92,19 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
             }
 
             // Extended links
-            // id3::Content::ExtendedLink(content) => todo!(),
+            id3::Content::ExtendedLink(content) => {
+                let js_extended_link = cx.empty_object();
+                let js_description = cx.string(&content.description);
+                let js_link = cx.string(&content.link);
+
+                js_extended_link
+                    .set(&mut cx, "description", js_description)
+                    .unwrap();
+                js_extended_link.set(&mut cx, "link", js_link).unwrap();
+
+                transfer_frame_as_tuple!(i, "extended link", frame.id(), js_extended_link);
+                return;
+            }
 
             // Comments
             id3::Content::Comment(content) => {
@@ -116,7 +131,21 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
             // id3::Content::Popularimeter(content) => todo!(),
 
             // Lyrics
-            // id3::Content::Lyrics(content) => todo!(),
+            id3::Content::Lyrics(content) => {
+                let js_lyrics = cx.empty_object();
+                let js_lang = cx.string(&content.lang);
+                let js_description = cx.string(&content.description);
+                let js_text = cx.string(&content.text);
+
+                js_lyrics.set(&mut cx, "lang", js_lang).unwrap();
+                js_lyrics
+                    .set(&mut cx, "description", js_description)
+                    .unwrap();
+                js_lyrics.set(&mut cx, "text", js_text).unwrap();
+
+                transfer_frame_as_tuple!(i, "lyrics", frame.id(), js_lyrics);
+                return;
+            }
 
             // SynchronisedLyrics
             // id3::Content::SynchronisedLyrics(content) => todo!(),
