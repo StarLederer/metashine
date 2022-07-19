@@ -1,4 +1,7 @@
-use id3::{Frame, Tag, TagLike};
+use id3::{
+    frame::{Comment, EncapsulatedObject, ExtendedLink, ExtendedText, Lyrics},
+    Frame, Tag, TagLike,
+};
 use neon::{prelude::*, types::buffer::TypedArray};
 
 fn u8_vec_to_arraybuffer<'a, C: Context<'a>>(
@@ -205,8 +208,14 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
 
             // Unknown frames
             id3::Content::Unknown(content) => {
+                let js_unknown = cx.empty_object();
+                // let js_version = cx.string(&content.version);
                 let js_data = u8_vec_to_arraybuffer(&mut cx, &content.data).unwrap();
-                transfer_frame_as_tuple!(i, "unknown", frame.id(), js_data);
+
+                // js_unknown.set(&mut cx, "version", js_version).unwrap();
+                js_unknown.set(&mut cx, "data", js_data).unwrap();
+
+                transfer_frame_as_tuple!(i, "unknown", frame.id(), js_unknown);
             }
 
             // Frames that are not implemented yet
@@ -224,7 +233,17 @@ fn write_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let path = js_path.value(&mut cx);
 
     let js_tag: Handle<JsArray> = cx.argument(1).expect("Incorrect argument 1 received");
-    let mut tag = Tag::new();
+    let mut tag;
+    match Tag::read_from_path(&path) {
+        Ok(t) => {
+            tag = t;
+        }
+        Err(error) => match error.kind {
+            id3::ErrorKind::NoTag => tag = Tag::new(),
+            _ => panic!("Error reading tag: {}", &error.description),
+        },
+    };
+    tag.remove_all_pictures();
 
     let frame_tuples: Vec<Handle<JsValue>> = js_tag.to_vec(&mut cx).expect("");
 
@@ -241,6 +260,65 @@ fn write_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
                     let js_frame_content: Handle<JsString> = js_tuple.get(&mut cx, 2).unwrap();
                     let frame_content = js_frame_content.value(&mut cx);
                     tag.add_frame(Frame::text(frame_name, frame_content));
+                }
+                // Extended texts
+                else if frame_type == "extended text" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_description: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "description").unwrap();
+                    let js_value: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "value").unwrap();
+
+                    tag.add_frame(ExtendedText {
+                        description: js_description.value(&mut cx),
+                        value: js_value.value(&mut cx),
+                    });
+                }
+                // Links
+                else if frame_type == "link" {
+                    let js_frame_content: Handle<JsString> = js_tuple.get(&mut cx, 2).unwrap();
+                    let frame_content = js_frame_content.value(&mut cx);
+                    tag.add_frame(Frame::link(frame_name, frame_content));
+                }
+                // Extended links
+                else if frame_type == "extended link" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_description: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "description").unwrap();
+                    let js_link: Handle<JsString> = js_frame_content.get(&mut cx, "link").unwrap();
+
+                    tag.add_frame(ExtendedLink {
+                        description: js_description.value(&mut cx),
+                        link: js_link.value(&mut cx),
+                    });
+                }
+                // Lyrics
+                else if frame_type == "lyrics" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_lang: Handle<JsString> = js_frame_content.get(&mut cx, "lang").unwrap();
+                    let js_description: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "description").unwrap();
+                    let js_text: Handle<JsString> = js_frame_content.get(&mut cx, "text").unwrap();
+
+                    tag.add_frame(Lyrics {
+                        lang: js_lang.value(&mut cx),
+                        description: js_description.value(&mut cx),
+                        text: js_text.value(&mut cx),
+                    });
+                }
+                // Comments
+                else if frame_type == "comment" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_lang: Handle<JsString> = js_frame_content.get(&mut cx, "lang").unwrap();
+                    let js_description: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "description").unwrap();
+                    let js_text: Handle<JsString> = js_frame_content.get(&mut cx, "text").unwrap();
+
+                    tag.add_frame(Comment {
+                        lang: js_lang.value(&mut cx),
+                        description: js_description.value(&mut cx),
+                        text: js_text.value(&mut cx),
+                    });
                 }
                 // Pictures
                 else if frame_type == "picture" {
@@ -276,7 +354,27 @@ fn write_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
                         id3::Content::Picture(picture.clone()),
                     ));
                 }
+                // Encapsulated object
+                else if frame_type == "encapsulated object" {
+                    let js_frame_content: Handle<JsObject> = js_tuple.get(&mut cx, 2).unwrap();
+                    let js_mime_type: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "MIMEType").unwrap();
+                    let js_filename: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "filename").unwrap();
+                    let js_description: Handle<JsString> =
+                        js_frame_content.get(&mut cx, "description").unwrap();
+                    let js_data: Handle<JsArrayBuffer> =
+                        js_frame_content.get(&mut cx, "data").unwrap();
+
+                    tag.add_frame(EncapsulatedObject {
+                        mime_type: js_mime_type.value(&mut cx),
+                        filename: js_filename.value(&mut cx),
+                        description: js_description.value(&mut cx),
+                        data: arraybuffer_to_u8_vec(&mut cx, &js_data),
+                    });
+                }
             }
+
             Err(_) => {}
         }
     });

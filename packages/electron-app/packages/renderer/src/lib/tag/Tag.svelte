@@ -103,13 +103,13 @@
     // Sanitize tag because we pollute them with empty placeholders
     function isContentComplete(frame: ID3Frame) {
       if (frame[0] === 'text') {
-        if (frame[2].length > 0) return true;
+        if (frame[2].length <= 0) return false;
       }
       if (frame[0] === 'picture') {
-        if (frame[2].data) return true;
+        if (!frame[2].data) return false;
       }
 
-      return false;
+      return true;
     }
 
     const sanitizedTag: ID3Tag = [];

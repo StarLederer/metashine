@@ -16,8 +16,8 @@ declare module "@metashine/native-addon" {
     "extended text",
     string,
     {
-      value: string;
       description: string;
+      value: string;
     }
   ];
 
@@ -76,7 +76,10 @@ declare module "@metashine/native-addon" {
   type ID3Unknown = [
     "unknown",
     string,
-    ArrayBuffer,
+    {
+      version: string;
+      data: ArrayBuffer;
+    },
   ];
 
   type ID3Frame = ID3Text
