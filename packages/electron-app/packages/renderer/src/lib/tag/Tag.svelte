@@ -1,9 +1,8 @@
 <script lang="ts">
   import type {
-    FrameModifier,
+    FrameCarrier,
     PictureCarrier,
     TagCarrier,
-    TagModifier,
   } from '@metashine/native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
@@ -13,14 +12,16 @@
   import OtherFrame from './components/OtherFrame.svelte';
   import { findFrameIndexes } from '../../../../common/util';
 
-  let currentTag: TagModifier = [];
+  let currentTag: TagCarrier = [];
 
   const favorites = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
   let missingFrames = [];
 
   const addFrame = (name: string) => {
+    unsavedChanges = true;
+
     if (name.startsWith('T')) {
-      currentTag = [...currentTag, ['text', name, '']];
+      currentTag = [...currentTag, ['text', name, '', false]];
     } else if (name === 'APIC') {
       currentTag = [
         ...currentTag,
@@ -33,6 +34,7 @@
             description: null,
             data: null,
           },
+          false,
         ],
       ];
     } else {
@@ -46,25 +48,6 @@
       const indexes = findFrameIndexes(currentTag, id);
       if (indexes.length <= 0) {
         missingFrames.push(id);
-      } else {
-        let oneFound = false;
-        indexes.forEach((i) => {
-          const frame = currentTag[i];
-          if (!frame[0].startsWith('remove')) {
-            if (frame[0] === 'picture') {
-              // We only look for picture type 3 for now
-              if (frame[2].pictureType === 3) {
-                oneFound = true;
-              }
-            } else {
-              oneFound = true;
-            }
-          }
-        });
-
-        if (!oneFound) {
-          missingFrames.push(id);
-        }
       }
     });
   }
@@ -108,7 +91,7 @@
    * Global instance
    */
   window.tags = {
-    updateFrame(modifier: FrameModifier): void {
+    updateFrame(modifier: FrameCarrier): void {
       unsavedChanges = true;
 
       if (modifier[0] === 'text') {
@@ -133,6 +116,7 @@
                   ...currentFrame,
                   ...modifier[2],
                 },
+                false,
               ];
 
               return;
@@ -192,39 +176,57 @@
     {/if}
 
     <!-- Regular frames -->
-    {#each currentTag as [type, name, value], i}
+    {#each currentTag as [type, name, value, remove], i}
       <!-- <p style="padding: 1rem; opacity: 0.2;">
         type {type}; name: {name}; value: {value};
       </p> -->
       {#if type === 'text'}
         <TextFrame
           {name}
+          {remove}
           bind:value
           on:input={() => {
             unsavedChanges = true;
+            unsavedChanges = true;
           }}
-          on:removed={() => {
-            currentTag[i] = ['remove', name];
+          on:remove={() => {
+            currentTag[i][3] = true;
+            unsavedChanges = true;
+          }}
+          on:restore={() => {
+            currentTag[i][3] = false;
+            unsavedChanges = true;
           }}
         />
       {:else if type === 'picture'}
         <PictureFrame
           {name}
+          {remove}
           bind:value
           on:change={() => {
             unsavedChanges = true;
+            unsavedChanges = true;
           }}
-          on:removed={() => {
-            currentTag[i] = ['remove picture', name, value.pictureType];
+          on:remove={() => {
+            currentTag[i][3] = true;
+            unsavedChanges = true;
+          }}
+          on:restore={() => {
+            currentTag[i][3] = false;
+            unsavedChanges = true;
           }}
         />
-      {:else if type.startsWith('remove')}
-        <!--  -->
       {:else}
         <OtherFrame
           {name}
-          on:removed={() => {
-            currentTag[i] = ['remove', name];
+          {remove}
+          on:remove={() => {
+            currentTag[i][3] = true;
+            unsavedChanges = true;
+          }}
+          on:restore={() => {
+            currentTag[i][3] = false;
+            unsavedChanges = true;
           }}
         />
       {/if}

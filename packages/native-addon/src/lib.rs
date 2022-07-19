@@ -43,11 +43,13 @@ fn load_tag(mut cx: FunctionContext) -> JsResult<JsArray> {
         ($i:expr, $tag_type:expr, $tag_id:expr, $tag_content:expr) => {
             let js_type = cx.string($tag_type);
             let js_key = cx.string($tag_id);
+            let js_remove = cx.boolean(false);
 
             let js_tuple = cx.empty_array();
             js_tuple.set(&mut cx, 0, js_type).unwrap();
             js_tuple.set(&mut cx, 1, js_key).unwrap();
             js_tuple.set(&mut cx, 2, $tag_content).unwrap();
+            js_tuple.set(&mut cx, 3, js_remove).unwrap();
 
             js_metadata
                 .set(&mut cx, $i, js_tuple)
@@ -243,7 +245,6 @@ fn write_tag(mut cx: FunctionContext) -> JsResult<JsUndefined> {
             _ => panic!("Error reading tag: {}", &error.description),
         },
     };
-    tag.remove_all_pictures();
 
     let frame_tuples: Vec<Handle<JsValue>> = js_tag.to_vec(&mut cx).expect("");
 

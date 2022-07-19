@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { ID3Picture } from '@metashine/native-addon';
+  import Remove from './Remove.svelte';
   import { arrayBufferToBase64 } from '../../../../../common/util';
 
   const dispatch = createEventDispatcher();
@@ -54,6 +55,7 @@
         data: buffer,
       };
       dispatch('change', { value });
+      dispatch('restore');
     });
   }
 
@@ -73,13 +75,14 @@
               data: window.electron.clipboard.readImagePNG(),
             };
             dispatch('change', { value });
+            dispatch('restore');
           }
         },
       },
       {
         name: 'Remove',
         click() {
-          dispatch('removed');
+          dispatch('remove');
         },
       },
     ]);
@@ -87,11 +90,15 @@
 
   export let name: string;
   export let value: ID3Picture = null;
+  export let remove: boolean;
 </script>
 
 <div class="tag-field picture-field">
   <span>
     {locale.pictureTypes[value.pictureType]} ({name}: {value.pictureType})
+    {#if remove}
+    removed
+  {/if}
   </span>
   <div
     class="picture-input"
@@ -100,7 +107,7 @@
     on:drop={onDropAlbumArt}
     on:contextmenu={onContextMenu}
   >
-    {#if value.data}
+    {#if value.data && !remove}
       <img
         src={`data:${value.MIMEType};base64,${arrayBufferToBase64(value.data)}`}
         alt="Album art"
@@ -108,5 +115,9 @@
     {/if}
   </div>
 
-  <!-- <Remove on:click={() => { dispatch('removed'); }} style="bottom: 2.5rem; right: 1.5rem"/> -->
+  <Remove
+    on:remove
+    on:restore
+    restore={remove}
+  />
 </div>

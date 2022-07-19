@@ -58,55 +58,64 @@ declare module "@metashine/native-addon" {
   export type TextCarrier = [
     "text",
     string,
-    ID3Text
+    ID3Text,
+    boolean
   ];
 
   export type ExtendedTextCarrier = [
     "extended text",
     string,
-    ID3ExtendedText
+    ID3ExtendedText,
+    boolean
   ];
 
   export type LinkCarrier = [
     "link",
     string,
-    ID3Link
+    ID3Link,
+    boolean
   ];
 
   export type ExtendedLinkCarrier = [
     "extended link",
     string,
-    ID3ExtendedLink
+    ID3ExtendedLink,
+    boolean
   ];
 
   export type LyricsCarrier = [
     "lyrics",
     string,
-    ID3Lyrics
+    ID3Lyrics,
+    boolean
   ];
 
   export type CommentCarrier = [
     "comment",
     string,
-    ID3Comment
+    ID3Comment,
+    boolean
   ];
 
   export type PictureCarrier = [
     "picture",
     string,
-    ID3Picture
+    ID3Picture,
+    boolean
   ];
 
   export type EncapsulatedObjectCarrier = [
     "encapsulated object",
     string,
-    ID3EncapsulatedObject
+    ID3EncapsulatedObject,
+    boolean
   ];
 
   export type UnknownCarrier = [
     "unknown",
     string,
-    ArrayBuffer
+    ArrayBuffer,
+    boolean
   ];
 
   export type FrameCarrier = TextCarrier
@@ -122,30 +131,9 @@ declare module "@metashine/native-addon" {
   export type TagCarrier = FrameCarrier[];
 
   /**
-   * These types are used to tell the native addon to remove tags
-   */
-
-  export type IDRemover = [
-    "remove",
-    string
-  ];
-
-  export type PictureRemover = [
-    "remove picture",
-    string,
-    number,
-  ];
-
-  export type FrameRemover = IDRemover | PictureRemover;
-
-  export type FrameModifier = FrameCarrier | FrameRemover;
-
-  export type TagModifier = FrameModifier[];
-
-  /**
    * Functions
    */
 
   export function loadTag(path: string): TagCarrier;
-  export function writeTag(path: string, update: TagModifier): void;
+  export function writeTag(path: string, update: TagCarrier): void;
 }

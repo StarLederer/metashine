@@ -1,8 +1,5 @@
 <script lang="ts">
-import { createEventDispatcher } from 'svelte';
 import Remove from './Remove.svelte';
-
-const dispatch = createEventDispatcher();
 
 // TODO: this should be internationalized
 const locale = {
@@ -19,13 +16,17 @@ const locale = {
 };
 
 export let name: string;
-export let value: string = '';
+export let value: string;
+export let remove: boolean;
 </script>
 
 <div class="tag-field">
-  <label for={name}
-    >{locale.tags[name] ? `${locale.tags[name]} (${name})` : name}
+  <label for={name} style={`padding-bottom: ${remove ? '2rem' : '0'}`}>
+    {locale.tags[name] ? `${locale.tags[name]} (${name})` : name}
+    {#if remove}
+      removed
+    {/if}
   </label>
-  <input type="text" id={name} placeholder="Unknown" bind:value on:input />
-  <Remove on:click={() => { dispatch('removed'); }}/>
+  <input type="text" id={name} placeholder="Unknown" bind:value on:input style={`display: ${remove ? 'none' : 'block'}`}/>
+  <Remove on:remove on:restore restore={remove}/>
 </div>
