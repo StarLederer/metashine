@@ -2,18 +2,18 @@ import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
 import { loadTag, writeTag } from '@metashine/native-addon';
-import type { ID3Tag } from '@metashine/native-addon';
+import type { TagModifier } from '@metashine/native-addon';
 
 import IpcEvents from '../../common/IpcEvents';
 import type { ISuppotedFile } from '../../common/SupportedFile';
 
 function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentFiles: string[] = [];
-  let currentTag: ID3Tag = [];
+  let currentTag: TagModifier = [];
 
   ipcMain.on(
     IpcEvents.renderer.has.changedTag,
-    (event: IpcMainEvent, newTag: ID3Tag) => {
+    (event: IpcMainEvent, newTag: TagModifier) => {
       currentTag = newTag;
       event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
     },
@@ -70,7 +70,7 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          writeTag(supportedFile.path, currentTag);
+          // writeTag(supportedFile.path, currentTag);
         } catch (error) {
           event.sender.send(IpcEvents.main.wants.toRender.error, error);
         }

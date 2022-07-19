@@ -21,18 +21,14 @@
   transition: 500ms;
 }
 
-.tag-field::before,
-.tag-field:last-child:after {
+.tag-field::before {
   content: '';
   width: 100%;
   height: 1px;
   background: rgba(0, 0, 0, 0.0625);
   position: absolute;
+  bottom: 0;
   display: block;
-}
-
-.tag-field:first-child:before {
-  display: none;
 }
 
 .tag-field label,

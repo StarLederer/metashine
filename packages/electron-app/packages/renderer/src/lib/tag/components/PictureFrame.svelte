@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { APICFrame } from '@metashine/native-addon';
+  import type { ID3Picture } from '@metashine/native-addon';
   import { arrayBufferToBase64 } from '../../../../../common/util';
 
   const dispatch = createEventDispatcher();
@@ -79,17 +79,14 @@
       {
         name: 'Remove',
         click() {
-          value = {
-            ...value,
-            data: undefined,
-          };
+          dispatch('removed');
         },
       },
     ]);
   }
 
   export let name: string;
-  export let value: APICFrame = null;
+  export let value: ID3Picture = null;
 </script>
 
 <div class="tag-field picture-field">
@@ -110,4 +107,6 @@
       />
     {/if}
   </div>
+
+  <!-- <Remove on:click={() => { dispatch('removed'); }} style="bottom: 2.5rem; right: 1.5rem"/> -->
 </div>

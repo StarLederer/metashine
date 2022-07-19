@@ -1,5 +1,10 @@
 <script lang="ts">
-  import type { ID3Frame, ID3Picture, ID3Tag } from '@metashine/native-addon';
+  import type {
+    FrameModifier,
+    PictureCarrier,
+    TagCarrier,
+    TagModifier,
+  } from '@metashine/native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
 
@@ -8,42 +13,67 @@
   import OtherFrame from './components/OtherFrame.svelte';
   import { findFrameIndexes } from '../../../../common/util';
 
-  let currentTag: ID3Tag = [];
+  let currentTag: TagModifier = [];
 
-  /**
-   * Communication
-   */
-  const order = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
+  const favorites = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
+  let missingFrames = [];
 
-  window.electron.on(IpcEvents.main.wants.toRender.meta, (_, tag: ID3Tag) => {
-    unsavedChanges = false;
+  const addFrame = (name: string) => {
+    if (name.startsWith('T')) {
+      currentTag = [...currentTag, ['text', name, '']];
+    } else if (name === 'APIC') {
+      currentTag = [
+        ...currentTag,
+        [
+          'picture',
+          'APIC',
+          {
+            MIMEType: null,
+            pictureType: 3,
+            description: null,
+            data: null,
+          },
+        ],
+      ];
+    } else {
+      alert("Can't add this frame yet");
+    }
+  };
 
-    // WARNING: This pollutes currentTag with invalid
-    // placeholders. They should not be returned to main
-    const arr = [...tag];
+  $: {
+    missingFrames = [];
+    favorites.forEach((id) => {
+      const indexes = findFrameIndexes(currentTag, id);
+      if (indexes.length <= 0) {
+        missingFrames.push(id);
+      } else {
+        let oneFound = false;
+        indexes.forEach((i) => {
+          const frame = currentTag[i];
+          if (!frame[0].startsWith('remove')) {
+            if (frame[0] === 'picture') {
+              // We only look for picture type 3 for now
+              if (frame[2].pictureType === 3) {
+                oneFound = true;
+              }
+            } else {
+              oneFound = true;
+            }
+          }
+        });
 
-    order.forEach((id) => {
-      if (findFrameIndexes(arr, id).length <= 0) {
-        if (id.startsWith('T')) {
-          arr.push(['text', id, '']);
-        } else if (id === 'APIC') {
-          arr.push([
-            'picture',
-            id,
-            {
-              MIMEType: undefined,
-              pictureType: 3,
-              description: '',
-              data: undefined,
-            },
-          ]);
+        if (!oneFound) {
+          missingFrames.push(id);
         }
       }
     });
+  }
 
-    arr.sort((a, b) => {
-      const indexA = order.indexOf(a[1]);
-      const indexB = order.indexOf(b[1]);
+  $: {
+    // Sort favorites on top
+    currentTag.sort((a, b) => {
+      const indexA = favorites.indexOf(a[1]);
+      const indexB = favorites.indexOf(b[1]);
 
       if (indexA < 0) return 0;
       if (indexB < 0) return -1;
@@ -51,37 +81,57 @@
       return indexA < indexB ? -1 : 0;
     });
 
-    currentTag = arr;
-  });
+    // Sort pictures by picture type
+    currentTag.sort((a, b) => {
+      if (a[0] === 'picture' && b[0] === 'picture') {
+        return a[2].pictureType - b[2].pictureType;
+      }
+
+      return 0;
+    });
+  }
+
+  /**
+   * Communication
+   */
+
+  window.electron.on(
+    IpcEvents.main.wants.toRender.meta,
+    (_, tag: TagCarrier) => {
+      unsavedChanges = false;
+
+      currentTag = [...tag];
+    },
+  );
 
   /**
    * Global instance
    */
   window.tags = {
-    updateFrame(update: ID3Frame): void {
+    updateFrame(modifier: FrameModifier): void {
       unsavedChanges = true;
 
-      if (update[0] === 'text') {
+      if (modifier[0] === 'text') {
         for (let i = 0; i < currentTag.length; ++i) {
-          if (currentTag[i][0] === 'text' && currentTag[i][1] === update[1]) {
-            currentTag[i] = update;
+          if (currentTag[i][0] === 'text' && currentTag[i][1] === modifier[1]) {
+            currentTag[i] = modifier;
             return;
           }
         }
-      } else if (update[0] === 'picture') {
+      } else if (modifier[0] === 'picture') {
         for (let i = 0; i < currentTag.length; ++i) {
           if (
             currentTag[i][0] === 'picture'
-            && currentTag[i][1] === update[1]
+            && currentTag[i][1] === modifier[1]
           ) {
-            const currentFrame = currentTag[i] as ID3Picture;
-            if (currentFrame[2].pictureType === update[2].pictureType) {
+            const currentFrame = currentTag[i] as PictureCarrier;
+            if (currentFrame[2].pictureType === modifier[2].pictureType) {
               currentTag[i] = [
                 'picture',
                 'APIC',
                 {
                   ...currentFrame,
-                  ...update[2],
+                  ...modifier[2],
                 },
               ];
 
@@ -90,7 +140,7 @@
           }
         }
       }
-      currentTag = [...currentTag, update];
+      currentTag = [...currentTag, modifier];
     },
   };
 
@@ -100,27 +150,8 @@
   let unsavedChanges = false;
 
   const onSaveClicked = () => {
-    // Sanitize tag because we pollute them with empty placeholders
-    function isContentComplete(frame: ID3Frame) {
-      if (frame[0] === 'text') {
-        if (frame[2].length <= 0) return false;
-      }
-      if (frame[0] === 'picture') {
-        if (!frame[2].data) return false;
-      }
-
-      return true;
-    }
-
-    const sanitizedTag: ID3Tag = [];
-    currentTag.forEach((frame) => {
-      if (isContentComplete(frame)) {
-        sanitizedTag.push(frame);
-      }
-    });
-
     // Communicate to main
-    window.electron.send(IpcEvents.renderer.has.changedTag, sanitizedTag);
+    window.electron.send(IpcEvents.renderer.has.changedTag, currentTag);
     window.electron.send(IpcEvents.renderer.wants.toSaveMeta);
   };
 </script>
@@ -139,15 +170,41 @@
       </button>
     </div>
   </header>
+
   <main>
+    <!-- Favorite frames -->
+    {#if missingFrames.length > 0}
+      <section class="missing-frames afterline">
+        <h3>Add these frames?</h3>
+        <div class="add-frames-list">
+          {#each missingFrames as missingID}
+            <button
+              class="add"
+              on:click={() => {
+                addFrame(missingID);
+              }}
+            >
+              {missingID}
+            </button>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
     <!-- Regular frames -->
-    {#each currentTag as [type, name, value]}
+    {#each currentTag as [type, name, value], i}
+      <!-- <p style="padding: 1rem; opacity: 0.2;">
+        type {type}; name: {name}; value: {value};
+      </p> -->
       {#if type === 'text'}
         <TextFrame
           {name}
           bind:value
           on:input={() => {
             unsavedChanges = true;
+          }}
+          on:removed={() => {
+            currentTag[i] = ['remove', name];
           }}
         />
       {:else if type === 'picture'}
@@ -157,9 +214,19 @@
           on:change={() => {
             unsavedChanges = true;
           }}
+          on:removed={() => {
+            currentTag[i] = ['remove picture', name, value.pictureType];
+          }}
         />
+      {:else if type.startsWith('remove')}
+        <!--  -->
       {:else}
-        <OtherFrame {name} />
+        <OtherFrame
+          {name}
+          on:removed={() => {
+            currentTag[i] = ['remove', name];
+          }}
+        />
       {/if}
     {/each}
   </main>
@@ -202,6 +269,33 @@
         opacity: 1;
         transform: scale(0.125);
         // margin-inline-start: 1rem;
+      }
+    }
+  }
+
+  .missing-frames {
+    height: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    h3 {
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.5);
+    }
+
+    .add-frames-list {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+
+      .add {
+        height: 1.5rem;
+        padding-inline: 1rem;
+        border: rgba(0, 0, 0, 0.4) 1px solid;
+        border-radius: 1.5rem;
       }
     }
   }

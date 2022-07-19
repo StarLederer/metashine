@@ -1,29 +1,31 @@
 <script lang="ts">
-  // TODO: this should be internationalized
-  const locale = {
-    tags: {
-      TALB: 'Album',
-      TBPM: 'BPM',
-      TCON: 'Genre',
-      TIT2: 'Track title',
-      TKEY: 'Key',
-      TPE1: 'Tack artirst',
-      TPE2: 'Album artist',
-      TRCK: 'Track number',
-    },
-  };
+import { createEventDispatcher } from 'svelte';
+import Remove from './Remove.svelte';
 
-  export let name: string;
-  export let value: string = '';
+const dispatch = createEventDispatcher();
+
+// TODO: this should be internationalized
+const locale = {
+  tags: {
+    TALB: 'Album',
+    TBPM: 'BPM',
+    TCON: 'Genre',
+    TIT2: 'Track title',
+    TKEY: 'Key',
+    TPE1: 'Tack artirst',
+    TPE2: 'Album artist',
+    TRCK: 'Track number',
+  },
+};
+
+export let name: string;
+export let value: string = '';
 </script>
 
 <div class="tag-field">
-  <label for={name}>{locale.tags[name] ? `${locale.tags[name]} (${name})` : name} </label>
-  <input
-    type="text"
-    id={name}
-    placeholder="Unknown"
-    bind:value
-    on:input
-  />
+  <label for={name}
+    >{locale.tags[name] ? `${locale.tags[name]} (${name})` : name}
+  </label>
+  <input type="text" id={name} placeholder="Unknown" bind:value on:input />
+  <Remove on:click={() => { dispatch('removed'); }}/>
 </div>

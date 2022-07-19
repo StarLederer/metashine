@@ -70,5 +70,5 @@ header .header-tabs h2 {
 
 main {
   max-height: calc(100vh - 4rem);
-  overflow: auto;
+  overflow: overlay;
 }
