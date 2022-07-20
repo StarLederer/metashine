@@ -28,14 +28,14 @@
 
 <style lang="scss">
   .remove {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 1rem;
+    height: 1rem;
 
     color: rgba(0, 0, 0, 0.2);
     border-radius: 1rem;
 
     position: absolute;
-    top: 2rem;
+    top: 1rem;
     right: 1rem;
 
     display: flex;
@@ -48,10 +48,12 @@
 
     &.restore {
       height: 1.5rem;
-      top: 1.75rem;
+      top: 0.75rem;
       width: auto;
       padding: 0 1rem;
-      border: rgba(0, 0, 0, 0.4) 1px solid;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 1);
+      border: rgba(0, 0, 0, 0.6) 1px solid;
 
       &:hover {
         background: rgba(0, 0, 0, 0.1);

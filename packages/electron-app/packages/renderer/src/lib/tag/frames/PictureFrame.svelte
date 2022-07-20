@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { ID3Picture } from '@metashine/native-addon';
-  import Remove from './Remove.svelte';
+  import Frame from './components/Frame.svelte';
   import { arrayBufferToBase64 } from '../../../../../common/util';
 
   const dispatch = createEventDispatcher();
@@ -93,13 +93,14 @@
   export let remove: boolean;
 </script>
 
-<div class="tag-field picture-field">
-  <span>
-    {locale.pictureTypes[value.pictureType]} ({name}: {value.pictureType})
-    {#if remove}
-    removed
-  {/if}
-  </span>
+<Frame
+  {remove}
+  title={`
+    ${locale.pictureTypes[value.pictureType]} (${name}: ${value.pictureType})
+  `}
+  on:remove
+  on:restore
+>
   <div
     class="picture-input"
     on:dragenter|preventDefault={() => {}}
@@ -114,10 +115,43 @@
       />
     {/if}
   </div>
+</Frame>
 
-  <Remove
-    on:remove
-    on:restore
-    restore={remove}
-  />
-</div>
+<style lang="scss">
+  .picture-input {
+    width: 100%;
+    aspect-ratio: 1/1;
+
+    background: rgba(0, 0, 0, 0.1);
+
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    border-radius: 0.25rem;
+
+    overflow: hidden;
+
+    &::before {
+      content: "Drag an image here";
+
+      width: 100%;
+      height: 100%;
+      position: absolute;
+
+      opacity: 0.1;
+
+      font-size: 1em;
+      font-weight: 700;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    & img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+</style>

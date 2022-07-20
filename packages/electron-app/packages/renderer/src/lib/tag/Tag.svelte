@@ -7,9 +7,9 @@
 
   import IpcEvents from '../../../../common/IpcEvents';
 
-  import TextFrame from './components/TextFrame.svelte';
-  import PictureFrame from './components/PictureFrame.svelte';
-  import OtherFrame from './components/OtherFrame.svelte';
+  import TextFrame from './frames/TextFrame.svelte';
+  import PictureFrame from './frames/PictureFrame.svelte';
+  import OtherFrame from './frames/OtherFrame.svelte';
   import { findFrameIndexes } from '../../../../common/util';
 
   let currentTag: TagCarrier = [];
@@ -235,6 +235,19 @@
 </section>
 
 <style lang="scss">
+  #left-section {
+    background: #ffffff;
+
+    header button {
+      height: 2rem;
+
+      font-weight: 700;
+      font-size: 0.75rem;
+
+      border-radius: 1rem;
+    }
+  }
+
   #tags-save {
     width: 6rem;
     background: #000000;
