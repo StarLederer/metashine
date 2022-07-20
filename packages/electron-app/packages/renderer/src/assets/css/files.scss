@@ -29,6 +29,7 @@ button#window-control-close:hover {
 /* file list */
 #right-section .table {
   width: fit-content;
+  min-width: 100%;
   height: calc(100% - 2rem);
 
   border: none;
