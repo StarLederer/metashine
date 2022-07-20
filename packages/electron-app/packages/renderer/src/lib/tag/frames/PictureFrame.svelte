@@ -108,7 +108,7 @@
     on:drop={onDropAlbumArt}
     on:contextmenu={onContextMenu}
   >
-    {#if value.data && !remove}
+    {#if value.data}
       <img
         src={`data:${value.MIMEType};base64,${arrayBufferToBase64(value.data)}`}
         alt="Album art"
