@@ -1,4 +1,4 @@
-type ID3Frame = import('@metashine/native-addon').ID3Frame;
+type ID3Frame = import('native-addon').ID3Frame;
 
 declare interface Window {
   tags: {

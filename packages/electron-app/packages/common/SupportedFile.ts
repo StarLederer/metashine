@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { loadTag, ID3Tag } from '@metashine/native-addon';
+import { loadTag, ID3Tag } from 'native-addon';
 
 interface ISuppotedFile {
   name: string;

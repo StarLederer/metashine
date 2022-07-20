@@ -3,7 +3,7 @@
     FrameCarrier,
     PictureCarrier,
     TagCarrier,
-  } from '@metashine/native-addon';
+  } from 'native-addon';
 
   import IpcEvents from '../../../../common/IpcEvents';
 

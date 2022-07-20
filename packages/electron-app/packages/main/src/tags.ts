@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
-import { loadTag, updateTag } from '@metashine/native-addon';
-import type { TagCarrier } from '@metashine/native-addon';
+import { loadTag, updateTag } from 'native-addon';
+import type { TagCarrier } from 'native-addon';
 
 import IpcEvents from '../../common/IpcEvents';
 import type { ISuppotedFile } from '../../common/SupportedFile';

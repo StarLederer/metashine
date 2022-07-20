@@ -1,6 +1,14 @@
 {
-  "name": "@metashine/electron-app",
+  "name": "metashine",
+  "description": "Music meta tag editor",
+  "version": "3.0.0-rc.1",
   "private": true,
+  "repository": "github:HermanLederer/metashine",
+  "author": {
+    "name": "Herman Lederer",
+    "email": "germans.lederers@gmail.com",
+    "url": "https://hermanlederer.github.io/"
+  },
   "main": "packages/main/dist/index.js",
   "scripts": {
     "dev": "node scripts/dev.js",
@@ -70,7 +78,7 @@
     "vite": "^2.9.13"
   },
   "dependencies": {
-    "@metashine/native-addon": "workspace:^0.1.0",
+    "native-addon": "workspace:^0.1.0",
     "electron-updater": "4.6.2",
     "soundcloud.ts": "^0.4.6",
     "spotify-api.js": "^9.2.1",

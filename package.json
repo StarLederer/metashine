@@ -1,15 +1,7 @@
 {
-  "name": "metashine",
-  "version": "3.0.0-rc.1",
-  "description": "Music meta tag editor",
-  "repository": "github:HermanLederer/metashine",
+  "name": "metashine-monorepo",
   "private": true,
   "license": "MIT",
-  "author": {
-    "name": "Herman Lederer",
-    "email": "germans.lederers@gmail.com",
-    "url": "https://hermanlederer.github.io/"
-  },
   "keywords": [
     "mp3",
     "tag",
@@ -22,7 +14,8 @@
   },
   "scripts": {
     "dev:electron-app": "cd packages/electron-app && pnpm run dev",
-    "build:native-addon": "cd packages/native-addon && pnpm run build",
+    "build:electron-app": "cd packages/electron-app && pnpm run build",
+    "build:native-addon": "cd packages/native-addon && pnpm run build-release",
     "build": ""
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@metashine/native-addon",
+  "name": "native-addon",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.node",

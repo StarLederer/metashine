@@ -1,4 +1,4 @@
-import { ID3Tag } from '@metashine/native-addon';
+import { ID3Tag } from 'native-addon';
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const arr = new Uint8Array(buffer);

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { ID3Picture } from '@metashine/native-addon';
+  import type { ID3Picture } from 'native-addon';
   import Frame from './components/Frame.svelte';
   import { arrayBufferToBase64 } from '../../../../../common/util';
 

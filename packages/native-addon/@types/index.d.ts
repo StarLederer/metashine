@@ -1,4 +1,4 @@
-declare module "@metashine/native-addon" {
+declare module "native-addon" {
   /**
    * Standard ID3 frame content types
    */
