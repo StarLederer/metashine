@@ -69,7 +69,6 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          console.log(sanitizedMods);
           currentTag = updateTag(supportedFile.path, sanitizedMods);
           event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
         } catch (error) {

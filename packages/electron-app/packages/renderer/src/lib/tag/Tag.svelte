@@ -216,7 +216,6 @@
           {remove}
           {value}
           on:change={(e) => {
-            console.log(e.detail.value);
             changeFrame(i, [type, name, e.detail.value, false]);
           }}
           on:remove={() => {
