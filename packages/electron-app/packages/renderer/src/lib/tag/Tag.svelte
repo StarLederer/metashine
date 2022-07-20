@@ -147,7 +147,14 @@
   };
 
   const onSaveClicked = () => {
-    window.electron.send(IpcEvents.renderer.wants.toWriteUpdate, tagMods);
+    const sanitizedMods: TagCarrier = [];
+    tagMods.forEach((mod) => {
+      if (mod) {
+        sanitizedMods.push(mod);
+      }
+    });
+
+    window.electron.send(IpcEvents.renderer.wants.toWriteUpdate, sanitizedMods);
   };
 </script>
 

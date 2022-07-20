@@ -58,18 +58,11 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   );
 
   ipcMain.on(IpcEvents.renderer.wants.toWriteUpdate, (event: IpcMainEvent, mods: TagCarrier) => {
-    const sanitizedMods: TagCarrier = [];
-    mods.forEach((mod) => {
-      if (mod) {
-        sanitizedMods.push(mod);
-      }
-    });
-
     currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          currentTag = updateTag(supportedFile.path, sanitizedMods);
+          currentTag = updateTag(supportedFile.path, mods);
           event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
         } catch (error) {
           event.sender.send(IpcEvents.main.wants.toRender.error, error);
