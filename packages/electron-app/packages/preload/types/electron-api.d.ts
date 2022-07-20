@@ -10,7 +10,7 @@ interface ElectronApi {
   clipboard: {
     availableFormats(): string[];
     writeText(text: string): void;
-    readImagePNG(): Buffer
+    readImagePNG(): ArrayBuffer
   };
 }
 

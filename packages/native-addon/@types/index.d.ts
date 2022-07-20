@@ -135,5 +135,5 @@ declare module "@metashine/native-addon" {
    */
 
   export function loadTag(path: string): TagCarrier;
-  export function writeTag(path: string, update: TagCarrier): void;
+  export function updateTag(path: string, update: TagCarrier): TagCarrier;
 }

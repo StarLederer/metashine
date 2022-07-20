@@ -20,8 +20,8 @@ const api: ElectronApi = {
     writeText(text: string) {
       clipboard.writeText(text);
     },
-    readImagePNG(): Buffer {
-      return clipboard.readImage().toPNG();
+    readImagePNG(): ArrayBuffer {
+      return clipboard.readImage().toPNG().buffer;
     },
   },
 };

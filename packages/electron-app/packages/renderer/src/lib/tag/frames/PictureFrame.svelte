@@ -55,7 +55,6 @@
         data: buffer,
       };
       dispatch('change', { value });
-      dispatch('restore');
     });
   }
 
@@ -75,7 +74,6 @@
               data: window.electron.clipboard.readImagePNG(),
             };
             dispatch('change', { value });
-            dispatch('restore');
           }
         },
       },
@@ -89,7 +87,7 @@
   }
 
   export let name: string;
-  export let value: ID3Picture = null;
+  export let value: ID3Picture;
   export let remove: boolean;
 </script>
 
@@ -108,7 +106,7 @@
     on:drop={onDropAlbumArt}
     on:contextmenu={onContextMenu}
   >
-    {#if value.data}
+    {#if value.data && value.data.byteLength > 0}
       <img
         src={`data:${value.MIMEType};base64,${arrayBufferToBase64(value.data)}`}
         alt="Album art"

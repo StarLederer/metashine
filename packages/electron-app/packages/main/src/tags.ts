@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import type { IpcMainEvent } from 'electron';
 
-import { loadTag, writeTag } from '@metashine/native-addon';
+import { loadTag, updateTag } from '@metashine/native-addon';
 import type { TagCarrier } from '@metashine/native-addon';
 
 import IpcEvents from '../../common/IpcEvents';
@@ -12,17 +12,9 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
   let currentTag: TagCarrier = [];
 
   ipcMain.on(
-    IpcEvents.renderer.has.changedTag,
-    (event: IpcMainEvent, newTag: TagCarrier) => {
-      currentTag = newTag;
-      event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
-    },
-  );
-
-  ipcMain.on(
     IpcEvents.renderer.wants.toSelectFile,
     (event: IpcMainEvent, filePath: string) => {
-      // Clear selectrion and select the file
+      // Clear selection and select the file
       currentFiles = [];
       currentFiles.push(filePath);
 
@@ -65,12 +57,21 @@ function setupTagsProcess(loadedFiles: Map<string, ISuppotedFile>) {
     },
   );
 
-  ipcMain.on(IpcEvents.renderer.wants.toSaveMeta, (event: IpcMainEvent) => {
+  ipcMain.on(IpcEvents.renderer.wants.toWriteUpdate, (event: IpcMainEvent, mods: TagCarrier) => {
+    const sanitizedMods: TagCarrier = [];
+    mods.forEach((mod) => {
+      if (mod) {
+        sanitizedMods.push(mod);
+      }
+    });
+
     currentFiles.forEach((filePath) => {
       const supportedFile = loadedFiles.get(filePath);
       if (supportedFile) {
         try {
-          // writeTag(supportedFile.path, currentTag);
+          console.log(sanitizedMods);
+          currentTag = updateTag(supportedFile.path, sanitizedMods);
+          event.sender.send(IpcEvents.main.wants.toRender.meta, currentTag);
         } catch (error) {
           event.sender.send(IpcEvents.main.wants.toRender.error, error);
         }

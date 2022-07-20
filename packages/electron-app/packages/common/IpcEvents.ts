@@ -25,7 +25,7 @@ const IpcEvents = {
         toCollapse: 'window-collapse',
         toToggleSize: 'window-toggle-size',
       },
-      toSaveMeta: 'save-meta',
+      toWriteUpdate: 'save-meta',
       toSearchForTags: 'opent-assistat',
       toRemoveFile: 'request-remove-file',
       toSelectFile: 'renderer-selection-file-selected',
@@ -36,7 +36,6 @@ const IpcEvents = {
       },
     },
     has: {
-      changedTag: 'renderer-has-changed-tag',
       receivedFile: 'file-received',
     },
   },

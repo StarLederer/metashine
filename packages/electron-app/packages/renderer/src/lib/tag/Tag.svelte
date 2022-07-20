@@ -13,15 +13,20 @@
   import { findFrameIndexes } from '../../../../common/util';
 
   let currentTag: TagCarrier = [];
+  let tagMods: TagCarrier = [];
 
   const favorites = ['TIT2', 'TPE1', 'TRCK', 'TALB', 'TPE2', 'APIC'];
   let missingFrames = [];
 
-  const addFrame = (name: string) => {
-    unsavedChanges = true;
+  const changeFrame = (i: number, mod: FrameCarrier) => {
+    currentTag[i] = mod;
+    tagMods[i] = mod;
+  };
 
+  const addFrame = (name: string) => {
     if (name.startsWith('T')) {
       currentTag = [...currentTag, ['text', name, '', false]];
+      tagMods[currentTag.length - 1] = currentTag[currentTag.length - 1];
     } else if (name === 'APIC') {
       currentTag = [
         ...currentTag,
@@ -29,19 +34,21 @@
           'picture',
           'APIC',
           {
-            MIMEType: null,
+            MIMEType: 'image/jpeg',
             pictureType: 3,
-            description: null,
-            data: null,
+            description: '',
+            data: new ArrayBuffer(0),
           },
           false,
         ],
       ];
+      tagMods[currentTag.length - 1] = currentTag[currentTag.length - 1];
     } else {
       alert("Can't add this frame yet");
     }
   };
 
+  // Update missing frames
   $: {
     missingFrames = [];
     favorites.forEach((id) => {
@@ -63,6 +70,7 @@
     });
   }
 
+  // Sort currentTag
   $: {
     // Sort favorites on top
     currentTag.sort((a, b) => {
@@ -85,6 +93,8 @@
     });
   }
 
+  $: unsavedChanges = tagMods.length > 0;
+
   /**
    * Communication
    */
@@ -92,9 +102,8 @@
   window.electron.on(
     IpcEvents.main.wants.toRender.meta,
     (_, tag: TagCarrier) => {
-      unsavedChanges = false;
-
       currentTag = [...tag];
+      tagMods = [];
     },
   );
 
@@ -103,12 +112,10 @@
    */
   window.tags = {
     updateFrame(modifier: FrameCarrier): void {
-      unsavedChanges = true;
-
       if (modifier[0] === 'text') {
         for (let i = 0; i < currentTag.length; ++i) {
           if (currentTag[i][0] === 'text' && currentTag[i][1] === modifier[1]) {
-            currentTag[i] = modifier;
+            changeFrame(i, modifier);
             return;
           }
         }
@@ -120,7 +127,7 @@
           ) {
             const currentFrame = currentTag[i] as PictureCarrier;
             if (currentFrame[2].pictureType === modifier[2].pictureType) {
-              currentTag[i] = [
+              changeFrame(i, [
                 'picture',
                 'APIC',
                 {
@@ -128,7 +135,7 @@
                   ...modifier[2],
                 },
                 false,
-              ];
+              ]);
 
               return;
             }
@@ -139,15 +146,8 @@
     },
   };
 
-  /**
-   *
-   */
-  let unsavedChanges = false;
-
   const onSaveClicked = () => {
-    // Communicate to main
-    window.electron.send(IpcEvents.renderer.has.changedTag, currentTag);
-    window.electron.send(IpcEvents.renderer.wants.toSaveMeta);
+    window.electron.send(IpcEvents.renderer.wants.toWriteUpdate, tagMods);
   };
 </script>
 
@@ -197,34 +197,37 @@
           {remove}
           bind:value
           on:input={() => {
-            unsavedChanges = true;
-            unsavedChanges = true;
+            changeFrame(i, [type, name, value, remove]);
           }}
           on:remove={() => {
-            currentTag[i][3] = true;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = true;
+            changeFrame(i, mod);
           }}
           on:restore={() => {
-            currentTag[i][3] = false;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = false;
+            changeFrame(i, mod);
           }}
         />
       {:else if type === 'picture'}
         <PictureFrame
           {name}
           {remove}
-          bind:value
-          on:change={() => {
-            unsavedChanges = true;
-            unsavedChanges = true;
+          {value}
+          on:change={(e) => {
+            console.log(e.detail.value);
+            changeFrame(i, [type, name, e.detail.value, false]);
           }}
           on:remove={() => {
-            currentTag[i][3] = true;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = true;
+            changeFrame(i, mod);
           }}
           on:restore={() => {
-            currentTag[i][3] = false;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = false;
+            changeFrame(i, mod);
           }}
         />
       {:else}
@@ -232,12 +235,14 @@
           {name}
           {remove}
           on:remove={() => {
-            currentTag[i][3] = true;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = true;
+            changeFrame(i, mod);
           }}
           on:restore={() => {
-            currentTag[i][3] = false;
-            unsavedChanges = true;
+            const mod = currentTag[i];
+            mod[3] = false;
+            changeFrame(i, mod);
           }}
         />
       {/if}
