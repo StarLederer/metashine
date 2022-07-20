@@ -43,8 +43,6 @@
         >
       </div>
 
-      <div id="beta-build-disclaimer">Preview build {packageJson.version}</div>
-
       <WindowControls />
     </header>
     <main>
