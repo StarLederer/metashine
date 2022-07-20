@@ -46,7 +46,18 @@
     missingFrames = [];
     favorites.forEach((id) => {
       const indexes = findFrameIndexes(currentTag, id);
-      if (indexes.length <= 0) {
+      if (id === 'APIC') {
+        let foundOne = false;
+        indexes.forEach((i) => {
+          const frame = currentTag[i];
+          if (frame[0] === 'picture' && frame[2].pictureType === 3) {
+            foundOne = true;
+          }
+        });
+        if (!foundOne) {
+          missingFrames.push(id);
+        }
+      } else if (indexes.length <= 0) {
         missingFrames.push(id);
       }
     });
@@ -311,6 +322,11 @@
         padding-inline: 1rem;
         border: rgba(0, 0, 0, 0.4) 1px solid;
         border-radius: 1.5rem;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.1);
+          color: black;
+        }
       }
     }
   }
