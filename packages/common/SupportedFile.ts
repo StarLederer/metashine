@@ -1,11 +1,11 @@
 import * as path from 'path';
-import { loadTag, ID3Tag } from 'native-addon';
+import { loadTag, TagCarrier } from 'native-addon';
 
 interface ISuppotedFile {
   name: string;
   path: string;
   location: string;
-  tag: ID3Tag | null;
+  tag: TagCarrier | null;
 }
 
 function getSupportedFileFomPath(filePath: string): ISuppotedFile {

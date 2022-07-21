@@ -1,0 +1,7 @@
+{
+  "name": "@metashine/main",
+  "main": "dist/index.js",
+  "dependencies": {
+    "native-addon": "file:../native-addon"
+  }
+}

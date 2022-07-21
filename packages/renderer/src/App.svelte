@@ -1,7 +1,4 @@
 <script lang="ts">
-  // eslint-disable-next-line import/no-relative-packages
-  import packageJson from '../../../../../package.json';
-
   import WindowControls from './lib/WindowControls.svelte';
   import Files from './lib/Files.svelte';
   import Assistant from './lib/assistant/Assistant.svelte';

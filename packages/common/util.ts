@@ -1,4 +1,4 @@
-import { ID3Tag } from 'native-addon';
+import { TagCarrier } from 'native-addon';
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const arr = new Uint8Array(buffer);
@@ -22,7 +22,7 @@ function stringToHashCode(s: string): number {
   return hash;
 }
 
-function findFrameIndexes(tag: ID3Tag, frameID: string): number[] {
+function findFrameIndexes(tag: TagCarrier, frameID: string): number[] {
   const indexes: number[] = [];
   tag.forEach((frame, i) => {
     if (frame[1] === frameID) indexes.push(i);
