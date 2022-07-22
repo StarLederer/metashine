@@ -25,14 +25,17 @@
 <Frame
   {remove}
   title={locale.tags[name] ? `${locale.tags[name]} (${name})` : name}
-
   on:remove
   on:restore
 >
-  <div class="bg"
-  on:click={() => {
-    field.focus();
-  }}></div>
+  {#if !remove}
+    <div
+      class="bg"
+      on:click={() => {
+        field.focus();
+      }}
+    />
+  {/if}
   <input
     type="text"
     id={name}
