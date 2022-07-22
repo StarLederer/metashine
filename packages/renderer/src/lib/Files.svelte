@@ -75,9 +75,12 @@
   let ctrl = false;
 
   function clickFile(path: string): void {
-    if (ctrl) {
+    // if (ctrl) {
+    if (false) {
       window.electron.send(IpcEvents.renderer.wants.toToggleFile, path);
-    } else window.electron.send(IpcEvents.renderer.wants.toSelectFile, path);
+    } else {
+      window.electron.send(IpcEvents.renderer.wants.toSelectFile, path);
+    }
   }
 
   function opneContextMenu(e: MouseEvent, name: string, path: string): void {
