@@ -90,7 +90,6 @@
     "vite": "^2.9.13"
   },
   "dependencies": {
-    "electron-updater": "4.6.2",
     "soundcloud.ts": "^0.4.6",
     "spotify-api.js": "^9.2.1"
   }

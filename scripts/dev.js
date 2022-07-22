@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-/* eslint-disable import/no-extraneous-dependencies */
-
 const { createServer, createLogger } = require('vite');
-const { builtinModules } = require('module');
-const esbuild = require('esbuild');
-// const { nodeExternalsPlugin } = require('esbuild-node-externals');
+const { build: esbuild } = require('esbuild');
 const electronPath = require('electron');
 const { spawn } = require('child_process');
+const { esbuildConfig } = require('./common/esbuild-conf');
 
 /** @type 'production' | 'development'' */
 process.env.MODE = process.env.MODE || 'development';
@@ -25,19 +22,6 @@ const sharedConfig = {
   logLevel: LOG_LEVEL,
 };
 
-/** @type {import('esbuild').BuildOptions} */
-const esbuildConfig = {
-  bundle: true,
-  splitting: false,
-  minify: true,
-  watch: true,
-  platform: 'node',
-  target: 'node16',
-  format: 'cjs',
-  external: [...builtinModules, 'electron', 'soundcloud.ts', 'native-addon'],
-  // plugins: [nodeExternalsPlugin()],
-};
-
 /** Messages on stderr that match any of the contained patterns will be stripped from output */
 const stderrFilterPatterns = [
   // warning about devtools extension
@@ -53,11 +37,15 @@ const stderrFilterPatterns = [
  * @param {import('esbuild').Plugin} param2
  * @returns {import('esbuild').BuildResult}
  */
-const getWatcher = (entry, outdir, plugin) => esbuild.build({
+const getWatcher = (entry, outdir, plugin) => esbuild({
   ...esbuildConfig,
+  watch: true,
   entryPoints: [entry],
   outdir,
-  plugins: [plugin],
+  plugins: [
+    ...esbuildConfig.plugins,
+    plugin,
+  ],
 });
 
 /**

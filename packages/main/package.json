@@ -2,6 +2,7 @@
   "name": "@metashine/main",
   "main": "dist/index.js",
   "dependencies": {
+    "electron-updater": "4.6.2",
     "native-addon": "file:../native-addon"
   }
 }
