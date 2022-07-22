@@ -23,8 +23,10 @@
   "main": "packages/main/dist/index.js",
   "scripts": {
     "dev": "node scripts/dev.js",
-    "build": "cross-env MODE=production node scripts/build.js",
-    "precompile": "cross-env MODE=production pnpm run build",
+    "build:electron": "cross-env MODE=production node scripts/build.js",
+    "build:addon": "cd packages/native-addon && pnpm run build-release",
+    "build": "pnpm run build:addon && pnpm run build:electron",
+    "precompile": "pnpm run build",
     "compile": "electron-builder",
     "pretest": "pnpm run build",
     "lint": "eslint . --ext js,ts,svelte",
