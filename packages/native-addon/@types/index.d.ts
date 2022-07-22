@@ -1,4 +1,4 @@
-declare module "native-addon" {
+declare module 'native-addon' {
   /**
    * Standard ID3 frame content types
    */
@@ -44,89 +44,89 @@ declare module "native-addon" {
   };
 
   export type ID3Content = ID3Text
-    | ID3ExtendedText
-    | ID3Link
-    | ID3ExtendedLink
-    | ID3Lyrics
-    | ID3Comment
-    | ID3Picture
-    | ID3EncapsulatedObject;
+  | ID3ExtendedText
+  | ID3Link
+  | ID3ExtendedLink
+  | ID3Lyrics
+  | ID3Comment
+  | ID3Picture
+  | ID3EncapsulatedObject;
 
   /**
    * Frame carriers
    */
   export type TextCarrier = [
-    "text",
+    'text',
     string,
     ID3Text,
-    boolean
+    boolean,
   ];
 
   export type ExtendedTextCarrier = [
-    "extended text",
+    'extended text',
     string,
     ID3ExtendedText,
-    boolean
+    boolean,
   ];
 
   export type LinkCarrier = [
-    "link",
+    'link',
     string,
     ID3Link,
-    boolean
+    boolean,
   ];
 
   export type ExtendedLinkCarrier = [
-    "extended link",
+    'extended link',
     string,
     ID3ExtendedLink,
-    boolean
+    boolean,
   ];
 
   export type LyricsCarrier = [
-    "lyrics",
+    'lyrics',
     string,
     ID3Lyrics,
-    boolean
+    boolean,
   ];
 
   export type CommentCarrier = [
-    "comment",
+    'comment',
     string,
     ID3Comment,
-    boolean
+    boolean,
   ];
 
   export type PictureCarrier = [
-    "picture",
+    'picture',
     string,
     ID3Picture,
-    boolean
+    boolean,
   ];
 
   export type EncapsulatedObjectCarrier = [
-    "encapsulated object",
+    'encapsulated object',
     string,
     ID3EncapsulatedObject,
-    boolean
+    boolean,
   ];
 
   export type UnknownCarrier = [
-    "unknown",
+    'unknown',
     string,
     ArrayBuffer,
-    boolean
+    boolean,
   ];
 
   export type FrameCarrier = TextCarrier
-    | ExtendedTextCarrier
-    | LinkCarrier
-    | ExtendedLinkCarrier
-    | LyricsCarrier
-    | CommentCarrier
-    | PictureCarrier
-    | EncapsulatedObjectCarrier
-    | UnknownCarrier;
+  | ExtendedTextCarrier
+  | LinkCarrier
+  | ExtendedLinkCarrier
+  | LyricsCarrier
+  | CommentCarrier
+  | PictureCarrier
+  | EncapsulatedObjectCarrier
+  | UnknownCarrier;
 
   export type TagCarrier = FrameCarrier[];
 
