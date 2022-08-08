@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "cargo-cp-artifact -nc dist/index.node -- cargo build --message-format=json-render-diagnostics",
+    "build:linux": "cargo-cp-artifact -nc dist/index.node -- cargo build --message-format=json-render-diagnostics --target x86_64-unknown-linux-gnu",
+    "build:windows": "cargo-cp-artifact -nc dist/index.node -- cargo build --message-format=json-render-diagnostics --target x86_64-pc-windows-gnu",
     "build-debug": "pnpm run build",
     "build-release": "pnpm run build --release",
+    "build-release:linux": "pnpm run build:linux --release",
+    "build-release:windows": "pnpm run build:windows --release",
     "test": "cargo test"
   },
   "devDependencies": {
