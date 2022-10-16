@@ -25,7 +25,7 @@
     "dev": "echo \"Please execute node scripts/dev.js instead\"",
     "build:electron": "cross-env MODE=production node scripts/build.js",
     "build:addon": "cd packages/native-addon && pnpm run build-release",
-    "build": "pnpm run build:addon && pnpm run build:electron",
+    "build": "pnpm run build:addon && pnpm i && pnpm run build:electron",
     "precompile": "pnpm run build",
     "compile": "electron-builder",
     "pretest": "pnpm run build",
