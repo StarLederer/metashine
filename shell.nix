@@ -1,13 +1,23 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {
+  overlays = [ (import (builtins.fetchTarball "https://github.com/oxalica/rust-overlay/archive/master.tar.gz")) ];
+} }:
 
-pkgs.mkShell {
+let
+  rust = pkgs.rust-bin.stable.latest.default.override {
+    extensions = [ "rust-src" ];
+    # targets = [ "arm-unknown-linux-gnueabihf" ];
+  };
+in pkgs.mkShell {
   name = "metashine";
 
   buildInputs = with pkgs; [
-    rustc
+    rust
     cargo
-    electron_15
+    rustfmt
+    rust-analyzer
+
     nodejs-16_x
     nodePackages.pnpm
+    electron_15
   ];
 }
