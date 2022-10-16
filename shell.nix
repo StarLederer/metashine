@@ -7,17 +7,48 @@ let
     extensions = [ "rust-src" ];
     # targets = [ "arm-unknown-linux-gnueabihf" ];
   };
-in pkgs.mkShell {
-  name = "metashine";
+in (
+  pkgs.buildFHSUserEnv {
+    name = "metashine";
 
-  buildInputs = with pkgs; [
-    rust
-    cargo
-    rustfmt
-    rust-analyzer
+    targetPkgs = pkgs: (with pkgs; [
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
+      xorg.libxcb
+      xorg.libxshmfence
+      alsaLib
+      at-spi2-core
+      nss
+      expat
+      cups
+      nspr
+      glib
+      atk
+      mesa
+      libxkbcommon
+      at-spi2-atk
+      dbus
+      libdrm
+      gtk3
+      pango
+      cairo
+      gdk-pixbuf
+      # Needed to compile some of the node_modules dependencies from source
+      # autoreconfHook
+      # autoPatchelfHook
 
-    nodejs-16_x
-    nodePackages.pnpm
-    electron_15
-  ];
-}
+      rust
+      cargo
+      rustfmt
+      rust-analyzer
+
+      nodejs-16_x
+      nodePackages.pnpm
+      electron_15
+    ]);
+  }
+).env
