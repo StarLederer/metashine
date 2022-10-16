@@ -3,6 +3,7 @@
 const { createServer, createLogger } = require('vite');
 const { build: esbuild } = require('esbuild');
 const { spawn } = require('child_process');
+const electronBin = require('electron');
 const { esbuildConfig } = require('./common/esbuild-conf');
 
 /** @type 'production' | 'development'' */
@@ -78,7 +79,7 @@ const setupMainPackageWatcher = (viteDevServer) => {
           spawnProcess = null;
         }
 
-        spawnProcess = spawn('electron', ['.']);
+        spawnProcess = spawn(String(electronBin), ['.']);
 
         spawnProcess.stdout.on(
           'data',
