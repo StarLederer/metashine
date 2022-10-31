@@ -79,7 +79,11 @@ const setupMainPackageWatcher = (viteDevServer) => {
           spawnProcess = null;
         }
 
-        spawnProcess = spawn(String(electronBin), ['.']);
+        if (process.platform === 'win32') {
+          spawnProcess = spawn(String(electronBin), ['.']);
+        } else {
+          spawnProcess = spawn('electron', ['.']);
+        }
 
         spawnProcess.stdout.on(
           'data',
