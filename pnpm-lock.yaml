@@ -70,10 +70,7 @@ importers:
       native-addon: file:packages/native-addon
 
   packages/native-addon:
-    specifiers:
-      cargo-cp-artifact: ^0.1.6
-    devDependencies:
-      cargo-cp-artifact: 0.1.6
+    specifiers: {}
 
   packages/preload:
     specifiers: {}
@@ -883,11 +880,6 @@ packages:
   /camelcase/6.3.0:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
-    dev: true
-
-  /cargo-cp-artifact/0.1.6:
-    resolution: {integrity: sha512-CQw0doK/aaF7j041666XzuilHxqMxaKkn+I5vmBsd8SAwS0cO5CqVEVp0xJwOKstyqWZ6WK4Ww3O6p26x/Goyg==}
-    hasBin: true
     dev: true
 
   /chalk/4.1.2:
