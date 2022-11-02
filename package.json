@@ -24,8 +24,6 @@
   "scripts": {
     "dev": "echo \"Please execute node scripts/dev.js instead\"",
     "build:electron": "cross-env MODE=production node scripts/build.js",
-    "build:addon": "cd packages/native-addon && pnpm run build-release",
-    "build": "pnpm run build:addon && pnpm i && pnpm run build:electron",
     "compile": "electron-builder",
     "lint": "eslint . --ext js,ts,svelte",
     "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
