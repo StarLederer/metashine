@@ -1,7 +1,5 @@
 # Metashine contribution guide
 
-A little quirky. Will fix soon.
-
 ## Development
 
 1. Enter development environment `nix develop` or make sure node 16 npm 8 and rust 1.62 are installed.
