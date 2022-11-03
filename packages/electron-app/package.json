@@ -12,24 +12,28 @@
   "license": "MIT",
   "keywords": [
     "mp3",
+    "id3",
+    "metadata",
     "tag",
     "editor",
+    "gui",
     "application"
   ],
   "engines": {
-    "node": ">=v16.13",
-    "pnpm": ">=7.1"
+    "node": ">=16",
+    "npm": ">=8"
   },
   "main": "packages/main/dist/index.js",
   "scripts": {
-    "dev": "echo \"Please execute node scripts/dev.js instead\"",
-    "build:electron": "cross-env MODE=production node scripts/build.js",
+    "dev": "node scripts/dev.js",
+    "build": "cross-env MODE=production node scripts/build.js",
+    "preview": "electron .",
     "compile": "electron-builder",
     "lint": "eslint . --ext js,ts,svelte",
     "typecheck-main": "tsc --noEmit -p packages/main/tsconfig.json",
     "typecheck-preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck-renderer": "svelte-check --tsconfig packages/renderer/tsconfig.json",
-    "typecheck": "pnpm run typecheck-main && pnpm run typecheck-preload && pnpm run typecheck-renderer"
+    "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
   },
   "build": {
     "appId": "eu.hermanlederer.metashine",
@@ -88,6 +92,8 @@
     "vite": "^2.9.13"
   },
   "dependencies": {
+    "native-addon": "file:../native-addon",
+    "electron-updater": "4.6.2",
     "soundcloud.ts": "^0.4.6",
     "spotify-api.js": "^9.2.1"
   }

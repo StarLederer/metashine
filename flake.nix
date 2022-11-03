@@ -14,7 +14,6 @@
         devShell = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             nodejs-16_x
-            nodePackages.pnpm
             electron_15
           ];
 

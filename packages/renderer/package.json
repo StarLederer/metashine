@@ -1,6 +1,0 @@
-{
-  "name": "@metashine/renderer",
-  "dependencies": {
-    "native-addon": "file:../native-addon"
-  }
-}

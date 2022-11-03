@@ -1,6 +1,0 @@
-{
-  "name": "@metashine/common",
-  "dependencies": {
-    "native-addon": "file:../native-addon"
-  }
-}
