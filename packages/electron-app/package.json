@@ -3,11 +3,11 @@
   "description": "Music meta tag editor",
   "version": "3.0.0-rc.1",
   "private": true,
-  "repository": "github:HermanLederer/metashine",
+  "repository": "github:StarLederer/metashine",
   "author": {
-    "name": "Herman Lederer",
+    "name": "Star Lederer",
     "email": "germans.lederers@gmail.com",
-    "url": "https://hermanlederer.github.io/"
+    "url": "https://starlederer.github.io/"
   },
   "license": "MIT",
   "keywords": [
@@ -36,7 +36,7 @@
     "typecheck": "npm run typecheck-main && npm run typecheck-preload && npm run typecheck-renderer"
   },
   "build": {
-    "appId": "eu.hermanlederer.metashine",
+    "appId": "eu.starlederer.metashine",
     "productName": "Metashine",
     "directories": {
       "buildResources": "buildResources"
