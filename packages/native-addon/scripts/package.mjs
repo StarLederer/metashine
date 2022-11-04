@@ -29,10 +29,15 @@ const print = (message, type) => {
   let rustBuildPath;
 
   const knownArtifactPaths = [
-    '../result/lib/libnative_addon.so', // nix targeting linux
-    '../result/lib/native_addon.dll', // nix targeting windows
-    '../target/x86_64-unknown-linux-gnu/release/libnative_addon.so', // raw cargo targeting linux
-    '../target/x86_64-pc-windows-gnu/release/native_addon.dll', // raw cargo targeting windows
+    // nix
+    '../result/lib/libnative_addon.so',
+    '../result/lib/native_addon.dll',
+
+    // raw cargo
+    '../target/release/libnative_addon.so',
+    '../target/release/native_addon.dll',
+    '../target/x86_64-unknown-linux-gnu/release/libnative_addon.so',
+    '../target/x86_64-pc-windows-gnu/release/native_addon.dll',
   ];
 
   await Promise.all(knownArtifactPaths.map((path) => new Promise(
