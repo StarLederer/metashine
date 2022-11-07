@@ -1,0 +1,12 @@
+{
+  "name": "@metashine/native-addon",
+  "main": "dist/index.node",
+  "types": "@types/index.d.ts",
+  "scripts": {
+    "build:no-nix:linux": "cargo build --release && node scripts/package.js",
+    "build:no-nix:windows": "cargo build --release && node scripts/package.js",
+    "build:linux": "nix build .#x86_64-unknown-linux-gnu && node scripts/package.js",
+    "build:windows": "nix build .#x86_64-unknown-linux-gnu && node scripts/package.js",
+    "test": "cargo test"
+  }
+}
