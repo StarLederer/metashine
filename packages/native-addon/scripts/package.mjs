@@ -78,9 +78,4 @@ const print = (message, type) => {
   );
 
   print('Artifact copied!', 'success');
-
-  await writeFile(
-    resolve('../dist/index.js'),
-    'export * from \'./index.node\';',
-  );
 })();
