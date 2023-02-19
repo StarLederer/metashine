@@ -11,3 +11,11 @@ Open source application that helps you find, write and format audio and video me
 - User-currated sraping of Spotify and Soundloud for tags
 - ID3 tags
 - Vorbis tags (coming soon)
+
+## Sponsors
+
+<p align="center">
+  <a href="https://starlederer.github.io/sponsors/sponsors.svg">
+    <img src="https://starlederer.github.io/sponsors/sponsors.svg"/>
+  </a>
+</p>
