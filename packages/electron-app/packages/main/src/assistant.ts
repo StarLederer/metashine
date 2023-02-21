@@ -14,7 +14,7 @@ function setUpAssistantProcess(): void {
     refreshToken: true,
     token: {
       clientID: 'e2323c89d0964354b86641fb730ef675',
-      clientSecret: '2e88b4690b194326aab451ea3d2e5ff2',
+      clientSecret: '6749d93ffa784ac1a6ff0701fc0058bf',
       // not sure if i was supposed to keep these a secret, but here you go world
     },
   });
